@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./docs",
+    "sourceMap": true,
+    "jsxFactory": "h",
+    "baseUrl": "./src",
+    "paths": {
+      "~*": ["./*"]
+    },
+    "include": ["src/**/*"],
+    "jsx": "react"
+  }
+}
