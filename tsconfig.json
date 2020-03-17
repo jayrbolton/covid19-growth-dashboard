@@ -7,7 +7,8 @@
     "paths": {
       "~*": ["./*"]
     },
-    "include": ["src/**/*"],
-    "jsx": "react"
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true
   }
 }
