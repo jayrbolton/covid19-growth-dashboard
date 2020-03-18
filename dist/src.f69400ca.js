@@ -487,7 +487,13 @@ module.exports = {
   "deaths": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv",
   "recovered": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv",
   "delimiter": ",",
-  "dateRegex": "(\\d+)\\/(\\d+)\\/(\\d+)"
+  "dateRegex": "(\\d+)\\/(\\d+)\\/(\\d+)",
+  "provinceIdx": 0,
+  "countryIdx": 1,
+  "latIdx": 2,
+  "lngIdx": 3,
+  "seriesIdx": 4,
+  "categoryKeys": ["confirmed", "deaths", "recovered"]
 };
 },{}],"utils/fetch-data.ts":[function(require,module,exports) {
 "use strict";
@@ -660,14 +666,13 @@ var LS_CACHE_PREFIX = 'cache_';
 var LS_CONFIRMED_KEY = 'cachedConfirmed';
 var LS_DEATHS_KEY = 'cachedDeaths';
 var LS_RECOVERED_KEY = 'cachedRecovered';
-var KEYS = ['confirmed', 'deaths', 'recovered'];
 
 function fetchData() {
   return __awaiter(this, void 0, void 0, function () {
-    var lastFetch, date, today, ret_1, validCache, _i, KEYS_1, key, ret, _a, KEYS_2, key, resp, data;
+    var lastFetch, date, today, ret_1, validCache, _i, _a, key, ret, _b, _c, key, resp, data;
 
-    return __generator(this, function (_b) {
-      switch (_b.label) {
+    return __generator(this, function (_d) {
+      switch (_d.label) {
         case 0:
           lastFetch = window.localStorage.getItem(LS_DATE_KEY);
           date = new Date();
@@ -678,8 +683,8 @@ function fetchData() {
               ret_1 = {};
               validCache = true;
 
-              for (_i = 0, KEYS_1 = KEYS; _i < KEYS_1.length; _i++) {
-                key = KEYS_1[_i];
+              for (_i = 0, _a = dataSources.categoryKeys; _i < _a.length; _i++) {
+                key = _a[_i];
                 ret_1[key] = localStorage.getItem(LS_CACHE_PREFIX + key);
 
                 if (!ret_1[key]) {
@@ -703,26 +708,26 @@ function fetchData() {
 
           window.localStorage.setItem(LS_DATE_KEY, today);
           ret = {};
-          _a = 0, KEYS_2 = KEYS;
-          _b.label = 1;
+          _b = 0, _c = dataSources.categoryKeys;
+          _d.label = 1;
 
         case 1:
-          if (!(_a < KEYS_2.length)) return [3
+          if (!(_b < _c.length)) return [3
           /*break*/
           , 5];
-          key = KEYS_2[_a];
+          key = _c[_b];
           return [4
           /*yield*/
-          , fetch(dataSources.confirmed)];
+          , fetch(dataSources[key])];
 
         case 2:
-          resp = _b.sent();
+          resp = _d.sent();
           return [4
           /*yield*/
           , resp.text()];
 
         case 3:
-          data = _b.sent();
+          data = _d.sent();
 
           if (!resp.ok) {
             console.error("Error fetching data from Github with the following response:");
@@ -732,10 +737,10 @@ function fetchData() {
 
           ret[key] = data;
           window.localStorage.setItem(LS_CACHE_PREFIX + key, data);
-          _b.label = 4;
+          _d.label = 4;
 
         case 4:
-          _a++;
+          _b++;
           return [3
           /*break*/
           , 1];
@@ -754,8 +759,8 @@ exports.fetchData = fetchData;
 function clearCache() {
   window.localStorage.removeItem(LS_DATE_KEY);
 
-  for (var _i = 0, KEYS_3 = KEYS; _i < KEYS_3.length; _i++) {
-    var key = KEYS_3[_i];
+  for (var _i = 0, _a = dataSources.categoryKeys; _i < _a.length; _i++) {
+    var key = _a[_i];
     window.localStorage.removeItem(LS_CACHE_PREFIX + key);
   }
 }
@@ -7646,42 +7651,81 @@ var dataSources = __importStar(require("~constants/data-sources.json"));
 
 var parser = csv_parse_1.default({
   delimiter: dataSources.delimiter
-}); // TODO sort time series by date
-// TODO combine the three time series (confirmed, deaths, recovered) into one array
-// Convert a blob of csv text into an array of objects with some normalization on dates, etc
+}); // Convert a blob of csv text into an array of objects with some normalization on dates, etc
 
 function normalizeData(sourceData) {
-  var ret = {};
+  var dates = null; // All date columns, values parsed from the headers
+
+  var agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
+
+  console.log(sourceData);
 
   var _loop_1 = function _loop_1(key) {
     var text = sourceData[key];
     var lines = text.split('\n');
-    var headers = rowToArray(lines[0]);
-    var rows = lines.slice(1).map(function (row) {
-      return parseRow(row, headers);
-    }).map(normalizeDates);
-    ret[key] = rows;
+
+    if (!dates) {
+      var headers = rowToArray(lines[0]);
+      dates = parseDatesFromHeaders(headers);
+    }
+
+    lines.slice(1).forEach(function (rowStr) {
+      var row = rowToArray(rowStr);
+      var id = String(row[dataSources.latIdx]) + ',' + String(row[dataSources.lngIdx]);
+
+      if (!(id in agg)) {
+        agg[id] = {
+          province: row[dataSources.provinceIdx],
+          country: row[dataSources.countryIdx],
+          totals: {},
+          currentTotals: {}
+        };
+
+        for (var _i = 0, _a = dataSources.categoryKeys; _i < _a.length; _i++) {
+          var key_1 = _a[_i];
+          agg[id].totals[key_1] = [];
+          agg[id].currentTotals[key_1] = 0;
+        }
+      }
+
+      var ts = row.slice(dataSources.seriesIdx); // console.log(`setting totals for id ${id} with key ${key} to ${ts}`)
+
+      agg[id].totals[key] = ts;
+      agg[id].currentTotals[key] = ts[ts.length - 1];
+    });
   };
 
   for (var key in sourceData) {
     _loop_1(key);
+  } // Convert the aggregation object into an array
+
+
+  var ret = [];
+
+  for (var key in agg) {
+    ret.push(agg[key]);
   }
 
   return ret;
 }
 
-exports.normalizeData = normalizeData; // Parse a string into a number, if it is a number. Otherwise leave it.
+exports.normalizeData = normalizeData; // Get the array of dates as [year, month, day] triples
 
-function parseColumnVal(val) {
-  val = val.trim();
+function parseDatesFromHeaders(headers) {
+  var regex = new RegExp(dataSources.dateRegex);
+  var ret = [];
 
-  if (val === "") {
-    return null;
-  } else if (isNaN(val)) {
-    return val;
-  } else {
-    return Number(val);
+  for (var _i = 0, _a = headers.slice(dataSources.seriesIdx); _i < _a.length; _i++) {
+    var str = _a[_i];
+    var matches = str.match(regex); // Date keys have the US-based format "month/day/year" such as "1/20/20"
+
+    var month = Number(matches[1]);
+    var day = Number(matches[2]);
+    var year = 2000 + Number(matches[3]);
+    ret.push([year, month, day]);
   }
+
+  return ret;
 } // Parse a CSV row into an array of strings, taking quotes into account.
 // It would be better to use a library. But I got frustrated looking at the libraries on npm and decided to write this simple parser.
 
@@ -7713,39 +7757,116 @@ function rowToArray(row) {
   }
 
   return vals;
-} // Convert a row into an object where the keys are the headers
+} // Parse a string into a number, if it is a number. Otherwise leave it.
 
 
-function parseRow(row, headers) {
-  var arr = rowToArray(row);
-  var ret = {};
-  headers.forEach(function (key, idx) {
-    ret[key] = arr[idx];
-  });
-  return ret;
-} // Convert all the date keys (such as {"2/22/2020": 123}) into an array of pairs of normalized dates [["2020-02-22", 123]])
+function parseColumnVal(val) {
+  val = val.trim();
 
+  if (val === "") {
+    return null;
+  } else if (isNaN(val)) {
+    return val;
+  } else {
+    return Number(val);
+  }
+}
+},{"csv-parse":"../node_modules/csv-parse/lib/index.js","~constants/data-sources.json":"constants/data-sources.json"}],"components/vertical-bars.tsx":[function(require,module,exports) {
+"use strict";
 
-function normalizeDates(data) {
-  var re = new RegExp(dataSources.dateRegex);
-  var timeSeries = [];
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
 
-  for (var key in data) {
-    var matches = key.match(re); // Date keys have the US-based format "month/day/year" such as "1/20/20"
+    return _extendStatics(d, b);
+  };
 
-    if (matches && matches.length === 4) {
-      var month = Number(matches[1]);
-      var day = Number(matches[2]);
-      var year = 2000 + Number(matches[3]);
-      timeSeries.push([[year, month, day], data[key]]);
-      delete data[key];
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
     }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var preact_1 = require("preact");
+
+var VerticalBars =
+/** @class */
+function (_super) {
+  __extends(VerticalBars, _super);
+
+  function VerticalBars(props) {
+    var _this = _super.call(this, props) || this;
+
+    _this.state = {};
+    return _this;
   }
 
-  data.ts = timeSeries;
+  VerticalBars.prototype.rowView = function (row) {
+    return preact_1.h("div", null, preact_1.h("span", null, row.province), preact_1.h("span", null, row.country), preact_1.h("span", null, row.currentTotals.confirmed), preact_1.h("span", null, row.currentTotals.deaths), preact_1.h("span", null, row.currentTotals.recovered));
+  };
+
+  VerticalBars.prototype.render = function () {
+    if (this.props.loading || !this.props.data) {
+      return preact_1.h("p", null, "Loading data..");
+    }
+
+    return preact_1.h(preact_1.Fragment, null, this.props.data.map(this.rowView));
+  };
+
+  return VerticalBars;
+}(preact_1.Component);
+
+exports.VerticalBars = VerticalBars;
+},{"preact":"../node_modules/preact/dist/preact.module.js"}],"utils/sort-data.ts":[function(require,module,exports) {
+"use strict";
+/*
+ * Sorting functions
+ */
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+}); // Sort all entries by the current total confirmed cases
+
+function sortByTotalConfirmed(data, dir) {
+  if (dir === void 0) {
+    dir = 'desc';
+  } // Data is sorted in place without cloning
+
+
+  data.sort(function (rowA, rowB) {
+    var confirmedA = rowA.totals.confirmed[rowA.totals.confirmed.length - 1];
+    var confirmedB = rowB.totals.confirmed[rowB.totals.confirmed.length - 1];
+
+    if (confirmedA < confirmedB) {
+      return dir === 'asc' ? -1 : 1;
+    } else if (confirmedA > confirmedB) {
+      return dir === 'asc' ? 1 : -1;
+    } else {
+      return 0;
+    }
+  });
   return data;
 }
-},{"csv-parse":"../node_modules/csv-parse/lib/index.js","~constants/data-sources.json":"constants/data-sources.json"}],"components/app.tsx":[function(require,module,exports) {
+
+exports.sortByTotalConfirmed = sortByTotalConfirmed;
+},{}],"components/app.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -7784,6 +7905,10 @@ var fetch_data_1 = require("../utils/fetch-data");
 
 var normalize_data_1 = require("../utils/normalize-data");
 
+var vertical_bars_1 = require("./vertical-bars");
+
+var sort_data_1 = require("../utils/sort-data");
+
 var App =
 /** @class */
 function (_super) {
@@ -7801,14 +7926,14 @@ function (_super) {
   App.prototype.componentDidMount = function () {
     var _this = this;
 
-    fetch_data_1.fetchData().then(function (data) {
-      return normalize_data_1.normalizeData(data);
-    }).then(function (data) {
-      console.log(data);
+    fetch_data_1.fetchData().then(normalize_data_1.normalizeData).then(function (sourceData) {
+      var displayData = sort_data_1.sortByTotalConfirmed(sourceData);
+      console.log(displayData);
 
       _this.setState({
         loading: false,
-        data: data
+        sourceData: sourceData,
+        displayData: displayData
       });
     });
   };
@@ -7818,14 +7943,17 @@ function (_super) {
       return preact_1.h("p", null, "Loading data..");
     }
 
-    return preact_1.h("p", null, "Data is loaded");
+    return preact_1.h(preact_1.Fragment, null, preact_1.h(vertical_bars_1.VerticalBars, {
+      data: this.state.displayData,
+      loading: this.state.loading
+    }));
   };
 
   return App;
 }(preact_1.Component);
 
 exports.App = App;
-},{"preact":"../node_modules/preact/dist/preact.module.js","../utils/fetch-data":"utils/fetch-data.ts","../utils/normalize-data":"utils/normalize-data.ts"}],"index.tsx":[function(require,module,exports) {
+},{"preact":"../node_modules/preact/dist/preact.module.js","../utils/fetch-data":"utils/fetch-data.ts","../utils/normalize-data":"utils/normalize-data.ts","./vertical-bars":"components/vertical-bars.tsx","../utils/sort-data":"utils/sort-data.ts"}],"index.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7865,7 +7993,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42657" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38453" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

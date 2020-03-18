@@ -1,6 +1,8 @@
-import {h, Component} from 'preact';
+import {h, Component, Fragment} from 'preact';
 import {fetchData} from '../utils/fetch-data';
 import {normalizeData} from '../utils/normalize-data';
+import {VerticalBars} from './vertical-bars';
+import {sortByTotalConfirmed} from '../utils/sort-data';
 
 
 interface Props {
@@ -8,7 +10,8 @@ interface Props {
 
 interface State {
     loading: boolean;
-    data?: any;
+    sourceData?: any;
+    displayData?: any;
 }
 
 
@@ -23,12 +26,11 @@ export class App extends Component<Props, State> {
 
     componentDidMount() {
         fetchData()
-            .then((data) => {
-                return normalizeData(data);
-            })
-            .then((data) => {
-                console.log(data);
-                this.setState({loading: false, data});
+            .then(normalizeData)
+            .then((sourceData) => {
+                const displayData = sortByTotalConfirmed(sourceData);
+                console.log(displayData);
+                this.setState({loading: false, sourceData, displayData});
             });
     }
 
@@ -36,6 +38,10 @@ export class App extends Component<Props, State> {
         if (this.state.loading) {
             return <p>Loading data..</p>
         }
-        return <p>Data is loaded</p>;
+        return (
+            <Fragment>
+                <VerticalBars data={this.state.displayData} loading={this.state.loading} />
+            </Fragment>
+        );
     }
 }

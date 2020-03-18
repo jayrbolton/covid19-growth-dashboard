@@ -6,34 +6,60 @@ import * as dataSources from '~constants/data-sources.json';
 
 const parser = parse({delimiter: dataSources.delimiter});
 
-// TODO sort time series by date
-// TODO combine the three time series (confirmed, deaths, recovered) into one array
-
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
 export function normalizeData(sourceData) {
-    const ret = {};
+    let dates = null; // All date columns, values parsed from the headers
+    let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
+    console.log(sourceData);
     for (const key in sourceData) {
         const text = sourceData[key];
         const lines = text.split('\n');
-        const headers = rowToArray(lines[0]);
-        const rows = lines.slice(1)
-            .map((row) => parseRow(row, headers))
-            .map(normalizeDates);
-        ret[key] = rows;
+        if (!dates) {
+            const headers = rowToArray(lines[0]);
+            dates = parseDatesFromHeaders(headers);
+        }
+        lines.slice(1).forEach(rowStr => {
+            const row = rowToArray(rowStr);
+            const id = String(row[dataSources.latIdx]) + ',' + String(row[dataSources.lngIdx]);
+            if (!(id in agg)) {
+                agg[id] = {
+                    province: row[dataSources.provinceIdx],
+                    country: row[dataSources.countryIdx],
+                    totals: {},
+                    currentTotals: {}
+                };
+                for (const key of dataSources.categoryKeys) {
+                    agg[id].totals[key] = [];
+                    agg[id].currentTotals[key] = 0;
+                }
+            }
+            const ts = row.slice(dataSources.seriesIdx);
+            // console.log(`setting totals for id ${id} with key ${key} to ${ts}`)
+            agg[id].totals[key] = ts;
+            agg[id].currentTotals[key] = ts[ts.length - 1];
+        })
+    }
+    // Convert the aggregation object into an array
+    const ret = [];
+    for (const key in agg) {
+        ret.push(agg[key]);
     }
     return ret;
 }
 
-// Parse a string into a number, if it is a number. Otherwise leave it.
-function parseColumnVal(val) {
-    val = val.trim();
-    if (val === "") {
-        return null;
-    } else if (isNaN(val)) {
-        return val;
-    } else {
-        return Number(val);
+// Get the array of dates as [year, month, day] triples
+function parseDatesFromHeaders (headers) {
+    const regex = new RegExp(dataSources.dateRegex);
+    const ret = [];
+    for (const str of headers.slice(dataSources.seriesIdx)) {
+        const matches = str.match(regex);
+        // Date keys have the US-based format "month/day/year" such as "1/20/20"
+        const month = Number(matches[1]);
+        const day = Number(matches[2]);
+        const year = 2000 + Number(matches[3]);
+        ret.push([year, month, day]);
     }
+    return ret;
 }
 
 // Parse a CSV row into an array of strings, taking quotes into account.
@@ -61,31 +87,14 @@ function rowToArray(row) {
     return vals;
 }
 
-// Convert a row into an object where the keys are the headers
-function parseRow(row, headers) {
-    const arr = rowToArray(row);
-    const ret = {};
-    headers.forEach((key, idx) => {
-        ret[key] = arr[idx];
-    });
-    return ret;
-}
-
-// Convert all the date keys (such as {"2/22/2020": 123}) into an array of pairs of normalized dates [["2020-02-22", 123]])
-function normalizeDates(data) {
-    const re = new RegExp(dataSources.dateRegex);
-    const timeSeries = [];
-    for (const key in data) {
-        const matches = key.match(re);
-        // Date keys have the US-based format "month/day/year" such as "1/20/20"
-        if (matches && matches.length === 4) {
-            const month = Number(matches[1]);
-            const day = Number(matches[2]);
-            const year = 2000 + Number(matches[3]);
-            timeSeries.push([[year, month, day], data[key]]);
-            delete data[key];
-        }
+// Parse a string into a number, if it is a number. Otherwise leave it.
+function parseColumnVal(val) {
+    val = val.trim();
+    if (val === "") {
+        return null;
+    } else if (isNaN(val)) {
+        return val;
+    } else {
+        return Number(val);
     }
-    data.ts = timeSeries;
-    return data;
 }

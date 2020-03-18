@@ -12,7 +12,6 @@ const LS_CACHE_PREFIX = 'cache_';
 const LS_CONFIRMED_KEY = 'cachedConfirmed';
 const LS_DEATHS_KEY = 'cachedDeaths';
 const LS_RECOVERED_KEY = 'cachedRecovered';
-const KEYS = ['confirmed', 'deaths', 'recovered'];
 
 
 export async function fetchData() {
@@ -25,7 +24,7 @@ export async function fetchData() {
             // Fetch the date from the cache
             const ret = {};
             let validCache = true;
-            for (const key of KEYS) {
+            for (const key of dataSources.categoryKeys) {
                 ret[key] = localStorage.getItem(LS_CACHE_PREFIX + key);
                 if (!ret[key]) {
                     validCache = false;
@@ -44,8 +43,8 @@ export async function fetchData() {
     // Fetch the data from the Github repo and cache it
     window.localStorage.setItem(LS_DATE_KEY, today);
     const ret = {};
-    for (const key of KEYS) {
-        const resp = await fetch(dataSources.confirmed);
+    for (const key of dataSources.categoryKeys) {
+        const resp = await fetch(dataSources[key]);
         const data = await resp.text();
         if (!resp.ok) {
             console.error("Error fetching data from Github with the following response:");
@@ -60,7 +59,7 @@ export async function fetchData() {
 
 function clearCache () {
     window.localStorage.removeItem(LS_DATE_KEY);
-    for (const key of KEYS) {
+    for (const key of dataSources.categoryKeys) {
         window.localStorage.removeItem(LS_CACHE_PREFIX + key);
     }
 }
