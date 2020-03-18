@@ -10,6 +10,8 @@ const parser = parse({delimiter: dataSources.delimiter});
 export function normalizeData(sourceData) {
     let dates = null; // All date columns, values parsed from the headers
     let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
+    // Largest totals for creating bars
+    let maxTotal = 0;
     console.log(sourceData);
     for (const key in sourceData) {
         const text = sourceData[key];
@@ -36,15 +38,23 @@ export function normalizeData(sourceData) {
             const ts = row.slice(dataSources.seriesIdx);
             // console.log(`setting totals for id ${id} with key ${key} to ${ts}`)
             agg[id].totals[key] = ts;
-            agg[id].currentTotals[key] = ts[ts.length - 1];
+            const current = ts[ts.length - 1];
+            agg[id].currentTotals[key] = current;
+            if (current > maxTotal) {
+                maxTotal = current;
+            }
         })
     }
     // Convert the aggregation object into an array
-    const ret = [];
+    const rows = [];
     for (const key in agg) {
-        ret.push(agg[key]);
+        rows.push(agg[key]);
     }
-    return ret;
+    return {
+        maxTotal: 200000,
+        dates: dates,
+        rows: rows
+    };
 }
 
 // Get the array of dates as [year, month, day] triples

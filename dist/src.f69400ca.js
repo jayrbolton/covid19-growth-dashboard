@@ -117,7 +117,80 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../node_modules/preact/dist/preact.module.js":[function(require,module,exports) {
+})({"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+
+  return bundleURL;
+}
+
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+
+  return '/';
+}
+
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)\/[^/]+$/, '$1') + '/';
+}
+
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+
+function updateLink(link) {
+  var newLink = link.cloneNode();
+
+  newLink.onload = function () {
+    link.remove();
+  };
+
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+
+var cssTimeout = null;
+
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+
+    cssTimeout = null;
+  }, 50);
+}
+
+module.exports = reloadCSS;
+},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/tachyons/css/tachyons.css":[function(require,module,exports) {
+
+        var reloadCSS = require('_css_loader');
+        module.hot.dispose(reloadCSS);
+        module.hot.accept(reloadCSS);
+      
+},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/preact/dist/preact.module.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7657,7 +7730,9 @@ function normalizeData(sourceData) {
   var dates = null; // All date columns, values parsed from the headers
 
   var agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
+  // Largest totals for creating bars
 
+  var maxTotal = 0;
   console.log(sourceData);
 
   var _loop_1 = function _loop_1(key) {
@@ -7691,7 +7766,12 @@ function normalizeData(sourceData) {
       var ts = row.slice(dataSources.seriesIdx); // console.log(`setting totals for id ${id} with key ${key} to ${ts}`)
 
       agg[id].totals[key] = ts;
-      agg[id].currentTotals[key] = ts[ts.length - 1];
+      var current = ts[ts.length - 1];
+      agg[id].currentTotals[key] = current;
+
+      if (current > maxTotal) {
+        maxTotal = current;
+      }
     });
   };
 
@@ -7700,13 +7780,17 @@ function normalizeData(sourceData) {
   } // Convert the aggregation object into an array
 
 
-  var ret = [];
+  var rows = [];
 
   for (var key in agg) {
-    ret.push(agg[key]);
+    rows.push(agg[key]);
   }
 
-  return ret;
+  return {
+    maxTotal: 200000,
+    dates: dates,
+    rows: rows
+  };
 }
 
 exports.normalizeData = normalizeData; // Get the array of dates as [year, month, day] triples
@@ -7771,7 +7855,51 @@ function parseColumnVal(val) {
     return Number(val);
   }
 }
-},{"csv-parse":"../node_modules/csv-parse/lib/index.js","~constants/data-sources.json":"constants/data-sources.json"}],"components/vertical-bars.tsx":[function(require,module,exports) {
+},{"csv-parse":"../node_modules/csv-parse/lib/index.js","~constants/data-sources.json":"constants/data-sources.json"}],"utils/sort-data.ts":[function(require,module,exports) {
+"use strict";
+/*
+ * Sorting functions
+ */
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+}); // Sort all entries by the current total confirmed cases
+
+function sortByTotalConfirmed(data, dir) {
+  if (dir === void 0) {
+    dir = 'desc';
+  } // Data is sorted in place without cloning
+
+
+  data.rows.sort(function (rowA, rowB) {
+    var confirmedA = rowA.totals.confirmed[rowA.totals.confirmed.length - 1];
+    var confirmedB = rowB.totals.confirmed[rowB.totals.confirmed.length - 1];
+
+    if (confirmedA < confirmedB) {
+      return dir === 'asc' ? -1 : 1;
+    } else if (confirmedA > confirmedB) {
+      return dir === 'asc' ? 1 : -1;
+    } else {
+      return 0;
+    }
+  });
+  return data;
+}
+
+exports.sortByTotalConfirmed = sortByTotalConfirmed;
+},{}],"utils/formatting.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+}); // Pretty-print a number. eg. 123456 -> 123,456
+
+function formatNumber(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+exports.formatNumber = formatNumber;
+},{}],"components/vertical-bars.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -7806,6 +7934,16 @@ Object.defineProperty(exports, "__esModule", {
 
 var preact_1 = require("preact");
 
+var formatting_1 = require("../utils/formatting"); // Purposes of these sections:
+// - show current state
+//   - show total cases, deaths, recovered
+//   - compare the above values (bars)
+// - show growth rate
+//    - average new cases all time
+//    - average new cases this week
+//    - horizontal bar chart over time of total cases
+
+
 var VerticalBars =
 /** @class */
 function (_super) {
@@ -7818,55 +7956,188 @@ function (_super) {
     return _this;
   }
 
-  VerticalBars.prototype.rowView = function (row) {
-    return preact_1.h("div", null, preact_1.h("span", null, row.province), preact_1.h("span", null, row.country), preact_1.h("span", null, row.currentTotals.confirmed), preact_1.h("span", null, row.currentTotals.deaths), preact_1.h("span", null, row.currentTotals.recovered));
+  VerticalBars.prototype.rowView = function (row, data) {
+    var max = row.currentTotals.confirmed;
+    var _a = row.currentTotals,
+        confirmed = _a.confirmed,
+        deaths = _a.deaths,
+        recovered = _a.recovered; // XXX Maybe precompute all this upfront rather than on render
+
+    var deathsPercentage = '0%';
+    var recoveredPercentage = '0%';
+
+    if (confirmed > 0) {
+      deathsPercentage = String(Math.round(deaths * 1000 / confirmed) / 10) + '%';
+      recoveredPercentage = String(Math.round(recovered * 1000 / confirmed) / 10) + '%';
+    }
+
+    return preact_1.h("div", {
+      className: 'bb b--white-30 pb3 mb3'
+    }, preact_1.h("div", {
+      className: 'w-100 flex mb2'
+    }, preact_1.h("div", {
+      className: 'f4 w-25'
+    }, row.province && row.province !== row.country ? row.province + ', ' : '', preact_1.h("span", {
+      className: 'b'
+    }, row.country)), preact_1.h("div", {
+      className: 'w-75 flex'
+    }, preact_1.h("span", {
+      className: 'w-50'
+    }, preact_1.h("span", {
+      className: 'white-80'
+    }, "Average new cases per day:"), " 123"), preact_1.h("span", {
+      className: 'w-50'
+    }, preact_1.h("span", {
+      className: 'white-80'
+    }, "Average new cases last 7 days:"), " 123"))), preact_1.h("div", {
+      className: 'w-100 flex'
+    }, preact_1.h("div", {
+      className: 'w-25 pr3'
+    }, preact_1.h("div", {
+      className: 'flex items-center'
+    }, preact_1.h("span", {
+      style: {
+        width: '37%'
+      },
+      className: 'white-90'
+    }, "Confirmed:"), preact_1.h("span", {
+      className: 'dib',
+      style: {
+        width: '63%'
+      }
+    }, preact_1.h("span", {
+      className: 'dib nowrap bg-dark-blue pa1 b',
+      style: {
+        width: '100%'
+      }
+    }, formatting_1.formatNumber(confirmed)))), preact_1.h("div", {
+      className: 'flex items-center'
+    }, preact_1.h("span", {
+      style: {
+        width: '37%'
+      },
+      className: 'white-90'
+    }, "Recovered:"), preact_1.h("span", {
+      className: 'dib',
+      style: {
+        width: '63%'
+      }
+    }, preact_1.h("span", {
+      className: 'dib nowrap bg-dark-green pa1 b',
+      style: {
+        width: recoveredPercentage
+      }
+    }, formatting_1.formatNumber(recovered), " ", preact_1.h("span", {
+      className: 'f6 white-80'
+    }, "(", recoveredPercentage, ")")))), preact_1.h("div", {
+      className: 'flex items-center'
+    }, preact_1.h("span", {
+      style: {
+        width: '37%'
+      },
+      className: 'white-90'
+    }, "Deaths:"), preact_1.h("span", {
+      className: 'dib',
+      style: {
+        width: '63%'
+      }
+    }, preact_1.h("span", {
+      className: 'dib nowrap pa1 b',
+      style: {
+        width: deathsPercentage,
+        background: "#e7040fad"
+      }
+    }, formatting_1.formatNumber(deaths), " ", preact_1.h("span", {
+      className: 'f6 white-80'
+    }, "(", deathsPercentage, ")"))))), preact_1.h("div", {
+      className: 'w-75'
+    }, preact_1.h("div", null, preact_1.h("span", {
+      className: 'dib mt4'
+    }, "Bar chart time series goes here")))));
   };
 
   VerticalBars.prototype.render = function () {
+    var _this = this;
+
     if (this.props.loading || !this.props.data) {
       return preact_1.h("p", null, "Loading data..");
     }
 
-    return preact_1.h(preact_1.Fragment, null, this.props.data.map(this.rowView));
+    return preact_1.h(preact_1.Fragment, null, this.props.data.rows.map(function (row) {
+      return _this.rowView(row, _this.props.data);
+    }));
   };
 
   return VerticalBars;
 }(preact_1.Component);
 
 exports.VerticalBars = VerticalBars;
-},{"preact":"../node_modules/preact/dist/preact.module.js"}],"utils/sort-data.ts":[function(require,module,exports) {
+},{"preact":"../node_modules/preact/dist/preact.module.js","../utils/formatting":"utils/formatting.ts"}],"components/filters-and-sorts.tsx":[function(require,module,exports) {
 "use strict";
-/*
- * Sorting functions
- */
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
-}); // Sort all entries by the current total confirmed cases
+});
 
-function sortByTotalConfirmed(data, dir) {
-  if (dir === void 0) {
-    dir = 'desc';
-  } // Data is sorted in place without cloning
+var preact_1 = require("preact");
 
+var FiltersAndSorts =
+/** @class */
+function (_super) {
+  __extends(FiltersAndSorts, _super);
 
-  data.sort(function (rowA, rowB) {
-    var confirmedA = rowA.totals.confirmed[rowA.totals.confirmed.length - 1];
-    var confirmedB = rowB.totals.confirmed[rowB.totals.confirmed.length - 1];
+  function FiltersAndSorts(props) {
+    var _this = _super.call(this, props) || this;
 
-    if (confirmedA < confirmedB) {
-      return dir === 'asc' ? -1 : 1;
-    } else if (confirmedA > confirmedB) {
-      return dir === 'asc' ? 1 : -1;
-    } else {
-      return 0;
+    _this.state = {};
+    return _this;
+  }
+
+  FiltersAndSorts.prototype.render = function () {
+    if (this.props.loading) {
+      return '';
     }
-  });
-  return data;
-}
 
-exports.sortByTotalConfirmed = sortByTotalConfirmed;
-},{}],"components/app.tsx":[function(require,module,exports) {
+    return preact_1.h(preact_1.Fragment, null, preact_1.h("div", {
+      className: 'bg-near-black pv2 bb bw2 mb3 b--gray',
+      style: {
+        top: 0,
+        position: 'sticky'
+      }
+    }, "Filtering and sorting controls go here."));
+  };
+
+  return FiltersAndSorts;
+}(preact_1.Component);
+
+exports.FiltersAndSorts = FiltersAndSorts;
+},{"preact":"../node_modules/preact/dist/preact.module.js"}],"components/app.tsx":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -7905,9 +8176,11 @@ var fetch_data_1 = require("../utils/fetch-data");
 
 var normalize_data_1 = require("../utils/normalize-data");
 
+var sort_data_1 = require("../utils/sort-data");
+
 var vertical_bars_1 = require("./vertical-bars");
 
-var sort_data_1 = require("../utils/sort-data");
+var filters_and_sorts_1 = require("./filters-and-sorts");
 
 var App =
 /** @class */
@@ -7943,29 +8216,39 @@ function (_super) {
       return preact_1.h("p", null, "Loading data..");
     }
 
-    return preact_1.h(preact_1.Fragment, null, preact_1.h(vertical_bars_1.VerticalBars, {
+    return preact_1.h("div", {
+      className: 'bg-near-black'
+    }, preact_1.h("div", {
+      className: 'mw8 center pa2 sans-serif white'
+    }, preact_1.h("h1", {
+      className: 'light-gray tc'
+    }, "COVID-19 Worldwide Growth Dashboard"), preact_1.h(filters_and_sorts_1.FiltersAndSorts, {
+      loading: this.state.loading
+    }), preact_1.h(vertical_bars_1.VerticalBars, {
       data: this.state.displayData,
       loading: this.state.loading
-    }));
+    })));
   };
 
   return App;
 }(preact_1.Component);
 
 exports.App = App;
-},{"preact":"../node_modules/preact/dist/preact.module.js","../utils/fetch-data":"utils/fetch-data.ts","../utils/normalize-data":"utils/normalize-data.ts","./vertical-bars":"components/vertical-bars.tsx","../utils/sort-data":"utils/sort-data.ts"}],"index.tsx":[function(require,module,exports) {
+},{"preact":"../node_modules/preact/dist/preact.module.js","../utils/fetch-data":"utils/fetch-data.ts","../utils/normalize-data":"utils/normalize-data.ts","../utils/sort-data":"utils/sort-data.ts","./vertical-bars":"components/vertical-bars.tsx","./filters-and-sorts":"components/filters-and-sorts.tsx"}],"index.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+require("tachyons/css/tachyons.css");
+
 var preact_1 = require("preact");
 
 var app_1 = require("./components/app");
 
 preact_1.render(preact_1.h(app_1.App, null), document.body);
-},{"preact":"../node_modules/preact/dist/preact.module.js","./components/app":"components/app.tsx"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"tachyons/css/tachyons.css":"../node_modules/tachyons/css/tachyons.css","preact":"../node_modules/preact/dist/preact.module.js","./components/app":"components/app.tsx"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
