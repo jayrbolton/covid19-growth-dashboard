@@ -3,7 +3,7 @@ import {fetchData} from '../utils/fetch-data';
 import {normalizeData} from '../utils/normalize-data';
 import {sortByTotalConfirmed} from '../utils/sort-data';
 
-import {VerticalBars} from './vertical-bars';
+import {RegionStats} from './region-stats';
 import {FiltersAndSorts} from './filters-and-sorts';
 
 
@@ -45,7 +45,7 @@ export class App extends Component<Props, State> {
                 <div className='mw8 center pa2 sans-serif white'>
                     <h1 className='light-gray tc'>COVID-19 Worldwide Growth Dashboard</h1>
                     <FiltersAndSorts loading={this.state.loading} />
-                    <VerticalBars data={this.state.displayData} loading={this.state.loading} />
+                    <RegionStats data={this.state.displayData} loading={this.state.loading} />
                 </div>
             </div>
         );

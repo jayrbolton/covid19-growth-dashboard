@@ -22,7 +22,7 @@ interface State {
 //    - horizontal bar chart over time of total cases
 
 
-export class VerticalBars extends Component<Props, State> {
+export class RegionStats extends Component<Props, State> {
 
     constructor(props) {
         super(props);
@@ -60,7 +60,7 @@ export class VerticalBars extends Component<Props, State> {
                                     {formatNumber(confirmed)}
                                 </span>
                             </span>
-                        </span>
+                        </div>
 
                         <div className='flex items-center'>
                             <span style={{width: '37%'}} className='white-90'>Recovered:</span>
