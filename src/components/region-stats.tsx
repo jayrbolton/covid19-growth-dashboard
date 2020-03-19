@@ -1,12 +1,14 @@
 import {h, Component, Fragment} from 'preact';
 import {fetchData} from '../utils/fetch-data';
 import {formatNumber} from '../utils/formatting';
+import {TimeSeriesBars} from './time-series';
 
 
 interface Props {
     rows?: any;
     hiddenCount: number;
     loading: boolean;
+    dates: Array<Array<number>>;
 }
 
 interface State {
@@ -98,7 +100,9 @@ export class RegionStats extends Component<Props, State> {
                         </div>
                     </div>
                     <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex'>
-                        <div className='bg-dark-gray pa2 w-100'>Bar chart time series goes here</div>
+                        <div className='bg-dark-gray pa2 w-100'>
+                            <TimeSeriesBars dates={this.props.dates} totals={row.totals} />
+                        </div>
                     </div>
                 </div>
             </div>

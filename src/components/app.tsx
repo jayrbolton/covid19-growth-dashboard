@@ -71,7 +71,12 @@ export class App extends Component<Props, State> {
                 <div className='mw8 center pa2 sans-serif white'>
                     <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth Dashboard</h1>
                     <FiltersAndSorts loading={this.state.loading} onFilter={inp => this.handleFilter(inp)} />
-                    <RegionStats hiddenCount={this.hiddenCount} rows={this.state.rows} loading={this.state.loading} />
+                    <RegionStats
+                        hiddenCount={this.hiddenCount}
+                        rows={this.state.rows}
+                        loading={this.state.loading}
+                        dates={this.sourceData.dates}
+                    />
                 </div>
             </div>
         );
