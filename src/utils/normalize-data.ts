@@ -11,8 +11,6 @@ export function normalizeData(sourceData) {
     let dates = null; // All date columns, values parsed from the headers
     let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
     // Largest totals for creating bars
-    let maxTotal = 0;
-    console.log(sourceData);
     for (const key in sourceData) {
         const text = sourceData[key];
         const lines = text.split('\n');
@@ -36,13 +34,9 @@ export function normalizeData(sourceData) {
                 }
             }
             const ts = row.slice(dataSources.seriesIdx);
-            // console.log(`setting totals for id ${id} with key ${key} to ${ts}`)
             agg[id].totals[key] = ts;
             const current = ts[ts.length - 1];
             agg[id].currentTotals[key] = current;
-            if (current > maxTotal) {
-                maxTotal = current;
-            }
         })
     }
     // Convert the aggregation object into an array
@@ -50,8 +44,10 @@ export function normalizeData(sourceData) {
     for (const key in agg) {
         rows.push(agg[key]);
     }
+    // Additional pre-computation
+    getAverages(rows); 
+    getPercentages(rows);
     return {
-        maxTotal: 200000,
         dates: dates,
         rows: rows
     };
@@ -106,5 +102,47 @@ function parseColumnVal(val) {
         return val;
     } else {
         return Number(val);
+    }
+}
+
+// Compute case averages, such as new cases in the last 7 days
+// Mutates input
+function getAverages (rows) {
+    let idx = 0;
+    for (const row of rows) {
+        const confirmed = row.totals.confirmed;
+        const newCases = confirmed.reduce((agg, current, idx) => {
+            let prev = 0;
+            if (idx > 0) {
+                prev = confirmed[idx - 1];
+            }
+            agg.push(current - prev);
+            return agg;
+        }, [])
+        const newCasesSum = newCases.reduce((sum, n) => sum + n, 0);
+        const newCasesAllTime = Math.round(newCasesSum / newCases.length * 100) / 100;
+        const sevenDays = newCases.slice(newCases.length - 7);
+        const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
+        row.averages = {
+            newCasesAllTime,
+            newCases7d
+        };
+        idx += 1;
+    }
+}
+
+function getPercentages (rows) {
+    for (const row of rows) {
+        const {confirmed, deaths, recovered} = row.currentTotals;
+        let deathsPercentage = 0;
+        let recoveredPercentage = 0;
+        if (confirmed > 0) {
+            deathsPercentage = Math.round(deaths * 1000 / confirmed) / 10;
+            recoveredPercentage = Math.round(recovered * 1000 / confirmed) / 10;
+        }
+        row.percentages = {
+            deathsPercentage,
+            recoveredPercentage
+        }
     }
 }

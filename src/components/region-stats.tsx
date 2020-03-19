@@ -30,61 +30,63 @@ export class RegionStats extends Component<Props, State> {
     }
 
     rowView(row, data) {
-        const max = row.currentTotals.confirmed;
-        const {confirmed, deaths, recovered} = row.currentTotals;
-        // XXX Maybe precompute all this upfront rather than on render
-        let deathsPercentage = '0%';
-        let recoveredPercentage = '0%';
-        if (confirmed > 0) {
-            deathsPercentage = String(Math.round(deaths * 1000 / confirmed) / 10) + '%';
-            recoveredPercentage = String(Math.round(recovered * 1000 / confirmed) / 10) + '%';
-        }
+        const {confirmed, recovered, deaths} = row.currentTotals;
+        const {deathsPercentage, recoveredPercentage} = row.percentages;
+        const {newCasesAllTime, newCases7d} = row.averages;
         return (
             <div className='bb b--white-30 pb3 mb3'>
-                <div className='w-100 flex mb2'>
-                    <div className='f4 w-25'>
-                        {row.province && row.province !== row.country ? row.province + ', ' : ''}
-                        <span className='b'>{row.country}</span>
-                    </div>
-                    <div className='w-75 flex'>
-                        <span className='w-50'><span className='white-80'>Average new cases per day:</span> 123</span>
-                        <span className='w-50'><span className='white-80'>Average new cases last 7 days:</span> 123</span>
-                    </div>
-                </div>
-                <div className='w-100 flex'>
-                    <div className='w-25 pr3'>
-                        <div className='flex items-center'>
-                            <span style={{width: '37%'}} className='white-90'>Confirmed:</span>
-                            <span className='dib' style={{width: '63%'}}>
-                                <span className='dib nowrap bg-dark-blue pa1 b' style={{width: '100%'}}>
-                                    {formatNumber(confirmed)}
-                                </span>
-                            </span>
+                <div className='w-100 flex flex-wrap mb2'>
+                    <div className='w-100 w-100-m w-50-ns'>
+                        <div className='f4 mb2'>
+                            {row.province && row.province !== row.country ? row.province + ', ' : ''}
+                            <span className='b'>{row.country}</span>
                         </div>
 
-                        <div className='flex items-center'>
-                            <span style={{width: '37%'}} className='white-90'>Recovered:</span>
-                            <span className='dib' style={{width: '63%'}}>
-                                <span className='dib nowrap bg-dark-green pa1 b' style={{width: recoveredPercentage}}>
-                                    {formatNumber(recovered)} <span className='f6 white-80'>({recoveredPercentage})</span>
-                                </span>
-                            </span>
-                        </div>
+                        <div className='flex flex-wrap'>
+                            <div className='w-100 w-100-m w-50-ns pr2' style={{minWidth: '15rem'}}>
+                                <div className='flex items-center'>
+                                    <div style={{width: '37%'}} className='white-90'>Confirmed:</div>
+                                    <div className='nowrap' style={{width: '63%'}}>
+                                        <div className='dib pa1 b bg-dark-blue' style={{width: '100%'}}>
+                                            {formatNumber(confirmed)}
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div className='flex items-center'>
-                            <span style={{width: '37%'}} className='white-90'>Deaths:</span>
-                            <span className='dib' style={{width: '63%'}}>
-                                <span className='dib nowrap pa1 b' style={{width: deathsPercentage, background: "#e7040fad"}}>
-                                    {formatNumber(deaths)} <span className='f6 white-80'>({deathsPercentage})</span>
-                                </span>
-                            </span>
+                                <div className='flex items-center'>
+                                    <div style={{width: '37%'}} className='white-90'>Recovered:</div>
+                                    <div className='nowrap' style={{width: '63%'}}>
+                                        <div className='dib pa1 b bg-dark-green' style={{width: recoveredPercentage + '%'}}>
+                                            {formatNumber(recovered)} <span className='f6 white-80'>({recoveredPercentage + '%'})</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='flex items-center'>
+                                    <div style={{width: '37%'}} className='white-90'>Deaths:</div>
+                                    <div className='nowrap' style={{width: '63%'}}>
+                                        <div className='dib pa1 b bg-gray' style={{width: deathsPercentage + '%'}}>
+                                            {formatNumber(deaths)} <span className='f6 white-80'>({deathsPercentage + '%'})</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className='w-100 w-100-m w-50-ns'>
+                                <div className='pv1'>Average new cases per day:</div>
+                                <div className='flex items-center pv1'>
+                                    <div className='white-80' style={{width: '37%'}}>All time:</div>
+                                    <div>{formatNumber(newCasesAllTime)}</div>
+                                </div >
+                                <div className='flex items-center pv1'>
+                                    <div className='white-80' style={{width: '37%'}}>Last 7 days:</div>
+                                    <div>{formatNumber(newCases7d)}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div className='w-75'>
-                        <div>
-                            <span className='dib mt4'>Bar chart time series goes here</span>
-                        </div>
+                    <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex'>
+                        <div className='bg-dark-gray pa2 w-100'>Bar chart time series goes here</div>
                     </div>
                 </div>
             </div>
