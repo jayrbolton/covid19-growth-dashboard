@@ -44,7 +44,6 @@ export function normalizeData(sourceData) {
     for (const key in agg) {
         rows.push(agg[key]);
     }
-    console.log(rows);
     // Additional pre-computation
     getActives(rows);
     getAverages(rows);
