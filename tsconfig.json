@@ -4,6 +4,7 @@
     "sourceMap": true,
     "jsxFactory": "h",
     "baseUrl": "./src",
+    "lib": ["es2017", "dom"],
     "paths": {
       "~*": ["./*"]
     },
