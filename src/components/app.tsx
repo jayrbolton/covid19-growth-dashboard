@@ -43,7 +43,7 @@ export class App extends Component<Props, State> {
         return (
             <div className='bg-near-black'>
                 <div className='mw8 center pa2 sans-serif white'>
-                    <h1 className='light-gray tc f4 f2-m'>COVID-19 Worldwide Growth Dashboard</h1>
+                    <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth Dashboard</h1>
                     <FiltersAndSorts loading={this.state.loading} />
                     <RegionStats data={this.state.displayData} loading={this.state.loading} />
                 </div>
