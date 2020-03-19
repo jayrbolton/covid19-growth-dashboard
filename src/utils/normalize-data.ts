@@ -47,6 +47,7 @@ export function normalizeData(sourceData) {
     // Additional pre-computation
     getAverages(rows); 
     getPercentages(rows);
+    getMaxes(rows);
     return {
         dates: dates,
         rows: rows
@@ -131,6 +132,8 @@ function getAverages (rows) {
     }
 }
 
+// Calculate percentage stats for the cases (eg. what is the percentage of deaths as compared to confirmed)?
+// Mutates rows
 function getPercentages (rows) {
     for (const row of rows) {
         const {confirmed, deaths, recovered} = row.currentTotals;
@@ -143,6 +146,19 @@ function getPercentages (rows) {
         row.percentages = {
             deathsPercentage,
             recoveredPercentage
+        }
+    }
+}
+
+// Calculate max values for each time series
+// Mutates rows
+function getMaxes (rows) {
+    for (const row of rows) {
+        const confirmed = row.totals.confirmed.reduce((max, n) => n > max ? n : max, 0);
+        const recovered = row.totals.recovered.reduce((max, n) => n > max ? n : max, 0);
+        const deaths = row.totals.deaths.reduce((max, n) => n > max ? n : max, 0);
+        row.maxes = {
+            confirmed, recovered, deaths
         }
     }
 }
