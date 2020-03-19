@@ -90,14 +90,14 @@ export class RegionStats extends Component<Props, State> {
                                 </div>
                             </div>
 
-                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m'>
+                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m pl2 bl b--white-50'>
                                 <div className='pv1'>Average new cases per day:</div>
                                 <div className='flex items-center pv1'>
-                                    <div className='white-80' style={{width: '37%'}}>All time:</div>
+                                    <div className='white-80' style={{width: '45%'}}>Last {this.props.dates.length} days:</div>
                                     <div>{formatNumber(newCasesAllTime)}</div>
                                 </div >
                                 <div className='flex items-center pv1'>
-                                    <div className='white-80' style={{width: '37%'}}>Last 7 days:</div>
+                                    <div className='white-80' style={{width: '45%'}}>Last 7 days:</div>
                                     <div>{formatNumber(newCases7d)}</div>
                                 </div>
                             </div>
