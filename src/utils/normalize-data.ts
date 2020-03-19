@@ -37,15 +37,17 @@ export function normalizeData(sourceData) {
             agg[id].totals[key] = ts;
             const current = ts[ts.length - 1];
             agg[id].currentTotals[key] = current;
-        })
+        });
     }
     // Convert the aggregation object into an array
     const rows = [];
     for (const key in agg) {
         rows.push(agg[key]);
     }
+    console.log(rows);
     // Additional pre-computation
-    getAverages(rows); 
+    getActives(rows);
+    getAverages(rows);
     getPercentages(rows);
     getMaxes(rows);
     return {
@@ -70,7 +72,8 @@ function parseDatesFromHeaders (headers) {
 }
 
 // Parse a CSV row into an array of strings, taking quotes into account.
-// It would be better to use a library. But I got frustrated looking at the libraries on npm and decided to write this simple parser.
+// It would be better to use a library. But I got frustrated looking at the libraries on npm and
+// decided to write this simple parser.
 function rowToArray(row) {
     let inQuoted = false; // Are we within a quoted string? If so, include commas in the column val
     let vals = [];
@@ -136,16 +139,19 @@ function getAverages (rows) {
 // Mutates rows
 function getPercentages (rows) {
     for (const row of rows) {
-        const {confirmed, deaths, recovered} = row.currentTotals;
-        let deathsPercentage = 0;
-        let recoveredPercentage = 0;
+        const {confirmed, deaths, recovered, active} = row.currentTotals;
+        let deathsPercentage = 0,
+            recoveredPercentage = 0,
+            activePercentage = 0;
         if (confirmed > 0) {
             deathsPercentage = Math.round(deaths * 1000 / confirmed) / 10;
             recoveredPercentage = Math.round(recovered * 1000 / confirmed) / 10;
+            activePercentage = Math.round(active * 1000 / confirmed) / 10;
         }
         row.percentages = {
             deathsPercentage,
-            recoveredPercentage
+            recoveredPercentage,
+            activePercentage
         }
     }
 }
@@ -160,5 +166,21 @@ function getMaxes (rows) {
         row.maxes = {
             confirmed, recovered, deaths
         }
+    }
+}
+
+/**
+ * Adds an array of active cases on each date for each region.
+ * This mutates each row.totals
+ * @param rows
+ */
+function getActives(rows) {
+    for (const row of rows) {
+        row.totals.active = row.totals.confirmed.map((n, idx) =>
+            n - row.totals.recovered[idx] - row.totals.deaths[idx]
+        );
+        row.currentTotals.active = row.currentTotals.confirmed -
+            row.currentTotals.deaths -
+            row.currentTotals.recovered;
     }
 }
