@@ -10,6 +10,7 @@ interface Props {
 }
 
 interface State {
+    showAmount: number;
 }
 
 // Purposes of these sections:
@@ -26,7 +27,15 @@ export class RegionStats extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            showAmount: 100
+        };
+    }
+
+    handleClickShowMore() {
+        this.setState({
+            showAmount: this.state.showAmount + 100
+        })
     }
 
     rowView(row, data) {
@@ -93,15 +102,30 @@ export class RegionStats extends Component<Props, State> {
         );
     }
 
+    showMoreButton() {
+        const diff = this.props.data.rows.length - this.state.showAmount;
+        if (diff <= 0) {
+            return '';
+        }
+        return (
+            <p>
+                <a onClick={() => this.handleClickShowMore()} className='pointer link b light-blue dim'>
+                    Show more ({diff} remaining)
+                </a>
+            </p>
+        );
+    }
+
     render() {
         if (this.props.loading || !this.props.data) {
             return <p>Loading data..</p>
         }
+        const rows = this.props.data.rows.slice(0, this.state.showAmount);
         return (
-            <Fragment>
-                {this.props.data.rows.map(row => this.rowView(row, this.props.data))}
-            </Fragment>
+            <div>
+                {rows.map(row => this.rowView(row, this.props.data))}
+                {this.showMoreButton()}
+            </div>
         );
     }
 }
-
