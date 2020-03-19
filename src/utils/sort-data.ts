@@ -4,9 +4,9 @@
 
 
 // Sort all entries by the current total confirmed cases
-export function sortByTotalConfirmed(data, dir='desc') {
+export function sortByTotalConfirmed(rows, dir='desc') {
     // Data is sorted in place without cloning
-    data.rows.sort((rowA, rowB) => {
+    rows.sort((rowA, rowB) => {
         const confirmedA = rowA.totals.confirmed[rowA.totals.confirmed.length - 1];
         const confirmedB = rowB.totals.confirmed[rowB.totals.confirmed.length - 1];
         if (confirmedA < confirmedB) {
@@ -17,5 +17,4 @@ export function sortByTotalConfirmed(data, dir='desc') {
             return 0;
         }
     });
-    return data;
 }

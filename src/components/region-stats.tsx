@@ -1,11 +1,11 @@
 import {h, Component, Fragment} from 'preact';
 import {fetchData} from '../utils/fetch-data';
-import {normalizeData} from '../utils/normalize-data';
 import {formatNumber} from '../utils/formatting';
 
 
 interface Props {
-    data?: any;
+    rows?: any;
+    hiddenCount: number;
     loading: boolean;
 }
 
@@ -38,7 +38,10 @@ export class RegionStats extends Component<Props, State> {
         })
     }
 
-    rowView(row, data) {
+    rowView(row) {
+        if (row.hidden) {
+            return '';
+        }
         const {confirmed, recovered, deaths} = row.currentTotals;
         const {deathsPercentage, recoveredPercentage} = row.percentages;
         const {newCasesAllTime, newCases7d} = row.averages;
@@ -103,7 +106,8 @@ export class RegionStats extends Component<Props, State> {
     }
 
     showMoreButton() {
-        const diff = this.props.data.rows.length - this.state.showAmount;
+        const len = this.props.rows.length - this.props.hiddenCount;
+        const diff = len - this.state.showAmount;
         if (diff <= 0) {
             return '';
         }
@@ -117,13 +121,13 @@ export class RegionStats extends Component<Props, State> {
     }
 
     render() {
-        if (this.props.loading || !this.props.data) {
+        if (this.props.loading) {
             return <p>Loading data..</p>
         }
-        const rows = this.props.data.rows.slice(0, this.state.showAmount);
+        const rows = this.props.rows.slice(0, this.state.showAmount);
         return (
             <div>
-                {rows.map(row => this.rowView(row, this.props.data))}
+                {rows.map(row => this.rowView(row))}
                 {this.showMoreButton()}
             </div>
         );
