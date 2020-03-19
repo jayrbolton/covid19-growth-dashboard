@@ -44,8 +44,8 @@ export class RegionStats extends Component<Props, State> {
         if (row.hidden) {
             return '';
         }
-        const {confirmed, recovered, deaths} = row.currentTotals;
-        const {deathsPercentage, recoveredPercentage} = row.percentages;
+        const {confirmed, recovered, deaths, active} = row.currentTotals;
+        const {deathsPercentage, recoveredPercentage, activePercentage} = row.percentages;
         const {newCasesAllTime, newCases7d} = row.averages;
         return (
             <div className='bb b--white-30 pb3 mb3'>
@@ -61,8 +61,17 @@ export class RegionStats extends Component<Props, State> {
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Confirmed:</div>
                                     <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-orange' style={{width: '100%'}}>
+                                        <div className='dib pa1 b bg-blue' style={{width: '100%'}}>
                                             {formatNumber(confirmed)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='flex items-center'>
+                                    <div style={{width: '37%'}} className='white-90'>Active:</div>
+                                    <div className='nowrap' style={{width: '63%'}}>
+                                        <div className='dib pa1 b bg-orange' style={{width: activePercentage + '%'}}>
+                                            {formatNumber(active)}
                                         </div>
                                     </div>
                                 </div>

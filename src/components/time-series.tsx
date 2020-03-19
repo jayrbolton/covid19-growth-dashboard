@@ -8,7 +8,8 @@ interface Props {
     totals: {
         confirmed: Array<number>,
         recovered: Array<number>,
-        deaths: Array<number>
+        deaths: Array<number>,
+        active: Array<number>
     },
     maxes: {
         confirmed: number,
@@ -51,9 +52,10 @@ export class TimeSeriesBars extends Component<Props, State> {
     }
 
     render() {
-        const {confirmed, recovered, deaths} = this.props.totals;
+        const {active, confirmed, recovered, deaths} = this.props.totals;
         const totals = confirmed.map((n, idx) => n + recovered[idx] + deaths[idx]);
-        const max = totals.reduce((max, n) => max > n ? max : n, 0);
+        const max = this.props.maxes.confirmed;
+        const activePerc = active.slice(-50).map(n => Math.round(n * 100 / max));
         const confirmedPerc = confirmed.slice(-50).map(n => Math.round(n * 100 / max));
         const recoveredPerc = recovered.slice(-50).map(n => Math.round(n * 100 / max));
         const deathsPerc = deaths.slice(-50).map(n => Math.round(n * 100 / max));
@@ -63,11 +65,11 @@ export class TimeSeriesBars extends Component<Props, State> {
         return (
             <div className='w-100'>
                 <div className='white-80 mb1'>
-                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>confirmed</span>, <span className='green b'>recovered</span>, and <span className='gray b'>deaths</span> from 0 to {formatNumber(max)})</div>
+                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>active</span>, <span className='green b'>recovered</span>, and <span className='gray b'>deaths</span> from 0 to {formatNumber(max)})</div>
                 </div>
 
                 <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>
-                    {confirmedPerc.map((perc, idx) => this.vertBar(perc, idx, recoveredPerc, deathsPerc))}
+                    {activePerc.map((perc, idx) => this.vertBar(perc, idx, recoveredPerc, deathsPerc))}
                 </div>
 
                 <div className='white-80 mt1'>
