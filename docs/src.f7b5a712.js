@@ -104,4 +104,4 @@ var t=require("buffer").Buffer;const{Transform:e}=require("stream"),i=require(".
 },{"preact":"aSor","../utils/fetch-data":"gr1H","../utils/normalize-data":"RWgr","../utils/sort-data":"tnRP","../utils/filter-data":"W5Tl","./region-stats":"Mvjg","./filters-and-sorts":"Uo8M"}],"zo2T":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0}),require("tachyons/css/tachyons.css");var e=require("preact"),r=require("./components/app");e.render(e.h(r.App,null),document.body);
 },{"tachyons/css/tachyons.css":"kuxM","preact":"aSor","./components/app":"DKsQ"}]},{},["zo2T"], null)
-//# sourceMappingURL=/covid19-growth-dashboard/src.f7b5a712.js.map
+//# sourceMappingURL=/src.f7b5a712.js.map
