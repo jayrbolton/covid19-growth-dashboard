@@ -12,7 +12,6 @@ window.addEventListener('resize', () => {
     if (width <= 500) {
         metaViewport.setAttribute('content', 'width=500');
     } else if (metaViewport.getAttribute('content') !== 'width=device-width') {
-        console.log('setting back to device width');
         metaViewport.setAttribute('content', 'width=device-width');
     }
 });

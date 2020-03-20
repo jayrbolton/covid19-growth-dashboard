@@ -48,18 +48,15 @@ export class App extends Component<Props, State> {
 
     handleFilterCountry(inp: string) {
         this.filterCountry = inp;
-        console.log('country', inp);
         this.applyFiltersAndSorts();
     }
 
     handleFilterProvince(inp: string) {
         this.filterProvince = inp;
-        console.log('province', inp);
         this.applyFiltersAndSorts();
     }
 
     handleSort(inp: string) {
-        console.log('sorting', inp);
         if (inp === 'confirmed') {
             this.sortBy = Sorts.ConfirmedDesc;
         } else if (inp === 'growth') {
