@@ -2,10 +2,9 @@
 
 Another dashboard to visualize and examine the spread of COVID-19 around the world.
 
-Credit goes to [Johns Hopkins TODO]() for the initial dashboard and the source data.
-https://coronavirus.jhu.edu/map.html
+Credit goes to [Johns Hopkins University](https://coronavirus.jhu.edu/) for the initial dashboard and the source data. The JHU Dashboard can be found [here](https://coronavirus.jhu.edu/map.html)
 
-Source data is found in [this repo](https://github.com/CSSEGISandData/COVID-19). This is updated nightly.
+Source data is found in [this repo](https://github.com/CSSEGISandData/COVID-19). This is updated nightly, and further data sources can be found in the README at that link.
 
 Thanks to Github for the hosting.
 
@@ -32,4 +31,4 @@ Build to `/docs` (which is served by Github-pages) by running `npm run build`
 
 ## Contribution
 
-See the [contribution guidelines](TODO)
+See the [contribution guidelines](CONTRIBUTING.md).
