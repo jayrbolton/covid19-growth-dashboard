@@ -9,7 +9,6 @@ render(<App />, document.body);
 const metaViewport = document.querySelector('meta[name="viewport"]'); 
 window.addEventListener('resize', () => {
     const width = window.outerWidth;
-    console.log(metaViewport.getAttribute('content'));
     if (width <= 500) {
         metaViewport.setAttribute('content', 'width=500');
     } else if (metaViewport.getAttribute('content') !== 'width=device-width') {
