@@ -70,7 +70,7 @@ export class RegionStats extends Component<Props, State> {
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Active:</div>
                                     <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-orange' style={{width: activePercentage + '%'}}>
+                                        <div className='dib b bg-orange' style={{width: activePercentage + '%'}}>
                                             <div className='dib pa1'>
                                                 {formatNumber(active)} <span className='f6 white-80'>({activePercentage + '%'})</span>
                                             </div>
