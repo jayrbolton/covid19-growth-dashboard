@@ -39,14 +39,14 @@ export class TimeSeriesBars extends Component<Props, State> {
         }
     }
 
-    vertBar(perc, idx, recoveredPerc, deathsPerc) {
-        const recovered = recoveredPerc[idx];
-        const deaths = deathsPerc[idx];
+    vertBar(confirmed, idx, recoveredPercentages, deathsPercentages) {
+        const recovered = recoveredPercentages[idx];
+        const deaths = deathsPercentages[idx];
         return (
             <div class='flex flex-column h-100 justify-end' style={{width: '1.5%', margin: '0px 0.25%'}}>
-                <div className='bg-gray' style={{height: deaths + '%'}}></div>
-                <div className='bg-green' style={{height: recovered + '%'}}></div>
-                <div className='bg-orange' style={{height: perc + '%'}}></div>
+                <div title={deaths + '%'} className='bg-gray' style={{height: deaths + '%'}}></div>
+                <div title={recovered + '%'} className='bg-green' style={{height: recovered + '%'}}></div>
+                <div title={confirmed + '%'} className='bg-orange' style={{height: confirmed + '%'}}></div>
             </div>
         );
     }
