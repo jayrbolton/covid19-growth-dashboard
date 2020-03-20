@@ -99,7 +99,7 @@ export class RegionStats extends Component<Props, State> {
                                 </div>
                             </div>
 
-                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m pl2 bl b--white-50'>
+                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m pl0 pl0-m pl2-ns bn bn-m bl-ns b--white-50'>
                                 <div className='pv1'>Average new cases per day:</div>
                                 <div className='flex items-center pv1'>
                                     <div className='white-80' style={{width: '45%'}}>Last {this.props.dates.length} days:</div>
