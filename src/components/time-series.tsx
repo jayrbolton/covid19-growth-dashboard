@@ -45,7 +45,7 @@ export class TimeSeriesBars extends Component<Props, State> {
         return (
             <div class='flex flex-column h-100 justify-end' style={{width: '1.5%', margin: '0px 0.25%'}}>
                 <div title={'Deaths: ' + deaths + '%'} className='bg-gray' style={{height: deaths + '%'}}></div>
-                <div title={'Recovered: ' + recovered + '%'} className='bg-dark-blue' style={{height: recovered + '%'}}></div>
+                <div title={'Recovered: ' + recovered + '%'} className='bg-blue' style={{height: recovered + '%'}}></div>
                 <div title={'Active: ' + active + '%'} className='bg-orange' style={{height: active + '%'}}></div>
             </div>
         );
@@ -63,7 +63,7 @@ export class TimeSeriesBars extends Component<Props, State> {
         return (
             <div className='w-100'>
                 <div className='white-80 mb1'>
-                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>active</span>, <span className='dark-blue b'>recovered</span>, and <span className='gray b'>deaths</span> from 0 to {formatNumber(max)})</div>
+                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>active</span>, <span className='blue b'>recovered</span>, and <span className='gray b'>deaths</span> from 0 to {formatNumber(max)})</div>
                 </div>
 
                 <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>
