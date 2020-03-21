@@ -6,6 +6,6 @@ Thanks to Github for the hosting.
 
 ## Disclaimer
 
-Data may not accurately represent the total number of COVID-19 cases and only represents a best guess.
+Data may not accurately represent the total number of COVID-19 cases and only represent a best guess.
 
 Note that the Johns Hopkins University data is **not scaled to the number of tests performed in each region**.
