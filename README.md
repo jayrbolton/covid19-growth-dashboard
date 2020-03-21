@@ -1,5 +1,7 @@
 # COVID-19 Growth Dashboard
 
+[Visit the website here](https://www.covid19tracking.org).
+
 Another dashboard to visualize and examine the spread of COVID-19 around the world.
 
 Credit goes to [Johns Hopkins University](https://coronavirus.jhu.edu/) for the initial dashboard and the source data. The JHU Dashboard can be found [here](https://coronavirus.jhu.edu/map.html)
