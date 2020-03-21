@@ -6,6 +6,10 @@ export function formatNumber(x) {
 
 // Return a localized format of a utc date
 // `date` should be in the format [year, month, day]
-export function formatUTCDate(date: Array<number>) {
+export function formatUTCDate(date?: Array<number>) {
+    if (!date) {
+        const d = new Date();
+        date = [d.getFullYear(), d.getMonth(), d.getDate()];
+    }
     return new Date(date.join('-')).toLocaleDateString();
 }

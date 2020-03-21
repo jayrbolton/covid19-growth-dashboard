@@ -3,9 +3,10 @@ import {fetchData} from '../utils/fetch-data';
 import {normalizeData} from '../utils/normalize-data';
 import {sortByTotalConfirmed, sortByGrowth} from '../utils/sort-data';
 import {filterByCountry, filterByProvince} from '../utils/filter-data';
-
+import * as dataSources from '../constants/data-sources.json';
 import {RegionStats} from './region-stats';
 import {FiltersAndSorts} from './filters-and-sorts';
+import {formatUTCDate} from '../utils/formatting';
 
 
 interface Props {
@@ -98,6 +99,16 @@ export class App extends Component<Props, State> {
             <div className='bg-near-black'>
                 <div className='mw8 center pa2 sans-serif white'>
                     <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth</h1>
+                    <p className='f6'>
+                        Data is updated daily from the
+                        <a href={dataSources.sourceURL} target='_blank' className='light-blue dib ml1'>
+                            Johns Hopkins University CSSE COVID-10 Data Repository
+                        </a>.
+                        Last update was {formatUTCDate()}.
+                        <a href={dataSources.citationsURL} target='_blank' className='light-blue dib ml1'>
+                            Disclaimer and citations
+                        </a>.
+                    </p>
                     <FiltersAndSorts
                         loading={this.state.loading}
                         onFilterCountry={inp => this.handleFilterCountry(inp)}
