@@ -2,7 +2,7 @@
 
 [Visit the website here](https://www.covid19tracking.org).
 
-Another dashboard to visualize and examine the spread of COVID-19 around the world.
+A dashboard to visualize and examine the activity of COVID-19 around the world.
 
 Credit goes to [Johns Hopkins University](https://coronavirus.jhu.edu/) for the initial dashboard and the source data. The JHU Dashboard can be found [here](https://coronavirus.jhu.edu/map.html)
 
@@ -12,7 +12,7 @@ Thanks to Github for the hosting.
 
 ## Report a bug
 
-[Open an issue](https://github.com/jayrbolton/covid19-growth-dashboard/issues) or [email us](TODO).
+[Open an issue in this repo](https://github.com/jayrbolton/covid19-growth-dashboard/issues).
 
 ## Development and contribution
 
