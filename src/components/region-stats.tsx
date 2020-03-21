@@ -60,8 +60,8 @@ export class RegionStats extends Component<Props, State> {
                             <div className='w-100 w-100-m w-50-ns pr2' style={{minWidth: '15rem'}}>
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Confirmed:</div>
-                                    <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-blue' style={{width: '100%'}}>
+                                    <div className='nowrap black-90' style={{width: '63%'}}>
+                                        <div className='dib pa1 b bg-white-90' style={{width: '100%'}}>
                                             {formatNumber(confirmed)}
                                         </div>
                                     </div>
@@ -70,7 +70,7 @@ export class RegionStats extends Component<Props, State> {
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Active:</div>
                                     <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-orange' style={{width: activePercentage + '%'}}>
+                                        <div className='dib b bg-orange' style={{width: activePercentage + '%'}}>
                                             <div className='dib pa1'>
                                                 {formatNumber(active)} <span className='f6 white-80'>({activePercentage + '%'})</span>
                                             </div>
@@ -81,7 +81,7 @@ export class RegionStats extends Component<Props, State> {
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Recovered:</div>
                                     <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib b bg-dark-green' style={{width: recoveredPercentage + '%'}}>
+                                        <div className='dib b bg-dark-blue' style={{width: recoveredPercentage + '%'}}>
                                             <div className='dib pa1'>
                                                 {formatNumber(recovered)} <span className='f6 white-80'>({recoveredPercentage + '%'})</span>
                                             </div>
