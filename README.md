@@ -14,6 +14,8 @@ Thanks to Github for the hosting.
 
 ## Development and contribution
 
+See the [contribution guidelines](CONTRIBUTING.md).
+
 Technologies used:
 
 * Typescript
@@ -28,7 +30,3 @@ Install dependencies with `npm install`
 Run the dev server with `npm run dev`
 
 Build to `/docs` (which is served by Github-pages) by running `npm run build`
-
-## Contribution
-
-See the [contribution guidelines](CONTRIBUTING.md).
