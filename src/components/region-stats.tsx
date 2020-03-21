@@ -141,7 +141,7 @@ export class RegionStats extends Component<Props, State> {
         if (this.props.loading) {
             return <p>Loading data..</p>
         }
-        const rows = this.props.rows.slice(0, this.state.showAmount);
+        const rows = this.props.rows.filter(r => !r.hidden).slice(0, this.state.showAmount);
         return (
             <div>
                 {rows.map(row => this.rowView(row))}

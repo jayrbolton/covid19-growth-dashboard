@@ -39,24 +39,22 @@ export class TimeSeriesBars extends Component<Props, State> {
         }
     }
 
-    vertBar(confirmed, idx, recoveredPercentages, deathsPercentages) {
+    vertBar(active, idx, recoveredPercentages, deathsPercentages) {
         const recovered = recoveredPercentages[idx];
         const deaths = deathsPercentages[idx];
         return (
             <div class='flex flex-column h-100 justify-end' style={{width: '1.5%', margin: '0px 0.25%'}}>
-                <div title={deaths + '%'} className='bg-gray' style={{height: deaths + '%'}}></div>
-                <div title={recovered + '%'} className='bg-dark-blue' style={{height: recovered + '%'}}></div>
-                <div title={confirmed + '%'} className='bg-orange' style={{height: confirmed + '%'}}></div>
+                <div title={'Deaths: ' + deaths + '%'} className='bg-gray' style={{height: deaths + '%'}}></div>
+                <div title={'Recovered: ' + recovered + '%'} className='bg-dark-blue' style={{height: recovered + '%'}}></div>
+                <div title={'Active: ' + active + '%'} className='bg-orange' style={{height: active + '%'}}></div>
             </div>
         );
     }
 
     render() {
         const {active, confirmed, recovered, deaths} = this.props.totals;
-        const totals = confirmed.map((n, idx) => n + recovered[idx] + deaths[idx]);
         const max = this.props.maxes.confirmed;
         const activePerc = active.slice(-50).map(n => Math.round(n * 100 / max));
-        const confirmedPerc = confirmed.slice(-50).map(n => Math.round(n * 100 / max));
         const recoveredPerc = recovered.slice(-50).map(n => Math.round(n * 100 / max));
         const deathsPerc = deaths.slice(-50).map(n => Math.round(n * 100 / max));
         const dates = this.props.dates.slice(-50);
