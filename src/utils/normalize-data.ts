@@ -126,11 +126,6 @@ function getAverages (rows) {
         const newCasesAllTime = Math.round(newCasesSum / newCases.length * 100) / 100;
         const sevenDays = newCases.slice(-7);
         const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
-        if (row.country === 'Korea, South') {
-            console.log('active', active);
-            console.log('new cases', newCases);
-            console.log('new cases 7 d', newCases7d);
-        }
         row.averages = {
             newCasesAllTime,
             newCases7d
