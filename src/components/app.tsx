@@ -92,7 +92,7 @@ export class App extends Component<Props, State> {
 
     render() {
         if (this.state.loading) {
-            return <p>Loading data..</p>
+            return <p className='white sans-serif pt5 tc'>Loading data...</p>
         }
         return (
             <div className='bg-near-black'>
