@@ -78,17 +78,15 @@ export class App extends Component<Props, State> {
         } else if (this.sortBy === Sorts.GrowthDesc) {
             sortByGrowth(rows);
         }
+        for (const row of rows) {
+            row.hidden = false;
+        }
         if (this.filterCountry) {
             this.hiddenCount = filterByCountry(rows, this.filterCountry);
         } 
         if (this.filterProvince) {
             this.hiddenCount = filterByProvince(rows, this.filterProvince);
         } 
-        if (!this.filterCountry && !this.filterProvince) {
-            for (const row of rows) {
-                row.hidden = false;
-            }
-        }
         this.setState({rows, loading: false});
     }
 

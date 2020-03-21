@@ -113,19 +113,24 @@ function parseColumnVal(val) {
 function getAverages (rows) {
     let idx = 0;
     for (const row of rows) {
-        const confirmed = row.totals.confirmed;
-        const newCases = confirmed.reduce((agg, current, idx) => {
+        const active = row.totals.active;
+        const newCases = active.reduce((agg, current, idx) => {
             let prev = 0;
             if (idx > 0) {
-                prev = confirmed[idx - 1];
+                prev = active[idx - 1];
             }
             agg.push(current - prev);
             return agg;
         }, [])
         const newCasesSum = newCases.reduce((sum, n) => sum + n, 0);
         const newCasesAllTime = Math.round(newCasesSum / newCases.length * 100) / 100;
-        const sevenDays = newCases.slice(newCases.length - 7);
+        const sevenDays = newCases.slice(-7);
         const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
+        if (row.country === 'Korea, South') {
+            console.log('active', active);
+            console.log('new cases', newCases);
+            console.log('new cases 7 d', newCases7d);
+        }
         row.averages = {
             newCasesAllTime,
             newCases7d
