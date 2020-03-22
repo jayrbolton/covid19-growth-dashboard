@@ -61,7 +61,7 @@ export class RegionStats extends Component<Props, State> {
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Confirmed:</div>
                                     <div className='nowrap black-90' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-white-90' style={{width: '100%'}}>
+                                        <div className='dib pa1 b bg-white-80' style={{width: '100%'}}>
                                             {formatNumber(confirmed)}
                                         </div>
                                     </div>
@@ -142,6 +142,13 @@ export class RegionStats extends Component<Props, State> {
         }
         const displayed = this.props.rows.filter(r => !r.hidden);
         const rows = displayed.slice(0, this.state.showAmount);
+        if (!rows.length) {
+            return (
+                <p className='pv4'>
+                    No results.
+                </p>
+            );
+        }
         return (
             <div>
                 {rows.map(row => this.rowView(row))}
