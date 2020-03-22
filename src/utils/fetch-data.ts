@@ -18,7 +18,7 @@ export async function fetchData() {
     // First try to fetch the date from a localStorage cache
     const lastFetch = window.localStorage.getItem(LS_DATE_KEY);
     const date = new Date();
-    const today = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    const today = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     if (lastFetch) {
         if (lastFetch === today) {
             // Fetch the date from the cache

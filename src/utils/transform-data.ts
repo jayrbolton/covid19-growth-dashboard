@@ -2,7 +2,9 @@
  * Take data from the source and convert it into something more usable for our purposes.
  */
 import parse from 'csv-parse';
-import * as dataSources from '~constants/data-sources.json';
+import * as dataSources from '../constants/data-sources.json';
+import * as states from '../constants/states.json';
+import * as stateCodes from '../constants/state-codes.json';
 
 const parser = parse({delimiter: dataSources.delimiter});
 
@@ -33,17 +35,19 @@ export function transformData(sourceData) {
         });
     }
     // Convert the aggregation object into an array
-    const rows = [];
+    let rows = [];
     for (const key in agg) {
         rows.push(agg[key]);
     }
     // Additional pre-computation
+    rows = removeUSCounties(rows); // This must come before any aggregation
     insertAggregations(rows); // This must go before the below transformations
     getCurrentTotals(rows);
     getActives(rows);
     getAverages(rows);
     getPercentages(rows);
     getMaxes(rows);
+    renameCountries(rows);
     return {
         dates: dates,
         rows: rows
@@ -268,5 +272,72 @@ function insertAggregations(rows) {
         }
         countryRow.cases = totalCases;
         rows.push(countryRow);
+    }
+}
+
+/**
+ * At one point, JHU was keeping data on US counties, and then stopped updating
+ * their numbers. These counties need to be removed from the entries, and their
+ * numbers added into the numbers for the whole-state entry.
+ * @param rows
+ */
+function removeUSCounties(rows) {
+    // Mapping of county "province" names to proper state names
+    // We must take the stats for each county prior to 3/17 and aggregate them into the whole-state entries
+    // "Washington, D.C." is a sub-region of "District of Columbia"
+    // This is handled as a special case.
+    const filtered = [];
+    const countyRegex = /^.+, ([A-Z]\.?[A-Z]\.?)$/
+    // Mapping of state names to rows
+    const states = {};
+    const counties = [];
+    for (const row of rows) {
+        if (row.country === 'US') {
+            if (countyRegex.test(row.province)) {
+                // Found a county
+                counties.push(row);
+            } else {
+                // Not a county
+                states[row.province] = row;
+                filtered.push(row);
+            }
+        } else {
+            filtered.push(row);
+        }
+    }
+    for (const county of counties) {
+        const matches = county.province.match(countyRegex);
+        if (matches && matches.length === 2) {
+            const stateCode = matches[1];
+            const stateName = stateCodes[stateCode];
+            const state = states[stateName];
+            for (const key of dataSources.categoryKeys) { // 3 iterations
+                state.cases[key] = state.cases[key].map((stateTotal, idx) => {
+                    return stateTotal + county.cases[key][idx];
+                })
+            }
+        } else {
+            console.error('Unknown county: ' + county);
+            continue;
+        }
+    }
+    console.log(filtered);
+    return filtered;
+}
+
+/**
+ * Some of the country names used by JHU are not ideal. This replaces them with clearer names.
+ * mutates rows
+ * @param rows
+ */
+function renameCountries(rows) {
+    const mapping = {
+        'Korea, South': 'South Korea',
+        'US': 'USA',
+    };
+    for (const row of rows) {
+        if (row.country in mapping) {
+            row.country = mapping[row.country];
+        }
     }
 }

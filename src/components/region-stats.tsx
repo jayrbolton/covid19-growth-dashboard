@@ -61,7 +61,7 @@ export class RegionStats extends Component<Props, State> {
                                 <div className='flex items-center'>
                                     <div style={{width: '37%'}} className='white-90'>Confirmed:</div>
                                     <div className='nowrap black-90' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-white-90' style={{width: '100%'}}>
+                                        <div className='dib pa1 b bg-white-80' style={{width: '100%'}}>
                                             {formatNumber(confirmed)}
                                         </div>
                                     </div>
@@ -122,9 +122,8 @@ export class RegionStats extends Component<Props, State> {
         );
     }
 
-    showMoreButton() {
-        const len = this.props.rows.length - this.props.hiddenCount;
-        const diff = len - this.state.showAmount;
+    showMoreButton(total: number) {
+        const diff = total - this.state.showAmount;
         if (diff <= 0) {
             return '';
         }
@@ -141,11 +140,19 @@ export class RegionStats extends Component<Props, State> {
         if (this.props.loading) {
             return <p>Loading data..</p>
         }
-        const rows = this.props.rows.filter(r => !r.hidden).slice(0, this.state.showAmount);
+        const displayed = this.props.rows.filter(r => !r.hidden);
+        const rows = displayed.slice(0, this.state.showAmount);
+        if (!rows.length) {
+            return (
+                <p className='pv4'>
+                    No results.
+                </p>
+            );
+        }
         return (
             <div>
                 {rows.map(row => this.rowView(row))}
-                {this.showMoreButton()}
+                {this.showMoreButton(displayed.length)}
             </div>
         );
     }
