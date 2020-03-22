@@ -6,7 +6,7 @@
 // Sort all entries by the current total confirmed cases
 // Data is sorted in place without cloning
 export function sortByTotalConfirmed(rows, dir='desc') {
-    genericSort(rows, row => row.totals.confirmed[row.totals.confirmed.length - 1]);
+    genericSort(rows, row => row.cases.confirmed[row.cases.confirmed.length - 1]);
 }
 
 // Sort by the recent growth rate over last 7 days

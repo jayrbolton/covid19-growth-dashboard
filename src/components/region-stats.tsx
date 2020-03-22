@@ -115,7 +115,7 @@ export class RegionStats extends Component<Props, State> {
                         </div>
                     </div>
                     <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex'>
-                        <TimeSeriesBars dates={this.props.dates} totals={row.totals} maxes={row.maxes} />
+                        <TimeSeriesBars dates={this.props.dates} cases={row.cases} maxes={row.maxes} />
                     </div>
                 </div>
             </div>

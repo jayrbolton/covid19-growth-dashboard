@@ -7,7 +7,7 @@ import * as dataSources from '~constants/data-sources.json';
 const parser = parse({delimiter: dataSources.delimiter});
 
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
-export function normalizeData(sourceData) {
+export function transformData(sourceData) {
     let dates = null; // All date columns, values parsed from the headers
     let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
     // Largest totals for creating bars
@@ -25,18 +25,11 @@ export function normalizeData(sourceData) {
                 agg[id] = {
                     province: row[dataSources.provinceIdx],
                     country: row[dataSources.countryIdx],
-                    totals: {},
-                    currentTotals: {}
+                    cases: {},
                 };
-                for (const key of dataSources.categoryKeys) {
-                    agg[id].totals[key] = [];
-                    agg[id].currentTotals[key] = 0;
-                }
             }
-            const ts = row.slice(dataSources.seriesIdx);
-            agg[id].totals[key] = ts;
-            const current = ts[ts.length - 1];
-            agg[id].currentTotals[key] = current;
+            const timeSeries = row.slice(dataSources.seriesIdx);
+            agg[id].cases[key] = timeSeries;
         });
     }
     // Convert the aggregation object into an array
@@ -45,6 +38,8 @@ export function normalizeData(sourceData) {
         rows.push(agg[key]);
     }
     // Additional pre-computation
+    insertAggregations(rows); // This must go before the below transformations
+    getCurrentTotals(rows);
     getActives(rows);
     getAverages(rows);
     getPercentages(rows);
@@ -108,12 +103,28 @@ function parseColumnVal(val) {
     }
 }
 
+/**
+ * Compute aggregated totals for each time series in the region
+ * Mutates each row in rows
+ * @param rows
+ */
+function getCurrentTotals(rows) {
+    for (const row of rows) {
+        row.currentTotals = {}
+        for (const key of dataSources.categoryKeys) {
+            const timeSeries = row.cases[key];
+            const current = timeSeries[timeSeries.length - 1];
+            row.currentTotals[key] = current;
+        }
+    }
+}
+
 // Compute case averages, such as new cases in the last 7 days
 // Mutates input
 function getAverages (rows) {
     let idx = 0;
     for (const row of rows) {
-        const active = row.totals.active;
+        const active = row.cases.active;
         const newCases = active.reduce((agg, current, idx) => {
             let prev = 0;
             if (idx > 0) {
@@ -159,9 +170,9 @@ function getPercentages (rows) {
 // Mutates rows
 function getMaxes (rows) {
     for (const row of rows) {
-        const confirmed = row.totals.confirmed.reduce((max, n) => n > max ? n : max, 0);
-        const recovered = row.totals.recovered.reduce((max, n) => n > max ? n : max, 0);
-        const deaths = row.totals.deaths.reduce((max, n) => n > max ? n : max, 0);
+        const confirmed = row.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
+        const recovered = row.cases.recovered.reduce((max, n) => n > max ? n : max, 0);
+        const deaths = row.cases.deaths.reduce((max, n) => n > max ? n : max, 0);
         row.maxes = {
             confirmed, recovered, deaths
         }
@@ -170,16 +181,92 @@ function getMaxes (rows) {
 
 /**
  * Adds an array of active cases on each date for each region.
- * This mutates each row.totals
+ * This mutates each row.cases
  * @param rows
  */
 function getActives(rows) {
     for (const row of rows) {
-        row.totals.active = row.totals.confirmed.map((n, idx) =>
-            n - row.totals.recovered[idx] - row.totals.deaths[idx]
+        row.cases.active = row.cases.confirmed.map((n, idx) =>
+            n - row.cases.recovered[idx] - row.cases.deaths[idx]
         );
         row.currentTotals.active = row.currentTotals.confirmed -
             row.currentTotals.deaths -
             row.currentTotals.recovered;
+    }
+}
+
+/**
+ * Compute additional region entries in `rows` as aggregations of countries,
+ * continents, or the whole world.
+ * Mutates rows
+ * @param rows
+ */
+function insertAggregations(rows) {
+    // A set of colonial countries that have an entry for the country as a
+    // whole, plus a handful of additional entries that represent outlying managed
+    // colonies. For example, there is an entry for "Denmark" as well as for
+    // "Faroe Islands, Denmark". We don't want to aggregate these examples.
+    const skips = {'France': true, 'Denmark': true, 'Netherlands': true, 'United Kingdom': true};
+    const worldwide = {
+        province: null,
+        country: 'Worldwide',
+        cases: {}
+    }
+    const totalCases = {};
+    for (const key of dataSources.categoryKeys) {
+        totalCases[key] = [];
+    }
+    for (const row of rows) {
+        for (const key of dataSources.categoryKeys) { // 3 iterations
+            row.cases[key].forEach((total, idx) => {
+                if (totalCases[key].length === idx) {
+                    totalCases[key].push(total);
+                } else {
+                    totalCases[key][idx] += total;
+                }
+            });
+        }
+    }
+    worldwide.cases = totalCases;
+    rows.push(worldwide);
+    // Aggregate each country that has split-up province entries
+    // A mapping from country name to row idx
+    const byCountry = {}
+    rows.forEach((row, idx) => {
+        if (!row.province || row.country in skips) {
+            return;
+        }
+        if (!(row.country in byCountry)) {
+            byCountry[row.country] = [];
+        }
+        byCountry[row.country].push(idx);
+    });
+    for (const country in byCountry) {
+        const countryRow = {
+            province: null,
+            country,
+            cases: {}
+        };
+        const totalCases = {};
+        for (const key of dataSources.categoryKeys) {
+            totalCases[key] = [];
+        }
+        // Aggregate case totals for every province in this country
+        for (const row of rows) {
+            if (row.country !== country) {
+                continue;
+            }
+            for (const key of dataSources.categoryKeys) { // 3 iterations
+                row.cases[key].forEach((total, idx) => {
+                    if (totalCases[key].length === idx) {
+                        totalCases[key].push(total);
+                    } else {
+                        totalCases[key][idx] += total;
+                    }
+                });
+            }
+        }
+        countryRow.cases = totalCases;
+        rows.push(countryRow);
     }
 }
