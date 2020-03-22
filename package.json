@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo TODO",
     "dev": "parcel src/index.html",
-    "build": "(rm -rf ./docs/*.{js,css,html}) && parcel build --out-dir docs src/index.html"
+    "build": "(bash -c 'rm -rf $(pwd)/docs/*.{js,css,html,map}') && parcel build --out-dir docs src/index.html"
   },
   "repository": {
     "type": "git",
