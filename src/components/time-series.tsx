@@ -5,7 +5,7 @@ import {formatUTCDate, formatNumber} from '../utils/formatting';
 
 interface Props {
     dates: Array<Array<number>>;
-    totals: {
+    cases: {
         confirmed: Array<number>,
         recovered: Array<number>,
         deaths: Array<number>,
@@ -52,7 +52,7 @@ export class TimeSeriesBars extends Component<Props, State> {
     }
 
     render() {
-        const {active, confirmed, recovered, deaths} = this.props.totals;
+        const {active, confirmed, recovered, deaths} = this.props.cases;
         const max = this.props.maxes.confirmed;
         const activePerc = active.slice(-50).map(n => Math.round(n * 100 / max));
         const recoveredPerc = recovered.slice(-50).map(n => Math.round(n * 100 / max));
@@ -63,7 +63,7 @@ export class TimeSeriesBars extends Component<Props, State> {
         return (
             <div className='w-100'>
                 <div className='white-80 mb1'>
-                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>active</span>, <span className='blue b'>recovered</span>, and <span className='gray b'>deaths</span> from 0 to {formatNumber(max)})</div>
+                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>active</span>, <span className='blue b'>recovered</span>, and <span className='gray b'>deaths</span> up to <span className='b'>{formatNumber(max)}</span> cases)</div>
                 </div>
 
                 <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>

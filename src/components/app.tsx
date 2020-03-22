@@ -1,6 +1,6 @@
 import {h, Component, Fragment} from 'preact';
 import {fetchData} from '../utils/fetch-data';
-import {normalizeData} from '../utils/normalize-data';
+import {transformData} from '../utils/transform-data';
 import {sortByTotalConfirmed, sortByGrowth} from '../utils/sort-data';
 import {filterByCountry, filterByProvince} from '../utils/filter-data';
 import * as dataSources from '../constants/data-sources.json';
@@ -40,7 +40,7 @@ export class App extends Component<Props, State> {
 
     componentDidMount() {
         fetchData()
-            .then(normalizeData)
+            .then(transformData)
             .then((sourceData) => {
                 this.sourceData = sourceData;
                 this.applyFiltersAndSorts();
@@ -100,12 +100,12 @@ export class App extends Component<Props, State> {
                 <div className='mw8 center pa2 sans-serif white'>
                     <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth</h1>
                     <p className='f6'>
-                        Data is updated daily from the
-                        <a href={dataSources.sourceURL} target='_blank' className='light-blue dib ml1'>
+                        Data is updated daily from the{' '}
+                        <a href={dataSources.sourceURL} target='_blank' className='light-blue'>
                             Johns Hopkins University CSSE COVID-10 Data Repository
                         </a>.
-                        Last update was {formatUTCDate()}.
-                        <a href={dataSources.citationsURL} target='_blank' className='light-blue dib ml1'>
+                        Last update was {formatUTCDate()} at 12am UTC.{' '}
+                        <a href={dataSources.citationsURL} target='_blank' className='light-blue'>
                             Disclaimer and citations
                         </a>.
                     </p>
