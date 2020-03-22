@@ -122,9 +122,8 @@ export class RegionStats extends Component<Props, State> {
         );
     }
 
-    showMoreButton() {
-        const len = this.props.rows.length - this.props.hiddenCount;
-        const diff = len - this.state.showAmount;
+    showMoreButton(total: number) {
+        const diff = total - this.state.showAmount;
         if (diff <= 0) {
             return '';
         }
@@ -141,11 +140,12 @@ export class RegionStats extends Component<Props, State> {
         if (this.props.loading) {
             return <p>Loading data..</p>
         }
-        const rows = this.props.rows.filter(r => !r.hidden).slice(0, this.state.showAmount);
+        const displayed = this.props.rows.filter(r => !r.hidden);
+        const rows = displayed.slice(0, this.state.showAmount);
         return (
             <div>
                 {rows.map(row => this.rowView(row))}
-                {this.showMoreButton()}
+                {this.showMoreButton(displayed.length)}
             </div>
         );
     }

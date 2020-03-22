@@ -9,7 +9,7 @@ export function formatNumber(x) {
 export function formatUTCDate(date?: Array<number>) {
     if (!date) {
         const d = new Date();
-        date = [d.getFullYear(), d.getMonth(), d.getDate()];
+        date = [d.getFullYear(), d.getMonth() + 1, d.getDate()];
     }
     return new Date(date.join('-')).toLocaleDateString();
 }
