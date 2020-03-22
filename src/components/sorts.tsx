@@ -25,10 +25,11 @@ export class Sorts extends Component<Props, State> {
     render() {
         return (
             <div>
-                <span className='dib mr2 white-80'>Sorting by:</span>
+                <span className='dib mr2 white-80'>Sort by:</span>
                 <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)}>
                     <option value='confirmed'>Confirmed cases</option>
-                    <option value='growth'>Recent growth rate</option>
+                    <option value='growth_desc'>Highest recent growth</option>
+                    <option value='growth_asc'>Least recent growth</option>
                 </select>
             </div>
         );

@@ -12,7 +12,7 @@ export function sortByTotalConfirmed(rows, dir='desc') {
 // Sort by the recent growth rate over last 7 days
 // Data is sorted in place without cloning
 export function sortByGrowth(rows, dir='desc') {
-    genericSort(rows, row => row.averages.newCases7d);
+    genericSort(rows, row => row.averages.newCases7d, dir);
 }
 
 function genericSort(rows, accessor, dir='desc') {

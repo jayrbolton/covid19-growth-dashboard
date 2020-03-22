@@ -19,7 +19,8 @@ interface State {
 
 enum Sorts {
     ConfirmedDesc,
-    GrowthDesc
+    GrowthDesc,
+    GrowthAsc
 }
 
 
@@ -60,8 +61,10 @@ export class App extends Component<Props, State> {
     handleSort(inp: string) {
         if (inp === 'confirmed') {
             this.sortBy = Sorts.ConfirmedDesc;
-        } else if (inp === 'growth') {
+        } else if (inp === 'growth_desc') {
             this.sortBy = Sorts.GrowthDesc;
+        } else if (inp === 'growth_asc') {
+            this.sortBy = Sorts.GrowthAsc;
         } else {
             throw new Error('Unknown sort option: ' + inp);
         }
@@ -77,7 +80,9 @@ export class App extends Component<Props, State> {
         if (this.sortBy === Sorts.ConfirmedDesc) {
             sortByTotalConfirmed(rows);
         } else if (this.sortBy === Sorts.GrowthDesc) {
-            sortByGrowth(rows);
+            sortByGrowth(rows, 'desc');
+        } else if (this.sortBy === Sorts.GrowthAsc) {
+            sortByGrowth(rows, 'asc');
         }
         for (const row of rows) {
             row.hidden = false;
