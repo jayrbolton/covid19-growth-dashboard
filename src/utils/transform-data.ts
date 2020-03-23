@@ -291,6 +291,7 @@ function removeUSCounties(rows) {
     // Mapping of state names to rows
     const states = {};
     const counties = [];
+    // Collect all the counties and states, and filter out counties in the final array
     for (const row of rows) {
         if (row.country === 'US') {
             if (countyRegex.test(row.province)) {
@@ -312,16 +313,15 @@ function removeUSCounties(rows) {
             const stateName = stateCodes[stateCode];
             const state = states[stateName];
             for (const key of dataSources.categoryKeys) { // 3 iterations
-                state.cases[key] = state.cases[key].map((stateTotal, idx) => {
-                    return stateTotal + county.cases[key][idx];
-                })
+                county.cases[key].forEach((countyTotal, idx) => {
+                    state.cases[key][idx] += countyTotal;
+                });
             }
         } else {
             console.error('Unknown county: ' + county);
             continue;
         }
     }
-    console.log(filtered);
     return filtered;
 }
 
