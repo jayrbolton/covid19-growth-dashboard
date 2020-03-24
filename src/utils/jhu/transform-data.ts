@@ -1,12 +1,9 @@
 /*
  * Take data from the source and convert it into something more usable for our purposes.
  */
-import parse from 'csv-parse';
-import * as dataSources from '../constants/data-sources.json';
-import * as states from '../constants/states.json';
-import * as stateCodes from '../constants/state-codes.json';
-
-const parser = parse({delimiter: dataSources.delimiter});
+import * as dataSources from '../../constants/data-sources.json';
+import * as states from '../../constants/states.json';
+import * as stateCodes from '../../constants/state-codes.json';
 
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
 export function transformData(sourceData) {

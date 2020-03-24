@@ -1,5 +1,5 @@
 import {h, Component, Fragment} from 'preact';
-import {SearchInput} from './generic/inputs';
+import {SearchInput} from '../generic/inputs';
 
 
 interface Props {

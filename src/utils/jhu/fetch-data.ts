@@ -3,7 +3,7 @@
  * Returns text blobs of the source CSVs.
  */
 
-import * as dataSources from '~constants/data-sources.json';
+import * as dataSources from '../../constants/data-sources.json';
 
 const LS_DATE_KEY = 'lastFetched';
 const LS_CACHE_PREFIX = 'cache_';
