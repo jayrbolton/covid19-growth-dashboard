@@ -40,10 +40,8 @@ export function transformData(sourceData) {
         rows.push(agg[key]);
     }
     // Additional pre-computation
-    rows = removeUSCounties(rows); // This must come before any aggregation
     insertAggregations(rows); // This must go before the below transformations
     getCurrentTotals(rows);
-    getActives(rows);
     getAverages(rows);
     getPercentages(rows);
     getMaxes(rows);
@@ -128,11 +126,11 @@ function getCurrentTotals(rows) {
 function getAverages (rows) {
     let idx = 0;
     for (const row of rows) {
-        const active = row.cases.active;
-        const newCases = active.reduce((agg, current, idx) => {
+        const confirmed = row.cases.confirmed;
+        const newCases = confirmed.reduce((agg, current, idx) => {
             let prev = 0;
             if (idx > 0) {
-                prev = active[idx - 1];
+                prev = confirmed[idx - 1];
             }
             agg.push(current - prev);
             return agg;
@@ -141,9 +139,12 @@ function getAverages (rows) {
         const newCasesAllTime = Math.round(newCasesSum / newCases.length * 100) / 100;
         const sevenDays = newCases.slice(-7);
         const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
+        const threeDays = newCases.slice(-3);
+        const newCases3d = Math.round(threeDays.reduce((sum, n) => sum + n, 0) / threeDays.length * 100) / 100;
         row.averages = {
             newCasesAllTime,
-            newCases7d
+            newCases7d,
+            newCases3d
         };
         idx += 1;
     }
@@ -153,20 +154,12 @@ function getAverages (rows) {
 // Mutates rows
 function getPercentages (rows) {
     for (const row of rows) {
-        const {confirmed, deaths, recovered, active} = row.currentTotals;
-        let deathsPercentage = 0,
-            recoveredPercentage = 0,
-            activePercentage = 0;
+        const {confirmed, deaths} = row.currentTotals;
+        let deathsPercentage = 0;
         if (confirmed > 0) {
             deathsPercentage = Math.round(deaths * 1000 / confirmed) / 10;
-            recoveredPercentage = Math.round(recovered * 1000 / confirmed) / 10;
-            activePercentage = Math.round(active * 1000 / confirmed) / 10;
         }
-        row.percentages = {
-            deathsPercentage,
-            recoveredPercentage,
-            activePercentage
-        }
+        row.percentages = {deathsPercentage}
     }
 }
 
@@ -175,27 +168,8 @@ function getPercentages (rows) {
 function getMaxes (rows) {
     for (const row of rows) {
         const confirmed = row.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
-        const recovered = row.cases.recovered.reduce((max, n) => n > max ? n : max, 0);
         const deaths = row.cases.deaths.reduce((max, n) => n > max ? n : max, 0);
-        row.maxes = {
-            confirmed, recovered, deaths
-        }
-    }
-}
-
-/**
- * Adds an array of active cases on each date for each region.
- * This mutates each row.cases
- * @param rows
- */
-function getActives(rows) {
-    for (const row of rows) {
-        row.cases.active = row.cases.confirmed.map((n, idx) =>
-            n - row.cases.recovered[idx] - row.cases.deaths[idx]
-        );
-        row.currentTotals.active = row.currentTotals.confirmed -
-            row.currentTotals.deaths -
-            row.currentTotals.recovered;
+        row.maxes = {confirmed, deaths};
     }
 }
 
@@ -273,56 +247,6 @@ function insertAggregations(rows) {
         countryRow.cases = totalCases;
         rows.push(countryRow);
     }
-}
-
-/**
- * At one point, JHU was keeping data on US counties, and then stopped updating
- * their numbers. These counties need to be removed from the entries, and their
- * numbers added into the numbers for the whole-state entry.
- * @param rows
- */
-function removeUSCounties(rows) {
-    // Mapping of county "province" names to proper state names
-    // We must take the stats for each county prior to 3/17 and aggregate them into the whole-state entries
-    // "Washington, D.C." is a sub-region of "District of Columbia"
-    // This is handled as a special case.
-    const filtered = [];
-    const countyRegex = /^.+, ([A-Z]\.?[A-Z]\.?)$/
-    // Mapping of state names to rows
-    const states = {};
-    const counties = [];
-    // Collect all the counties and states, and filter out counties in the final array
-    for (const row of rows) {
-        if (row.country === 'US') {
-            if (countyRegex.test(row.province)) {
-                // Found a county
-                counties.push(row);
-            } else {
-                // Not a county
-                states[row.province] = row;
-                filtered.push(row);
-            }
-        } else {
-            filtered.push(row);
-        }
-    }
-    for (const county of counties) {
-        const matches = county.province.match(countyRegex);
-        if (matches && matches.length === 2) {
-            const stateCode = matches[1];
-            const stateName = stateCodes[stateCode];
-            const state = states[stateName];
-            for (const key of dataSources.categoryKeys) { // 3 iterations
-                county.cases[key].forEach((countyTotal, idx) => {
-                    state.cases[key][idx] += countyTotal;
-                });
-            }
-        } else {
-            console.error('Unknown county: ' + county);
-            continue;
-        }
-    }
-    return filtered;
 }
 
 /**

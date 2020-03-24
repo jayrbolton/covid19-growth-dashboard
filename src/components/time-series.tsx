@@ -7,13 +7,10 @@ interface Props {
     dates: Array<Array<number>>;
     cases: {
         confirmed: Array<number>,
-        recovered: Array<number>,
         deaths: Array<number>,
-        active: Array<number>
     },
     maxes: {
         confirmed: number,
-        recovered: number,
         deaths: number
     }
 }
@@ -23,7 +20,7 @@ interface State {
 
 // Purposes of these sections:
 // - show current state
-//   - show total cases, deaths, recovered
+//   - show total cases, deaths
 //   - compare the above values (bars)
 // - show growth rate
 //    - average new cases all time
@@ -39,35 +36,29 @@ export class TimeSeriesBars extends Component<Props, State> {
         }
     }
 
-    vertBar(active, idx, recoveredPercentages, deathsPercentages) {
-        const recovered = recoveredPercentages[idx];
-        const deaths = deathsPercentages[idx];
+    vertBar(confirmed, idx, max) {
+        const perc = Math.round(confirmed * 100 / max);
         return (
             <div class='flex flex-column h-100 justify-end' style={{width: '1.5%', margin: '0px 0.25%'}}>
-                <div title={'Deaths: ' + deaths + '%'} className='bg-gray' style={{height: deaths + '%'}}></div>
-                <div title={'Recovered: ' + recovered + '%'} className='bg-blue' style={{height: recovered + '%'}}></div>
-                <div title={'Active: ' + active + '%'} className='bg-orange' style={{height: active + '%'}}></div>
+                <div title={'Confirmed: ' + perc + '%'} className='bg-blue' style={{height: perc + '%'}}></div>
             </div>
         );
     }
 
     render() {
-        const {active, confirmed, recovered, deaths} = this.props.cases;
+        const {confirmed, deaths} = this.props.cases;
         const max = this.props.maxes.confirmed;
-        const activePerc = active.slice(-50).map(n => Math.round(n * 100 / max));
-        const recoveredPerc = recovered.slice(-50).map(n => Math.round(n * 100 / max));
-        const deathsPerc = deaths.slice(-50).map(n => Math.round(n * 100 / max));
         const dates = this.props.dates.slice(-50);
         const startDate = formatUTCDate(dates[0]);
         const endDate = formatUTCDate(dates[dates.length - 1]);
         return (
             <div className='w-100'>
                 <div className='white-80 mb1'>
-                    <div className='pr4 f6'>Y-axis: cases (<span className='orange b'>active</span>, <span className='blue b'>recovered</span>, and <span className='gray b'>deaths</span> up to <span className='b'>{formatNumber(max)}</span> cases)</div>
+                    <div className='pr4 f6'>Y-axis: <span className='b blue'>confirmed</span> cases up to <span className='b'>{formatNumber(max)</span> total)</div>
                 </div>
 
                 <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>
-                    {activePerc.map((perc, idx) => this.vertBar(perc, idx, recoveredPerc, deathsPerc))}
+                    {confirmed.map((n, idx) => this.vertBar(n, idx, max))}
                 </div>
 
                 <div className='white-80 mt1'>
