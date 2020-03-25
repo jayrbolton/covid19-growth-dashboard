@@ -1,111 +1,93 @@
 import {h, Component, Fragment} from 'preact';
-import {fetchData} from '../utils/fetch-data';
-import {formatNumber} from '../utils/formatting';
+import {ShowIf} from '../generic/show-if';
+import {formatNumber} from '../../utils/formatting';
 import {TimeSeriesBars} from './time-series';
+import {DashboardData} from './index';
 
 
 interface Props {
-    rows?: any;
-    hiddenCount: number;
     loading: boolean;
-    dates: Array<Array<number>>;
+    data: DashboardData;
 }
 
 interface State {
-    showAmount: number;
 }
-
-// Purposes of these sections:
-// - show current state
-//   - show total cases, deaths
-//   - compare the above values (bars)
-// - show growth rate
-//    - average new cases all time
-//    - average new recent cases
-//    - horizontal bar chart over time of total cases
 
 
 export class RegionStats extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        this.state = {
-            showAmount: 100
-        };
+        this.state = {};
     }
 
     handleClickShowMore() {
+        /* TODO
         this.setState({
             showAmount: this.state.showAmount + 100
         })
+        */
     }
 
-    rowView(row) {
-        if (row.hidden) {
-            return '';
-        }
-        const {confirmed, deaths} = row.currentTotals;
-        const {deathsPercentage, activePercentage} = row.percentages;
-        const {newCasesAllTime, newCases7d, newCases3d} = row.averages;
+    col0Stat(stat) {
         return (
-            <div className='bb b--white-30 pb3 mb3'>
-                <div className='w-100 flex flex-wrap'>
-                    <div className='w-100 w-100-m w-50-ns'>
-                        <div className='f4 mb2'>
-                            {row.province && row.province !== row.country ? row.province + ', ' : ''}
-                            <span className='b'>{row.country}</span>
+            <div className='flex items-center'>
+                <div style={{width: '37%'}} className='white-90'>{stat.label}</div>
+                <div className='nowrap' style={{width: '63%'}}>
+                    <div className='dib b' style={{width: stat.percentage + '%', background: stat.barColor}}>
+                        <div className='dib pa1'>
+                            {formatNumber(stat.stat)}
+                            <ShowIf bool={stat.percentage !== 100}>
+                                <span className='f6 white-80'> ({stat.percentage + '%'})</span>
+                            </ShowIf>
                         </div>
-
-                        <div className='flex flex-wrap'>
-                            <div className='w-100 w-100-m w-50-ns pr2' style={{minWidth: '15rem'}}>
-                                <div className='flex items-center'>
-                                    <div style={{width: '37%'}} className='white-90'>Confirmed:</div>
-                                    <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib pa1 b bg-dark-blue' style={{width: '100%'}}>
-                                            {formatNumber(confirmed)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='flex items-center'>
-                                    <div style={{width: '37%'}} className='white-90'>Deaths:</div>
-                                    <div className='nowrap' style={{width: '63%'}}>
-                                        <div className='dib b bg-gray' style={{width: deathsPercentage + '%'}}>
-                                            <div className='dib pa1'>
-                                                {formatNumber(deaths)} <span className='f6 white-80'>({deathsPercentage + '%'})</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m pl0 pl0-m pl2-ns bn bn-m bl-ns b--white-50'>
-                                <div className='pv1'>Average new cases per day:</div>
-                                <div className='flex items-center pv1'>
-                                    <div className='white-80' style={{width: '45%'}}>Last {this.props.dates.length} days:</div>
-                                    <div>{formatNumber(newCasesAllTime)}</div>
-                                </div >
-                                <div className='flex items-center pv1'>
-                                    <div className='white-80' style={{width: '45%'}}>Last 7 days:</div>
-                                    <div>{formatNumber(newCases7d)}</div>
-                                </div>
-                                <div className='flex items-center pv1'>
-                                    <div className='white-80' style={{width: '45%'}}>Last 3 days:</div>
-                                    <div>{formatNumber(newCases3d)}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex'>
-                        <TimeSeriesBars dates={this.props.dates} cases={row.cases} maxes={row.maxes} />
                     </div>
                 </div>
             </div>
         );
     }
 
-    showMoreButton(total: number) {
-        const diff = total - this.state.showAmount;
+    // Has the type found in DashboardData.entries.col1.stats
+    col1Stat(stat) {
+        return (
+            <div className='flex items-center pv1'>
+                <div className='white-80' style={{width: '45%'}}>{stat.label}</div>
+                <div>{formatNumber(stat.stat)}</div>
+            </div >
+        );
+    }
+
+    rowView(row) {
+        const title = [row.city, row.province, row.country].filter(s => s).join(', ');
+        return (
+            <div className='bb b--white-30 pb3 mb3'>
+                <div className='w-100 flex flex-wrap'>
+                    <div className='w-100 w-100-m w-50-ns'>
+                        <div className='f4 mb2 b'>
+                            {title}
+                        </div>
+
+                        <div className='flex flex-wrap'>
+                            <div className='w-100 w-100-m w-50-ns pr2' style={{minWidth: '15rem'}}>
+                                {row.col0.stats.map(stat => this.col0Stat(stat))}
+                            </div>
+
+                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m pl0 pl0-m pl2-ns bn bn-m bl-ns b--white-50'>
+                                <div className='pv1'>{row.col1.title}</div>
+                                {row.col1.stats.map(stat => this.col1Stat(stat))}
+                            </div>
+                        </div>
+                    </div>
+                    <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex'>
+                        <TimeSeriesBars bars={row.bars} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    showMoreButton() {
+        const diff = this.props.data.count - this.props.data.entries.length;
         if (diff <= 0) {
             return '';
         }
@@ -119,11 +101,10 @@ export class RegionStats extends Component<Props, State> {
     }
 
     render() {
-        if (this.props.loading) {
+        if (this.props.loading || !this.props.data) {
             return <p>Loading data..</p>
         }
-        const displayed = this.props.rows.filter(r => !r.hidden);
-        const rows = displayed.slice(0, this.state.showAmount);
+        const rows = this.props.data.entries;
         if (!rows.length) {
             return (
                 <p className='pv4'>
@@ -134,7 +115,7 @@ export class RegionStats extends Component<Props, State> {
         return (
             <div>
                 {rows.map(row => this.rowView(row))}
-                {this.showMoreButton(displayed.length)}
+                {this.showMoreButton()}
             </div>
         );
     }

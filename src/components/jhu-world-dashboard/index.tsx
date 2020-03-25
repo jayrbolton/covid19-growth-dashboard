@@ -10,6 +10,7 @@ interface Props {
 
 interface State {
     loading: boolean;
+    sourceData?: DashboardData;
 };
 
 export class JHUWorldDashboard extends Component<Props, State> {
@@ -20,14 +21,12 @@ export class JHUWorldDashboard extends Component<Props, State> {
         this.state = {
             loading: true
         };
-    }
-
-    componentDidMount() {
         fetchData()
             .then(transformData)
             .then((sourceData) => {
-                this.sourceData = sourceData;
-            });
+                this.setState({sourceData});
+            })
+            .finally(() => this.setState({loading: false}));
     }
 
     render() {
@@ -47,7 +46,7 @@ export class JHUWorldDashboard extends Component<Props, State> {
                         Disclaimer and citations
                     </a>.
                 </p>
-                <Dashboard loading={this.state.loading} />
+                <Dashboard loading={this.state.loading} sourceData={this.state.sourceData} />
             </div>
         );
     }
