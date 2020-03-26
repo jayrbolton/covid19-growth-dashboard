@@ -2,7 +2,7 @@ import {h, Component} from 'preact';
 import {FiltersAndSorts} from './filters-and-sorts';
 import {RegionStats} from './region-stats';
 import {filterByCountry, filterByProvince} from '../../utils/filter-data';
-import {sortByTotalConfirmed, sortByGrowth} from '../../utils/sort-data';
+import {sortByTotalConfirmed, sortByGrowth, sortByDeaths} from '../../utils/sort-data';
 
 export interface PercentageStat {
     label: string;
@@ -60,8 +60,14 @@ interface State {
 };
 
 export class Dashboard extends Component<Props, State> {
+    // Total count of results before pagination
+    resultsCount: number = 0;
+    // Pagination count
     displayCount: number = 100;
     sourceData: DashboardData;
+    filterCountry: string | null = null;
+    filterProvince: string | null = null;
+    sortBy: string  = 'confirmed';
 
     constructor(props: Props) {
         super(props);
@@ -78,86 +84,57 @@ export class Dashboard extends Component<Props, State> {
             })
     }
 
-    /*
     handleFilterCountry(inp: string) {
         this.filterCountry = inp;
-        this.applyFiltersAndSorts();
+        this.transformSourceData()
     }
-    */
 
-    /*
     handleFilterProvince(inp: string) {
         this.filterProvince = inp;
-        this.applyFiltersAndSorts();
+        this.transformSourceData()
     }
-    */
 
-    /*
     handleSort(inp: string) {
-        if (inp === 'confirmed') {
-            this.sortBy = Sorts.ConfirmedDesc;
-        } else if (inp === 'growth_desc') {
-            this.sortBy = Sorts.GrowthDesc;
-        } else if (inp === 'growth_asc') {
-            this.sortBy = Sorts.GrowthAsc;
-        } else {
-            throw new Error('Unknown sort option: ' + inp);
-        }
-        this.applyFiltersAndSorts()
+        this.sortBy = inp;
+        this.transformSourceData()
     }
-    */
-
-    /*
-    applyFiltersAndSorts() {
-        if (!this.sourceData) {
-            this.setState({rows: []});
-            return;
-        }
-        const rows = this.sourceData.rows.slice(0);
-        if (this.sortBy === Sorts.ConfirmedDesc) {
-            sortByTotalConfirmed(rows);
-        } else if (this.sortBy === Sorts.GrowthDesc) {
-            sortByGrowth(rows, 'desc');
-        } else if (this.sortBy === Sorts.GrowthAsc) {
-            sortByGrowth(rows, 'asc');
-        }
-        for (const row of rows) {
-            row.hidden = false;
-        }
-        if (this.filterCountry) {
-            this.hiddenCount = filterByCountry(rows, this.filterCountry);
-        } 
-        if (this.filterProvince) {
-            this.hiddenCount = filterByProvince(rows, this.filterProvince);
-        } 
-        this.setState({rows, loading: false});
-    }
-    */
 
     handleClickShowMore() {
         this.displayCount = this.displayCount += 100;
-        if (this.displayCount > this.sourceData.count) {
-            this.displayCount = this.sourceData.count;
+        if (this.displayCount > this.resultsCount) {
+            this.displayCount = this.resultsCount;
         }
         this.transformSourceData();
     }
 
     // Paginate, filter, and sort the source data
     transformSourceData() {
-        const displayData = {
-            count: this.displayCount,
-            entries: this.sourceData.entries.slice(0, this.displayCount)
-        };
-        console.log(displayData);
+        // Filter out any entries
+        let entries = this.sourceData.entries;
+        if (this.filterCountry) {
+            entries = filterByCountry(entries, this.filterCountry);
+        }
+        if (this.filterProvince) {
+            entries = filterByProvince(entries, this.filterProvince);
+        }
+        this.resultsCount = entries.length;
+        // Sort the results. The arrays are mutated in place by these functions.
+        if (this.sortBy === 'confirmed') {
+            sortByTotalConfirmed(entries);
+        } else if (this.sortBy === 'growth_desc') {
+            sortByGrowth(entries, 'desc');
+        } else if (this.sortBy === 'deaths') {
+            sortByDeaths(entries, 'desc');
+        }
+        // Paginate
+        entries = entries.slice(0, this.displayCount)
+        // Update state
+        const displayData = {count: this.displayCount, entries};
         this.setState({displayData, loading: false});
     }
 
     showMoreButton() {
-        let displayCount = 0;
-        if (this.state.displayData) {
-            displayCount = this.state.displayData.count;
-        }
-        const diff = this.sourceData.count - displayCount;
+        const diff = this.resultsCount - this.displayCount;
         if (diff <= 0) {
             return '';
         }
@@ -176,18 +153,14 @@ export class Dashboard extends Component<Props, State> {
         }
         return (
             <div className='mt2'>
+                <FiltersAndSorts
+                    onFilterCountry={inp => this.handleFilterCountry(inp)}
+                    onFilterProvince={inp => this.handleFilterProvince(inp)}
+                    onSort={inp => this.handleSort(inp)}
+                />
                 <RegionStats data={this.state.displayData} />
                 {this.showMoreButton()}
             </div>
         );
     }
 }
-
-/* TODO
-                <FiltersAndSorts
-                    loading={this.props.loading}
-                    onFilterCountry={inp => this.handleFilterCountry(inp)}
-                    onFilterProvince={inp => this.handleFilterProvince(inp)}
-                    onSort={inp => this.handleSort(inp)}
-                />
-*/

@@ -29,7 +29,7 @@ export class Sorts extends Component<Props, State> {
                 <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)}>
                     <option value='confirmed'>Confirmed cases</option>
                     <option value='growth_desc'>Highest recent growth</option>
-                    <option value='growth_asc'>Least recent growth</option>
+                    <option value='deaths'>Deaths</option>
                 </select>
             </div>
         );

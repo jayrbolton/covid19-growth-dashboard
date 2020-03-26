@@ -1,18 +1,16 @@
 import {h, Component, Fragment} from 'preact';
-import {SearchInput} from './generic/inputs';
+import {SearchInput} from '../generic/inputs';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
 
 
 interface Props {
-    loading: boolean;
     onFilterCountry?: (string) => void;
     onFilterProvince?: (string) => void;
     onSort?: (string) => void;
 }
 
-interface State {
-}
+interface State {}
 
 
 export class FiltersAndSorts extends Component<Props, State> {
@@ -41,20 +39,15 @@ export class FiltersAndSorts extends Component<Props, State> {
     }
 
     render() {
-        if (this.props.loading) {
-            return '';
-        }
         return (
-            <Fragment>
-                <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between' style={{top: 0, position: 'sticky'}}>
-                    <div>
-                        <Filters onFilterCountry={inp => this.handleFilterCountry(inp)} onFilterProvince={inp => this.handleFilterProvince(inp)}/>
-                    </div>
-                    <div>
-                        <Sorts onSort={inp => this.handleSort(inp)} />
-                    </div>
+            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between' style={{top: 0, position: 'sticky'}}>
+                <div>
+                    <Filters onFilterCountry={inp => this.handleFilterCountry(inp)} onFilterProvince={inp => this.handleFilterProvince(inp)}/>
                 </div>
-            </Fragment>
+                <div>
+                    <Sorts onSort={inp => this.handleSort(inp)} />
+                </div>
+            </div>
         );
     }
 }
