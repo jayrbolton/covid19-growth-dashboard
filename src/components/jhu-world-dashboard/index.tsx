@@ -9,30 +9,16 @@ interface Props {
 };
 
 interface State {
-    loading: boolean;
-    sourceData?: DashboardData;
 };
 
 export class JHUWorldDashboard extends Component<Props, State> {
-    sourceData: any = null;
 
     constructor(props: Props) {
         super(props);
-        this.state = {
-            loading: true
-        };
-        fetchData()
-            .then(transformData)
-            .then((sourceData) => {
-                this.setState({sourceData});
-            })
-            .finally(() => this.setState({loading: false}));
+        this.state = {};
     }
 
     render() {
-        if (this.state.loading) {
-            return <p className='white sans-serif pt5 tc'>Loading data...</p>
-        }
         return (
             <div>
                 <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth</h1>
@@ -46,8 +32,12 @@ export class JHUWorldDashboard extends Component<Props, State> {
                         Disclaimer and citations
                     </a>.
                 </p>
-                <Dashboard loading={this.state.loading} sourceData={this.state.sourceData} />
+                <Dashboard fetchSourceData={fetchSourceData} />
             </div>
         );
     }
+}
+
+function fetchSourceData() {
+    return fetchData().then(transformData)
 }

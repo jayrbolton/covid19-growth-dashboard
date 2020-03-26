@@ -6,7 +6,6 @@ import {DashboardData} from './index';
 
 
 interface Props {
-    loading: boolean;
     data: DashboardData;
 }
 
@@ -86,24 +85,7 @@ export class RegionStats extends Component<Props, State> {
         );
     }
 
-    showMoreButton() {
-        const diff = this.props.data.count - this.props.data.entries.length;
-        if (diff <= 0) {
-            return '';
-        }
-        return (
-            <p>
-                <a onClick={() => this.handleClickShowMore()} className='pointer link b light-blue dim'>
-                    Show more ({diff} remaining)
-                </a>
-            </p>
-        );
-    }
-
     render() {
-        if (this.props.loading || !this.props.data) {
-            return <p>Loading data..</p>
-        }
         const rows = this.props.data.entries;
         if (!rows.length) {
             return (
@@ -113,10 +95,9 @@ export class RegionStats extends Component<Props, State> {
             );
         }
         return (
-            <div>
+            <Fragment>
                 {rows.map(row => this.rowView(row))}
-                {this.showMoreButton()}
-            </div>
+            </Fragment>
         );
     }
 }

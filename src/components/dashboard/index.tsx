@@ -50,17 +50,33 @@ export interface DashboardData {
 }
 
 interface Props {
-    loading: boolean;
-    sourceData: DashboardData;
+    fetchSourceData: () => Promise<DashboardData>;
 };
 
 interface State {
     // A copy of sourceData with sorts and filters applied
-    displayData: DashboardData
+    displayData?: DashboardData;
+    loading: boolean;
 };
 
 export class Dashboard extends Component<Props, State> {
-    hiddenCount: number = 0;
+    displayCount: number = 100;
+    sourceData: DashboardData;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            loading: true
+        };
+    }
+
+    componentDidMount() {
+        this.props.fetchSourceData()
+            .then((sourceData) => {
+                this.sourceData = sourceData;
+                this.transformSourceData();
+            })
+    }
 
     /*
     handleFilterCountry(inp: string) {
@@ -118,16 +134,50 @@ export class Dashboard extends Component<Props, State> {
     }
     */
 
-    render() {
-        if (this.props.loading) {
-            return <p className='white sans-serif pt5 tc'>Loading data...</p>
+    handleClickShowMore() {
+        this.displayCount = this.displayCount += 100;
+        if (this.displayCount > this.sourceData.count) {
+            this.displayCount = this.sourceData.count;
+        }
+        this.transformSourceData();
+    }
+
+    // Paginate, filter, and sort the source data
+    transformSourceData() {
+        const displayData = {
+            count: this.displayCount,
+            entries: this.sourceData.entries.slice(0, this.displayCount)
+        };
+        console.log(displayData);
+        this.setState({displayData, loading: false});
+    }
+
+    showMoreButton() {
+        let displayCount = 0;
+        if (this.state.displayData) {
+            displayCount = this.state.displayData.count;
+        }
+        const diff = this.sourceData.count - displayCount;
+        if (diff <= 0) {
+            return '';
         }
         return (
-            <div>
-                <RegionStats
-                    data={this.props.sourceData}
-                    loading={this.props.loading}
-                />
+            <p>
+                <a onClick={() => this.handleClickShowMore()} className='pointer link b light-blue dim'>
+                    Show more ({diff} remaining)
+                </a>
+            </p>
+        );
+    }
+
+    render() {
+        if (this.state.loading || !this.state.displayData) {
+            return <p className='white sans-serif pt3'>Loading data...</p>
+        }
+        return (
+            <div className='mt2'>
+                <RegionStats data={this.state.displayData} />
+                {this.showMoreButton()}
             </div>
         );
     }

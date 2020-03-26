@@ -7,6 +7,8 @@ import * as stateCodes from '../../constants/state-codes.json';
 
 import {DashboardData} from '../../components/dashboard';
 
+const CONFIRMED_COLOR = 'rgb(53, 126, 221)';
+
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
 export function transformData(sourceData): DashboardData {
     let dates = null; // All date columns, values parsed from the headers
@@ -21,6 +23,9 @@ export function transformData(sourceData): DashboardData {
         }
         lines.slice(1).forEach(rowStr => {
             const row = rowToArray(rowStr);
+            if (!row || !row.length) {
+                return;
+            }
             const id = String(row[dataSources.latIdx]) + ',' + String(row[dataSources.lngIdx]);
             if (!(id in agg)) {
                 agg[id] = {
@@ -69,7 +74,7 @@ function computeCol0Data(entries) {
                 label: 'Confirmed',
                 stat: confirmed,
                 percentage: Math.round(confirmed * 100 / maxConfirmed * 100) / 100,
-                barColor: '#00449e'
+                barColor: CONFIRMED_COLOR
             },
             {
                 label: 'Deaths',
@@ -121,7 +126,7 @@ function computeCol1Data(entries) {
 }
 
 function computeTimeSeries(entries) {
-    const colors = ['rgb(235, 179, 77)'];
+    const colors = [CONFIRMED_COLOR];
     const labels = ['Confirmed'];
     for (const entry of entries) {
         const {confirmed} = entry.cases;
