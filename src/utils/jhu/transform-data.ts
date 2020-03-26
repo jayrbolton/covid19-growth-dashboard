@@ -5,7 +5,7 @@ import * as dataSources from '../../constants/data-sources.json';
 import * as states from '../../constants/states.json';
 import * as stateCodes from '../../constants/state-codes.json';
 
-import {DashboardData} from '../../components/dashboard';
+import {DashboardData} from '../../types/dashboard';
 
 const CONFIRMED_COLOR = 'rgb(53, 126, 221)';
 
@@ -50,11 +50,7 @@ export function transformData(sourceData): DashboardData {
     computeCol1Data(entries);
     computeTimeSeries(entries);
     removeExtras(entries);
-
-    return {
-        count: entries.length,
-        entries
-    };
+    return {entries};
 }
 
 // Remove unneeded intermediate data

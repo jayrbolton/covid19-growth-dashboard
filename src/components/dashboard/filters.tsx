@@ -1,15 +1,12 @@
 import {h, Component, Fragment} from 'preact';
 import {SearchInput} from '../generic/inputs';
 
-
 interface Props {
     onFilterCountry?: (string) => void;
     onFilterProvince?: (string) => void;
-}
+};
 
-interface State {
-}
-
+interface State {};
 
 export class Filters extends Component<Props, State> {
 

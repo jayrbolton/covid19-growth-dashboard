@@ -1,5 +1,6 @@
 import {h, Component} from 'preact';
-import {Dashboard, DashboardData} from '../dashboard';
+import {Dashboard} from '../dashboard';
+import {DashboardData} from '../../types/dashboard';
 import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformData} from '../../utils/jhu/transform-data';
 import {formatUTCDate} from '../../utils/formatting';

@@ -3,7 +3,6 @@ import {SearchInput} from '../generic/inputs';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
 
-
 interface Props {
     onFilterCountry?: (string) => void;
     onFilterProvince?: (string) => void;
@@ -11,7 +10,6 @@ interface Props {
 }
 
 interface State {}
-
 
 export class FiltersAndSorts extends Component<Props, State> {
 

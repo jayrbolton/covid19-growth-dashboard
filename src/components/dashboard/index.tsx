@@ -1,53 +1,12 @@
 import {h, Component} from 'preact';
+// Components
 import {FiltersAndSorts} from './filters-and-sorts';
 import {RegionStats} from './region-stats';
+// Utils
 import {filterByCountry, filterByProvince} from '../../utils/filter-data';
 import {sortByTotalConfirmed, sortByGrowth, sortByDeaths} from '../../utils/sort-data';
-
-export interface PercentageStat {
-    label: string;
-    stat: number;
-    percentage: number;
-    barColor: string;
-}
-
-export interface AverageStat {
-    label: string;
-    stat: number;
-}
-
-export interface TimeSeriesData {
-    percentages: Array<Array<number>>; // Array of percentages for stacked bars
-    colors: Array<string>; // Array of background colors for the bars
-    labels: Array<string>; // Array of bar labels corresponding to above colors
-    yMax: number;
-    xMin: string;
-    xMax: string;
-    yLabel: string; // Y-axis label
-    xLabel: string; // X-axis label
-}
-
-export interface DashboardEntry {
-    city?: string,
-    province?: string,
-    country: string,
-    // First column which can show some stats, colored bars, percentages
-    col0: {
-        stats: Array<PercentageStat>;
-    };
-    // Second column which shows averages with a title
-    col1: {
-        title: string;
-        stats: Array<AverageStat>;
-    };
-    // Vertical bar graph
-    bars: TimeSeriesData;
-}
-
-export interface DashboardData {
-    count: number, // Total entries
-    entries: Array<DashboardEntry>;
-}
+// Types
+import {DashboardData} from '../../types/dashboard';
 
 interface Props {
     fetchSourceData: () => Promise<DashboardData>;
@@ -129,7 +88,7 @@ export class Dashboard extends Component<Props, State> {
         // Paginate
         entries = entries.slice(0, this.displayCount)
         // Update state
-        const displayData = {count: this.displayCount, entries};
+        const displayData = {entries};
         this.setState({displayData, loading: false});
     }
 

@@ -2,16 +2,13 @@ import {h, Component, Fragment} from 'preact';
 import {ShowIf} from '../generic/show-if';
 import {formatNumber} from '../../utils/formatting';
 import {TimeSeriesBars} from './time-series';
-import {DashboardData} from './index';
-
+import {DashboardData} from '../../types/dashboard';
 
 interface Props {
     data: DashboardData;
-}
+};
 
-interface State {
-}
-
+interface State {};
 
 export class RegionStats extends Component<Props, State> {
 
