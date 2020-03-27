@@ -1,6 +1,6 @@
 /**
  * Transform the covidtracking.com data:
- * Take the raw JSON response and transform it into a DashboardData typ
+ * Take the raw JSON response and transform it into a DashboardData type
  */
 import * as stateCodes from '../../constants/state-codes.json';
 import {DashboardData} from '../../types/dashboard';
