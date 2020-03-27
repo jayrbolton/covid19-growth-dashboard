@@ -1,4 +1,4 @@
-import {h, Component} from 'preact';
+import {h, Component, Fragment} from 'preact';
 import {Dashboard} from '../dashboard';
 import {DashboardData} from '../../types/dashboard';
 import {fetchData} from '../../utils/jhu/fetch-data';
@@ -6,11 +6,9 @@ import {transformData} from '../../utils/jhu/transform-data';
 import {formatUTCDate} from '../../utils/formatting';
 import * as dataSources from '../../constants/data-sources.json';
 
-interface Props {
-};
+interface Props {};
 
-interface State {
-};
+interface State {};
 
 export class JHUWorldDashboard extends Component<Props, State> {
 
@@ -21,24 +19,20 @@ export class JHUWorldDashboard extends Component<Props, State> {
 
     render() {
         return (
-            <div>
+            <Fragment>
                 <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth</h1>
                 <p className='f6'>
                     Data is updated daily from the{' '}
                     <a href={dataSources.sourceURL} target='_blank' className='light-blue'>
-                        Johns Hopkins University CSSE COVID-10 Data Repository
-                    </a>.
-                    Last update was {formatUTCDate()} at 12am UTC.{' '}
-                    <a href={dataSources.citationsURL} target='_blank' className='light-blue'>
-                        Disclaimer and citations
+                        Johns Hopkins University CSSE COVID-19 Data Repository
                     </a>.
                 </p>
                 <Dashboard fetchSourceData={fetchSourceData} />
-            </div>
+            </Fragment>
         );
     }
 }
 
 function fetchSourceData() {
-    return fetchData().then(transformData)
+    return fetchData().then(transformData);
 }

@@ -28,15 +28,13 @@ export class RegionStats extends Component<Props, State> {
     col0Stat(stat) {
         return (
             <div className='flex items-center'>
-                <div style={{width: '37%'}} className='white-90'>{stat.label}</div>
-                <div className='nowrap' style={{width: '63%'}}>
-                    <div className='dib b' style={{width: stat.percentage + '%', background: stat.barColor}}>
-                        <div className='dib pa1'>
+                <div style={{width: '50%'}} className='white-90'>{stat.label}</div>
+                <div className='nowrap' style={{width: '50%'}}>
+                    <div className='dib pa1'>
+                        <span className='dib b'>
                             {formatNumber(stat.stat)}
-                            <ShowIf bool={stat.percentage !== 100}>
-                                <span className='f6 white-80'> ({stat.percentage + '%'})</span>
-                            </ShowIf>
-                        </div>
+                            <ShowIf bool={stat.percentage}>%</ShowIf>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -57,25 +55,17 @@ export class RegionStats extends Component<Props, State> {
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
         return (
             <div className='bb b--white-30 pb3 mb3'>
-                <div className='w-100 flex flex-wrap'>
-                    <div className='w-100 w-100-m w-50-ns'>
-                        <div className='f4 mb2 b'>
-                            {title}
-                        </div>
-
-                        <div className='flex flex-wrap'>
-                            <div className='w-100 w-100-m w-50-ns pr2' style={{minWidth: '15rem'}}>
-                                {row.col0.stats.map(stat => this.col0Stat(stat))}
-                            </div>
-
-                            <div className='w-100 w-100-m w-50-ns mt2 mt0-ns mt0-m pl0 pl0-m pl2-ns bn bn-m bl-ns b--white-50'>
-                                <div className='pv1'>{row.col1.title}</div>
-                                {row.col1.stats.map(stat => this.col1Stat(stat))}
-                            </div>
-                        </div>
+                <div className='f4 mb2 b'> {title} </div>
+                <div className='w-100 flex flex-wrap justify-between'>
+                    <div className='w-100 w-100-m w-25-ns' style={{minWidth: '15rem'}}>
+                        {row.col0.stats.map(stat => this.col0Stat(stat))}
                     </div>
-                    <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex'>
-                        <TimeSeriesBars bars={row.bars} />
+                    <div className='w-100 w-100-m w-25-ns mt2 mt0-ns mt0-m pl0 pl0-m pl3-ns'>
+                        <div className='pv1'>{row.col1.title}</div>
+                        {row.col1.stats.map(stat => this.col1Stat(stat))}
+                    </div>
+                    <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns flex pt1'>
+                        <TimeSeriesBars data={row.timeSeries} />
                     </div>
                 </div>
             </div>

@@ -2,8 +2,7 @@ import {h, Component, Fragment} from 'preact';
 import {SearchInput} from '../generic/inputs';
 
 interface Props {
-    onFilterCountry?: (string) => void;
-    onFilterProvince?: (string) => void;
+    onFilterLocation?: (string) => void;
 };
 
 interface State {};
@@ -19,26 +18,11 @@ export class Filters extends Component<Props, State> {
     }
 
     // From an input event, call the callback at most every 200 milliseconds
-    handleFilterCountry(ev) {
+    handleFilterLocation(ev) {
         const inp = ev.currentTarget.value.trim().toLowerCase();
         const callback = () => {
-            if (this.props.onFilterCountry) {
-                this.props.onFilterCountry(inp);
-            }
-        }
-        if (this.timeout) {
-          clearTimeout(this.timeout);
-          this.timeout = null;
-        }
-        this.timeout = window.setTimeout(callback, 200);
-    }
-
-    // From an input event, call the callback at most every 200 milliseconds
-    handleFilterProvince(ev) {
-        const inp = ev.currentTarget.value.trim().toLowerCase();
-        const callback = () => {
-            if (this.props.onFilterProvince) {
-                this.props.onFilterProvince(inp);
+            if (this.props.onFilterLocation) {
+                this.props.onFilterLocation(inp);
             }
         }
         if (this.timeout) {
@@ -51,18 +35,11 @@ export class Filters extends Component<Props, State> {
     render() {
         return (
             <div className='flex items-center'>
-                <div className='mr3'>
-                    <label className='dib mr2 white-80'>Country:</label>
-                    <SearchInput
-                        type='text'
-                        onInput={ev => this.handleFilterCountry(ev)}
-                    />
-                </div>
                 <div>
-                    <label className='dib mr2 white-80'>Province/state:</label>
+                    <label className='dib mr2 white-80'>Search location:</label>
                     <SearchInput
                         type='text'
-                        onInput={ev => this.handleFilterProvince(ev)}
+                        onInput={ev => this.handleFilterLocation(ev)}
                     />
                 </div>
             </div>

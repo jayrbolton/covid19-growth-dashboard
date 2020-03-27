@@ -1,9 +1,10 @@
 // Time series bar chart
 import {h, Component, Fragment} from 'preact';
 import {formatUTCDate, formatNumber} from '../../utils/formatting';
+import {TimeSeriesData} from '../../types/dashboard';
 
 interface Props {
-    bars: any;
+    data: TimeSeriesData;
 }
 
 interface State {
@@ -61,27 +62,19 @@ export class TimeSeriesBars extends Component<Props, State> {
     }
 
     render() {
-        const {percentages, colors, labels} = this.props.bars;
-        const start = new Date(this.props.bars.xMin).toLocaleDateString();
-        const end = new Date(this.props.bars.xMax).toLocaleDateString();
+        const {percentages, colors, labels} = this.props.data;
+        const start = new Date(this.props.data.xMin).toLocaleDateString();
+        const end = new Date(this.props.data.xMax).toLocaleDateString();
         return (
             <div className='w-100'>
-                <div className='white-90 mb1'>
-                    <div className='pr4 f6'>
-                        Y-axis: {this.yAxisLabels(this.props.bars.labels, this.props.bars.colors)}
-                        up to <span className='b'>{formatNumber(this.props.bars.yMax)}</span>{' '}
-                        total
-                    </div>
-                </div>
 
                 <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>
                     {percentages.map((perc, idx) => this.vertBar(perc, idx, colors, labels))}
                 </div>
 
-                <div className='white-90 mt1'>
-                    <div className='f6'>
-                        X-axis: {this.props.bars.xLabel} (from {start} to {end})
-                    </div>
+                <div className='white-90 f6 mt2'>
+                    {this.yAxisLabels(this.props.data.labels, this.props.data.colors)}{' '}
+                    from <b>0</b> on <b>{start}</b> up to <b>{formatNumber(this.props.data.yMax)}</b> on <b>{end}</b>
                 </div>
             </div>
         );

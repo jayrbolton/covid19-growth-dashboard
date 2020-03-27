@@ -3,6 +3,11 @@
  */
 
 
+export function sortByCol0Stat(rows, index, dir='desc') {
+    genericSort(rows, row => row.col0.stats[index].stat, dir);
+}
+
+
 // Sort all entries by the current total confirmed cases
 // Data is sorted in place without cloning
 export function sortByTotalConfirmed(rows, dir='desc') {

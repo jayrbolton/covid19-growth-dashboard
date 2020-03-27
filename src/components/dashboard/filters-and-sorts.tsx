@@ -2,11 +2,12 @@ import {h, Component, Fragment} from 'preact';
 import {SearchInput} from '../generic/inputs';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
+import {DashboardEntry} from '../../types/dashboard';
 
 interface Props {
-    onFilterCountry?: (string) => void;
-    onFilterProvince?: (string) => void;
+    onFilterLocation?: (string) => void;
     onSort?: (string) => void;
+    rowExample: DashboardEntry;
 }
 
 interface State {}
@@ -18,15 +19,9 @@ export class FiltersAndSorts extends Component<Props, State> {
         this.state = {};
     }
 
-    handleFilterCountry(inp: string) {
-        if (this.props.onFilterCountry) {
-            this.props.onFilterCountry(inp);
-        }
-    }
-
-    handleFilterProvince(inp: string) {
-        if (this.props.onFilterProvince) {
-            this.props.onFilterProvince(inp);
+    handleFilterLocation(inp: string) {
+        if (this.props.onFilterLocation) {
+            this.props.onFilterLocation(inp);
         }
     }
 
@@ -40,10 +35,10 @@ export class FiltersAndSorts extends Component<Props, State> {
         return (
             <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between' style={{top: 0, position: 'sticky'}}>
                 <div>
-                    <Filters onFilterCountry={inp => this.handleFilterCountry(inp)} onFilterProvince={inp => this.handleFilterProvince(inp)}/>
+                    <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                 </div>
                 <div>
-                    <Sorts onSort={inp => this.handleSort(inp)} />
+                    <Sorts onSort={inp => this.handleSort(inp)} rowExample={this.props.rowExample} />
                 </div>
             </div>
         );

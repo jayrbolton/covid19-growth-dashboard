@@ -3,8 +3,8 @@ import {h, Component} from 'preact';
 import {FiltersAndSorts} from './filters-and-sorts';
 import {RegionStats} from './region-stats';
 // Utils
-import {filterByCountry, filterByProvince} from '../../utils/filter-data';
-import {sortByTotalConfirmed, sortByGrowth, sortByDeaths} from '../../utils/sort-data';
+import {filterLocation} from '../../utils/filter-data';
+import {sortByCol0Stat} from '../../utils/sort-data';
 // Types
 import {DashboardData} from '../../types/dashboard';
 
@@ -24,9 +24,8 @@ export class Dashboard extends Component<Props, State> {
     // Pagination count
     displayCount: number = 100;
     sourceData: DashboardData;
-    filterCountry: string | null = null;
-    filterProvince: string | null = null;
-    sortBy: string  = 'confirmed';
+    filterLocation: string | null = null;
+    sortBy: number  = 0;
 
     constructor(props: Props) {
         super(props);
@@ -43,17 +42,12 @@ export class Dashboard extends Component<Props, State> {
             })
     }
 
-    handleFilterCountry(inp: string) {
-        this.filterCountry = inp;
+    handleFilterLocation(inp: string) {
+        this.filterLocation = inp;
         this.transformSourceData()
     }
 
-    handleFilterProvince(inp: string) {
-        this.filterProvince = inp;
-        this.transformSourceData()
-    }
-
-    handleSort(inp: string) {
+    handleSort(inp: number) {
         this.sortBy = inp;
         this.transformSourceData()
     }
@@ -70,21 +64,12 @@ export class Dashboard extends Component<Props, State> {
     transformSourceData() {
         // Filter out any entries
         let entries = this.sourceData.entries;
-        if (this.filterCountry) {
-            entries = filterByCountry(entries, this.filterCountry);
-        }
-        if (this.filterProvince) {
-            entries = filterByProvince(entries, this.filterProvince);
+        if (this.filterLocation) {
+            entries = filterLocation(entries, this.filterLocation);
         }
         this.resultsCount = entries.length;
         // Sort the results. The arrays are mutated in place by these functions.
-        if (this.sortBy === 'confirmed') {
-            sortByTotalConfirmed(entries);
-        } else if (this.sortBy === 'growth_desc') {
-            sortByGrowth(entries, 'desc');
-        } else if (this.sortBy === 'deaths') {
-            sortByDeaths(entries, 'desc');
-        }
+        sortByCol0Stat(entries, this.sortBy, 'desc');
         // Paginate
         entries = entries.slice(0, this.displayCount)
         // Update state
@@ -113,8 +98,8 @@ export class Dashboard extends Component<Props, State> {
         return (
             <div className='mt2'>
                 <FiltersAndSorts
-                    onFilterCountry={inp => this.handleFilterCountry(inp)}
-                    onFilterProvince={inp => this.handleFilterProvince(inp)}
+                    rowExample={this.state.displayData.entries[0]}
+                    onFilterLocation={inp => this.handleFilterLocation(inp)}
                     onSort={inp => this.handleSort(inp)}
                 />
                 <RegionStats data={this.state.displayData} />

@@ -69,14 +69,10 @@ function computeCol0Data(entries) {
             {
                 label: 'Confirmed',
                 stat: confirmed,
-                percentage: Math.round(confirmed * 100 / maxConfirmed * 100) / 100,
-                barColor: CONFIRMED_COLOR
             },
             {
                 label: 'Deaths',
                 stat: deaths,
-                percentage: Math.round(deaths * 100 / maxConfirmed * 100) / 100,
-                barColor: '#777'
             },
         ];
         entry.col0 = {stats};
@@ -132,7 +128,7 @@ function computeTimeSeries(entries) {
         const start = new Date();
         start.setDate(start.getDate() - 50);
         const end = new Date();
-        entry.bars = {
+        entry.timeSeries = {
             percentages,
             colors,
             labels,
