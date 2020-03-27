@@ -74,7 +74,8 @@ export class TimeSeriesBars extends Component<Props, State> {
 
                 <div className='white-90 f6 mt2'>
                     {this.yAxisLabels(this.props.data.labels, this.props.data.colors)}{' '}
-                    from <b>0</b> on <b>{start}</b> up to <b>{formatNumber(this.props.data.yMax)}</b> on <b>{end}</b>
+                    from <b>{formatNumber(this.props.data.yMin)}</b> on <b>{start}</b>{' '}
+                    up to <b>{formatNumber(this.props.data.yMax)}</b> on <b>{end}</b>
                 </div>
             </div>
         );

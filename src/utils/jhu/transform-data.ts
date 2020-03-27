@@ -123,6 +123,7 @@ function computeTimeSeries(entries) {
     for (const entry of entries) {
         const {confirmed} = entry.cases;
         const max = entry.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
+        const min = entry.cases.confirmed.reduce((min, n) => n < min ? n : min, Infinity);
         const percentages = confirmed.slice(-50)
             .map(n => [Math.round(n * 100 / max)]);
         const start = new Date();
@@ -133,6 +134,7 @@ function computeTimeSeries(entries) {
             colors,
             labels,
             yMax: max,
+            yMin: min,
             xMin: start,
             xMax: end,
             yLabel: 'cases',

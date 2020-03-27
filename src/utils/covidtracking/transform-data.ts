@@ -88,6 +88,7 @@ export function transformData(resp: string): DashboardData {
             ]
         };
         const maxPos = series.reduce((max, each) => each.positive > max ? each.positive : max, 0);
+        const minPos = series.reduce((min, each) => each.positive < min ? each.positive : min, Infinity);
         const percentages = series.map(each => {
             // const neg = Math.round(each.negative * 100 / maxPos * 100) / 100;
             const pos = Math.round(each.positive * 100 / maxPos * 100) / 100;
@@ -108,6 +109,7 @@ export function transformData(resp: string): DashboardData {
             colors: [POS_COLOR],
             labels: ['Positive cases'],
             yMax: maxPos,
+            yMin: minPos,
             xMin: startDate,
             xMax: endDate,
             yLabel: 'Test results',

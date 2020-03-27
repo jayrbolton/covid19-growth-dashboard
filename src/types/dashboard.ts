@@ -41,6 +41,7 @@ export interface TimeSeriesData {
     colors: Array<string>; // Array of background colors for the bars, bottom to top
     labels: Array<string>; // Array of bar labels corresponding to above colors, bottom to top
     yMax: number; // Maximum y-axis value
+    yMin: number; // Minimum y-axis value
     xMin: string; // Minimum x-axis value (probably the start date)
     xMax: string; // Maximum x-axis value (probably the end date)
     yLabel: string; // Y-axis label
