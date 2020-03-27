@@ -1,15 +1,16 @@
 /*
  * Take data from the source and convert it into something more usable for our purposes.
  */
-import parse from 'csv-parse';
-import * as dataSources from '../constants/data-sources.json';
-import * as states from '../constants/states.json';
-import * as stateCodes from '../constants/state-codes.json';
+import * as dataSources from '../../constants/data-sources.json';
+import * as states from '../../constants/states.json';
+import * as stateCodes from '../../constants/state-codes.json';
 
-const parser = parse({delimiter: dataSources.delimiter});
+import {DashboardData} from '../../types/dashboard';
+
+const CONFIRMED_COLOR = 'rgb(53, 126, 221)';
 
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
-export function transformData(sourceData) {
+export function transformData(sourceData): DashboardData {
     let dates = null; // All date columns, values parsed from the headers
     let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
     // Largest totals for creating bars
@@ -22,6 +23,9 @@ export function transformData(sourceData) {
         }
         lines.slice(1).forEach(rowStr => {
             const row = rowToArray(rowStr);
+            if (!row || !row.length) {
+                return;
+            }
             const id = String(row[dataSources.latIdx]) + ',' + String(row[dataSources.lngIdx]);
             if (!(id in agg)) {
                 agg[id] = {
@@ -35,21 +39,108 @@ export function transformData(sourceData) {
         });
     }
     // Convert the aggregation object into an array
-    let rows = [];
+    let entries = [];
     for (const key in agg) {
-        rows.push(agg[key]);
+        entries.push(agg[key]);
     }
     // Additional pre-computation
-    insertAggregations(rows); // This must go before the below transformations
-    getCurrentTotals(rows);
-    getAverages(rows);
-    getPercentages(rows);
-    getMaxes(rows);
-    renameCountries(rows);
-    return {
-        dates: dates,
-        rows: rows
-    };
+    insertAggregations(entries); // This must go before the below transformations
+    renameCountries(entries);
+    computeCol0Data(entries);
+    computeCol1Data(entries);
+    computeTimeSeries(entries);
+    removeExtras(entries);
+    return {entries};
+}
+
+// Remove unneeded intermediate data
+function removeExtras(entries) {
+    for (const entry of entries) {
+        delete entry.cases;
+    }
+}
+
+function computeCol0Data(entries) {
+    for (const entry of entries) {
+        const confirmed = entry.cases.confirmed[entry.cases.confirmed.length - 1];
+        const deaths = entry.cases.deaths[entry.cases.deaths.length - 1];
+        const maxConfirmed = entry.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
+        const stats = [
+            {
+                label: 'Confirmed',
+                stat: confirmed,
+            },
+            {
+                label: 'Deaths',
+                stat: deaths,
+            },
+        ];
+        entry.col0 = {stats};
+    }
+}
+
+function computeCol1Data(entries) {
+    for (const entry of entries) {
+        const {confirmed, deaths} = entry.cases;
+        const newCases = confirmed.reduce((agg, current, idx) => {
+            let prev = 0;
+            if (idx > 0) {
+                prev = confirmed[idx - 1];
+            }
+            agg.push(current - prev);
+            return agg;
+        }, []);
+        const newCasesSum = newCases.reduce((sum, n) => sum + n, 0);
+        const newCasesAll = Math.round(newCasesSum / newCases.length * 100) / 100;
+        const sevenDays = newCases.slice(-7);
+        const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
+        const threeDays = newCases.slice(-3);
+        const newCases3d = Math.round(threeDays.reduce((sum, n) => sum + n, 0) / threeDays.length * 100) / 100;
+        const stats = [
+            {
+                label: `Last ${confirmed.length} days`,
+                stat: newCasesAll
+            },
+            {
+                label: 'Last 7 days',
+                stat: newCases7d
+            },
+            {
+                label: 'Last 3 days',
+                stat: newCases3d
+            }
+        ]
+        entry.col1 = {
+            title: 'Average new cases per day:',
+            stats
+        }
+    }
+}
+
+function computeTimeSeries(entries) {
+    const colors = [CONFIRMED_COLOR];
+    const labels = ['Confirmed'];
+    for (const entry of entries) {
+        const {confirmed} = entry.cases;
+        const max = entry.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
+        const min = entry.cases.confirmed.reduce((min, n) => n < min ? n : min, Infinity);
+        const percentages = confirmed.slice(-50)
+            .map(n => [Math.round(n * 100 / max)]);
+        const start = new Date();
+        start.setDate(start.getDate() - 50);
+        const end = new Date();
+        entry.timeSeries = {
+            percentages,
+            colors,
+            labels,
+            yMax: max,
+            yMin: min,
+            xMin: start,
+            xMax: end,
+            yLabel: 'cases',
+            xLabel: 'days'
+        }
+    }
 }
 
 // Get the array of dates as [year, month, day] triples
@@ -102,74 +193,6 @@ function parseColumnVal(val) {
         return val;
     } else {
         return Number(val);
-    }
-}
-
-/**
- * Compute aggregated totals for each time series in the region
- * Mutates each row in rows
- * @param rows
- */
-function getCurrentTotals(rows) {
-    for (const row of rows) {
-        row.currentTotals = {}
-        for (const key of dataSources.categoryKeys) {
-            const timeSeries = row.cases[key];
-            const current = timeSeries[timeSeries.length - 1];
-            row.currentTotals[key] = current;
-        }
-    }
-}
-
-// Compute case averages, such as new cases in the last 7 days
-// Mutates input
-function getAverages (rows) {
-    let idx = 0;
-    for (const row of rows) {
-        const confirmed = row.cases.confirmed;
-        const newCases = confirmed.reduce((agg, current, idx) => {
-            let prev = 0;
-            if (idx > 0) {
-                prev = confirmed[idx - 1];
-            }
-            agg.push(current - prev);
-            return agg;
-        }, [])
-        const newCasesSum = newCases.reduce((sum, n) => sum + n, 0);
-        const newCasesAllTime = Math.round(newCasesSum / newCases.length * 100) / 100;
-        const sevenDays = newCases.slice(-7);
-        const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
-        const threeDays = newCases.slice(-3);
-        const newCases3d = Math.round(threeDays.reduce((sum, n) => sum + n, 0) / threeDays.length * 100) / 100;
-        row.averages = {
-            newCasesAllTime,
-            newCases7d,
-            newCases3d
-        };
-        idx += 1;
-    }
-}
-
-// Calculate percentage stats for the cases (eg. what is the percentage of deaths as compared to confirmed)?
-// Mutates rows
-function getPercentages (rows) {
-    for (const row of rows) {
-        const {confirmed, deaths} = row.currentTotals;
-        let deathsPercentage = 0;
-        if (confirmed > 0) {
-            deathsPercentage = Math.round(deaths * 1000 / confirmed) / 10;
-        }
-        row.percentages = {deathsPercentage}
-    }
-}
-
-// Calculate max values for each time series
-// Mutates rows
-function getMaxes (rows) {
-    for (const row of rows) {
-        const confirmed = row.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
-        const deaths = row.cases.deaths.reduce((max, n) => n > max ? n : max, 0);
-        row.maxes = {confirmed, deaths};
     }
 }
 
@@ -246,6 +269,19 @@ function insertAggregations(rows) {
         }
         countryRow.cases = totalCases;
         rows.push(countryRow);
+    }
+}
+
+// Calculate percentage stats for the cases (eg. what is the percentage of deaths as compared to confirmed)?
+// Mutates rows
+function getPercentages (rows) {
+    for (const row of rows) {
+        const {confirmed, deaths} = row.currentTotals;
+        let deathsPercentage = 0;
+        if (confirmed > 0) {
+            deathsPercentage = Math.round(deaths * 1000 / confirmed) / 10;
+        }
+        row.percentages = {deathsPercentage}
     }
 }
 

@@ -3,7 +3,7 @@
  * Returns text blobs of the source CSVs.
  */
 
-import * as dataSources from '~constants/data-sources.json';
+import * as dataSources from '../../constants/data-sources.json';
 
 
 export async function fetchData() {
