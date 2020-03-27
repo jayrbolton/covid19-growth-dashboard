@@ -7,6 +7,7 @@ import {queryToObj, updateURLQuery} from '../utils/url';
 import {Nav, Page} from './nav';
 import {JHUWorldDashboard} from './jhu-world-dashboard';
 import {USADashboard} from './usa-dashboard';
+import {AboutPage} from './about-page';
 
 const history = createBrowserHistory();
 
@@ -22,7 +23,7 @@ export class App extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        const defaultPage = 'us-data';
+        const defaultPage = 'about';
         this.state = {
             currentPage: defaultPage
         };
@@ -56,6 +57,13 @@ export class App extends Component<Props, State> {
         return (<USADashboard />);
     }
 
+    aboutPage() {
+        if (this.state.currentPage !== 'about') {
+            return '';
+        }
+        return (<AboutPage />);
+    }
+
     render() {
         return (
             <div className='bg-near-black sans-serif white'>
@@ -63,6 +71,7 @@ export class App extends Component<Props, State> {
                 <div className='mw8 center pa2' style={{paddingTop: '4rem'}}>
                     {this.worldDataPage()}
                     {this.usDataPage()}
+                    {this.aboutPage()}
                 </div>
             </div>
         );
