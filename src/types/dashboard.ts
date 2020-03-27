@@ -1,5 +1,7 @@
 /**
- * Data types used in the generic consumed by the generic dashboard UI
+ * Data types used throughout the generic dashboard UI
+ *
+ * If you can translate some data source into this structure, then the dashboard UI will work.
  */
 
 export interface DashboardData {
