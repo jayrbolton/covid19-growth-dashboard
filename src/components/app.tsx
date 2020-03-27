@@ -23,7 +23,7 @@ export class App extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        const defaultPage = 'about';
+        const defaultPage = 'us-data';
         this.state = {
             currentPage: defaultPage
         };
