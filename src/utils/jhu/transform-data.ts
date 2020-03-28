@@ -46,11 +46,11 @@ export function transformData(sourceData): DashboardData {
     // Additional pre-computation
     insertAggregations(entries); // This must go before the below transformations
     renameCountries(entries);
-    computeCol0Data(entries);
-    computeCol1Data(entries);
+    computeStats(entries);
     computeTimeSeries(entries);
     removeExtras(entries);
-    return {entries};
+    const entryLabels = ['Confirmed', 'Deaths'];
+    return {entries, entryLabels};
 }
 
 // Remove unneeded intermediate data
@@ -60,60 +60,21 @@ function removeExtras(entries) {
     }
 }
 
-function computeCol0Data(entries) {
+function computeStats(entries) {
     for (const entry of entries) {
         const confirmed = entry.cases.confirmed[entry.cases.confirmed.length - 1];
         const deaths = entry.cases.deaths[entry.cases.deaths.length - 1];
         const maxConfirmed = entry.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
-        const stats = [
+        entry.stats = [
             {
                 label: 'Confirmed',
-                stat: confirmed,
+                val: confirmed,
             },
             {
                 label: 'Deaths',
-                stat: deaths,
+                val: deaths,
             },
         ];
-        entry.col0 = {stats};
-    }
-}
-
-function computeCol1Data(entries) {
-    for (const entry of entries) {
-        const {confirmed, deaths} = entry.cases;
-        const newCases = confirmed.reduce((agg, current, idx) => {
-            let prev = 0;
-            if (idx > 0) {
-                prev = confirmed[idx - 1];
-            }
-            agg.push(current - prev);
-            return agg;
-        }, []);
-        const newCasesSum = newCases.reduce((sum, n) => sum + n, 0);
-        const newCasesAll = Math.round(newCasesSum / newCases.length * 100) / 100;
-        const sevenDays = newCases.slice(-7);
-        const newCases7d = Math.round(sevenDays.reduce((sum, n) => sum + n, 0) / sevenDays.length * 100) / 100;
-        const threeDays = newCases.slice(-3);
-        const newCases3d = Math.round(threeDays.reduce((sum, n) => sum + n, 0) / threeDays.length * 100) / 100;
-        const stats = [
-            {
-                label: `Last ${confirmed.length} days`,
-                stat: newCasesAll
-            },
-            {
-                label: 'Last 7 days',
-                stat: newCases7d
-            },
-            {
-                label: 'Last 3 days',
-                stat: newCases3d
-            }
-        ]
-        entry.col1 = {
-            title: 'Average new cases per day:',
-            stats
-        }
     }
 }
 

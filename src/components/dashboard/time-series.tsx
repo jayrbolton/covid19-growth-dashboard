@@ -66,8 +66,7 @@ export class TimeSeriesBars extends Component<Props, State> {
         const start = new Date(this.props.data.xMin).toLocaleDateString();
         const end = new Date(this.props.data.xMax).toLocaleDateString();
         return (
-            <div className='w-100'>
-
+            <Fragment>
                 <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>
                     {percentages.map((perc, idx) => this.vertBar(perc, idx, colors, labels))}
                 </div>
@@ -77,7 +76,7 @@ export class TimeSeriesBars extends Component<Props, State> {
                     from <b>{formatNumber(this.props.data.yMin)}</b> on <b>{start}</b>{' '}
                     up to <b>{formatNumber(this.props.data.yMax)}</b> on <b>{end}</b>
                 </div>
-            </div>
+            </Fragment>
         );
     }
 }

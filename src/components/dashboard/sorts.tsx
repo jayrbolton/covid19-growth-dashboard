@@ -6,7 +6,7 @@ import {DashboardEntry} from '../../types/dashboard';
 interface Props {
     onSort?: (string) => void;
     // Used to automatically fill in the sort options
-    rowExample: DashboardEntry;
+    entryLabels: Array<string>;
 }
 
 interface State {}
@@ -26,16 +26,14 @@ export class Sorts extends Component<Props, State> {
     }
 
     render() {
-        const sortNames = this.props.rowExample.col0.stats.map(each => each.label);
-        const sortIndexes = this.props.rowExample.col0.stats.map((_, idx) => idx);
         return (
             <div>
                 <span className='dib mr2 white-80'>Sort by:</span>
                 <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)}>
                     {
-                        sortNames.map((name, idx) => {
+                        this.props.entryLabels.map((label, idx) => {
                             return (
-                                <option value={idx}>{name}</option>
+                                <option value={idx}>{label}</option>
                             );
                         })
                     }

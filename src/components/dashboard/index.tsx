@@ -4,7 +4,7 @@ import {FiltersAndSorts} from './filters-and-sorts';
 import {RegionStats} from './region-stats';
 // Utils
 import {filterLocation} from '../../utils/filter-data';
-import {sortByCol0Stat} from '../../utils/sort-data';
+import {sortByStat} from '../../utils/sort-data';
 // Types
 import {DashboardData} from '../../types/dashboard';
 
@@ -69,11 +69,11 @@ export class Dashboard extends Component<Props, State> {
         }
         this.resultsCount = entries.length;
         // Sort the results. The arrays are mutated in place by these functions.
-        sortByCol0Stat(entries, this.sortBy, 'desc');
+        sortByStat(entries, this.sortBy, 'desc');
         // Paginate
         entries = entries.slice(0, this.displayCount)
         // Update state
-        const displayData = {entries};
+        const displayData = {entries, entryLabels: this.sourceData.entryLabels};
         this.setState({displayData, loading: false});
     }
 
@@ -98,7 +98,7 @@ export class Dashboard extends Component<Props, State> {
         return (
             <div className='mt2'>
                 <FiltersAndSorts
-                    rowExample={this.state.displayData.entries[0]}
+                    entryLabels={this.state.displayData.entryLabels}
                     onFilterLocation={inp => this.handleFilterLocation(inp)}
                     onSort={inp => this.handleSort(inp)}
                 />

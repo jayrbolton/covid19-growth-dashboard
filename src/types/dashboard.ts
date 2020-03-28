@@ -6,35 +6,24 @@
 
 export interface DashboardData {
     entries: Array<DashboardEntry>;
+    // Master list of statistic label names for each entry (so we know what to sort on)
+    // Indexes should correspond to the same indexes in DashboardEntry.stats
+    entryLabels: Array<string>;
 }
 
 export interface DashboardEntry {
     city?: string,
     province?: string,
     country: string,
-    // First column which can show some stats, colored bars, percentages
-    col0: {
-        stats: Array<PercentageStat>;
-    };
-    // Second column which shows averages with a title
-    col1: {
-        title: string;
-        stats: Array<AverageStat>;
-    };
+    stats: Array<EntryStat>;
     // Vertical bar graph
     timeSeries: TimeSeriesData;
 }
 
-export interface PercentageStat {
-    label: string; // Eg. "Confirmed"
-    stat: number;  // Eg. 1234
-    percentage: number; // Eg. "100%"
-    barColor: string;   // Eg. "#222"
-}
-
-export interface AverageStat {
-    label: string; // Eg. "Last 7 days"
-    stat: number;  // Eg. 12.23
+export interface EntryStat {
+    label: string;
+    val: number;
+    percentage: boolean; // Is this a percentage value?
 }
 
 export interface TimeSeriesData {

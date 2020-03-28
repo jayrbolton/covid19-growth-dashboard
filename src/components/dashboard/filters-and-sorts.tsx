@@ -7,7 +7,7 @@ import {DashboardEntry} from '../../types/dashboard';
 interface Props {
     onFilterLocation?: (string) => void;
     onSort?: (string) => void;
-    rowExample: DashboardEntry;
+    entryLabels: Array<string>;
 }
 
 interface State {}
@@ -38,7 +38,7 @@ export class FiltersAndSorts extends Component<Props, State> {
                     <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                 </div>
                 <div>
-                    <Sorts onSort={inp => this.handleSort(inp)} rowExample={this.props.rowExample} />
+                    <Sorts onSort={inp => this.handleSort(inp)} entryLabels={this.props.entryLabels} />
                 </div>
             </div>
         );
