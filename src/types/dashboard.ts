@@ -12,29 +12,20 @@ export interface DashboardData {
 }
 
 export interface DashboardEntry {
-    city?: string,
-    province?: string,
-    country: string,
+    location: string;
     stats: Array<EntryStat>;
-    // Vertical bar graph
-    timeSeries: TimeSeriesData;
 }
 
 export interface EntryStat {
     label: string;
     val: number;
-    percentage: boolean; // Is this a percentage value?
+    isPercentage: boolean;
+    percentGrowth: number;
+    growthRate: number;
+    timeSeries: TimeSeriesData;
 }
 
 export interface TimeSeriesData {
-    percentages: Array<Array<number>>; // Array of percentages for stacked bars
-    amounts: Array<Array<number>>; // Raw amounts for each entry
-    colors: Array<string>; // Array of background colors for the bars, bottom to top
-    labels: Array<string>; // Array of bar labels corresponding to above colors, bottom to top
-    yMax: number; // Maximum y-axis value
-    yMin: number; // Minimum y-axis value
-    xMin: string; // Minimum x-axis value (probably the start date)
-    xMax: string; // Maximum x-axis value (probably the end date)
-    yLabel: string; // Y-axis label
-    xLabel: string; // X-axis label
+    values: Array<number>; // Actual values in the time series
+    color: string; // Color for the line or bar 
 }

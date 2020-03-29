@@ -4,23 +4,7 @@
 
 
 export function filterLocation(rows, query: string = '') {
-    const accessor = row => {
-        return [row.city, row.province, row.country].filter(x => x).join(', ');
-    }
-    return genericSearch(rows, accessor, query);
-}
-
-
-// Filter rows by region (country/region/province/state) -- exact prefix match, case-insensitive
-// Returns a new array of arrays
-export function filterByCountry(rows, query: string = '') {
-    return genericSearch(rows, row => row.country, query);
-}
-
-// Filter rows by region (country/region/province/state) -- exact prefix match, case-insensitive
-// Returns a new array of arrays
-export function filterByProvince(rows, query: string = '') {
-    return genericSearch(rows, row => row.province || '', query);
+    return genericSearch(rows, row => row.location, query);
 }
 
 function genericSearch(rows, accessor, query) {

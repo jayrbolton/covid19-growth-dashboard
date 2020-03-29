@@ -2,6 +2,7 @@ import {h, Component, Fragment} from 'preact';
 import {SearchInput} from '../generic/inputs';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
+import {MetricsSelector} from './metrics-selector';
 import {DashboardEntry} from '../../types/dashboard';
 
 interface Props {
@@ -33,11 +34,12 @@ export class FiltersAndSorts extends Component<Props, State> {
 
     render() {
         return (
-            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between' style={{top: 0, position: 'sticky'}}>
+            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between items-center' style={{top: 0, position: 'sticky'}}>
                 <div>
                     <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                 </div>
-                <div>
+                <div className='flex items-center'>
+                    <MetricsSelector />
                     <Sorts onSort={inp => this.handleSort(inp)} entryLabels={this.props.entryLabels} />
                 </div>
             </div>
