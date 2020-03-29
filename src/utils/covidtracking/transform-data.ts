@@ -64,38 +64,54 @@ export function transformData(resp: string): DashboardData {
         country: 'US Totals',
         series: aggregateArr
     }
+    /*
+    const negative = getStat('Negative cases', COLORS[5], series.map(each => each.negative));
+    const totalTests = getStat('Total tests', COLORS[1], series.map(each => each.totalTestResults));
+    // Percentage stats
+    const mortality = getPercentageStat('Percent death', COLORS[0], series.map(each => {
+        return percent(each.death, each.positive);
+    }));
+    const percentHospitalized = getPercentageStat('Percent hospitalized', COLORS[3], data[state].series.map(each => {
+        return percent(each.hospitalized, each.positive);
+    }));
+    */
     // Convert the data into DashboardData
     let entries = [];
-    // Labels and accessor functions for each entry stats const entryStats = [
     const entryStats = [
         {
             label: 'Positive cases',
-            accessor: entry => entry.positive,
-            percentage: false
+            stat(series) {
+                return getStat(this.label, COLORS[0], series.map(each => each.positive));
+            }
         },
+        {
+            label: 'Percent positive',
+            stat (series) {
+                return getPercentageStat(this.label, COLORS[4], series.map(each => {
+                    return percent(each.positive, each.totalTestResults);
+                }));
+            }
+        },
+        {
+            label: 'Hospitalized',
+            stat (series) {
+                return getStat(this.label, COLORS[3], series.map(each => each.hospitalized));
+            }
+        },
+        {
+            label: 'Deaths',
+            stat (series) {
+                return getStat(this.label, COLORS[2], series.map(each => each.death));
+            }
+        }
     ];
+    // Labels and accessor functions for each entry stats const entryStats = [
     for (const state in data) {
         const stateName = stateCodes[state];
         const series = data[state].series;
-        // Total count stats
-        const positive = getStat('Positive cases', COLORS[0], series.map(each => each.positive));
-        const negative = getStat('Negative cases', COLORS[5], series.map(each => each.negative));
-        const totalTests = getStat('Total tests', COLORS[1], series.map(each => each.totalTestResults));
-        const deaths = getStat('Deaths', COLORS[2], series.map(each => each.death));
-        const hospitalized = getStat('Hospitalized', COLORS[3], data[state].series.map(each => each.hospitalized));
-        // Percentage stats
-        const percentPositive = getPercentageStat('Percent positive', COLORS[4], series.map(each => {
-            return percent(each.positive, each.totalTestResults);
-        }));
-        const mortality = getPercentageStat('Percent death', COLORS[0], series.map(each => {
-            return percent(each.death, each.positive);
-        }));
-        const percentHospitalized = getPercentageStat('Percent hospitalized', COLORS[3], data[state].series.map(each => {
-            return percent(each.hospitalized, each.positive);
-        }));
         const entry = {
             location: getLocation(data[state]),
-            stats: [positive, percentPositive, hospitalized, deaths, totalTests, mortality, percentHospitalized, negative],
+            stats: entryStats.map(each => each.stat(series)),
         };
         entries.push(entry);
     }

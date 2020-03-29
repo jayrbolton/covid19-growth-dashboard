@@ -25,7 +25,7 @@ export class Dashboard extends Component<Props, State> {
     displayCount: number = 100;
     sourceData: DashboardData;
     filterLocation: string | null = null;
-    sortBy: number  = 0;
+    sortBy: {idx: number, prop: string} = {idx: 0, prop: 'val'};
 
     constructor(props: Props) {
         super(props);
@@ -47,8 +47,8 @@ export class Dashboard extends Component<Props, State> {
         this.transformSourceData()
     }
 
-    handleSort(inp: number) {
-        this.sortBy = inp;
+    handleSort(idx: number, prop: string) {
+        this.sortBy = {idx, prop};
         this.transformSourceData()
     }
 
@@ -100,7 +100,7 @@ export class Dashboard extends Component<Props, State> {
                 <FiltersAndSorts
                     entryLabels={this.state.displayData.entryLabels}
                     onFilterLocation={inp => this.handleFilterLocation(inp)}
-                    onSort={inp => this.handleSort(inp)}
+                    onSort={(idx, prop) => this.handleSort(idx, prop)}
                 />
                 <RegionStats data={this.state.displayData} />
                 {this.showMoreButton()}

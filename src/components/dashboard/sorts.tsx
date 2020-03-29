@@ -4,7 +4,7 @@ import {DashboardEntry} from '../../types/dashboard';
 
 
 interface Props {
-    onSort?: (string) => void;
+    onSort?: (number, string) => void;
     // Used to automatically fill in the sort options
     entryLabels: Array<string>;
 }
@@ -19,21 +19,37 @@ export class Sorts extends Component<Props, State> {
     }
 
     handleSort(ev) {
-        const val = ev.currentTarget.value.trim().toLowerCase();
+        const el = ev.currentTarget;
+        const [idxStr, prop] = el.value.split(':');
+        const idx = Number(idxStr);
         if (this.props.onSort) {
-            this.props.onSort(val);
+            this.props.onSort(idx, prop);
         }
     }
 
     render() {
+        const options = this.props.entryLabels.reduce((arr, label, idx) => {
+            arr.push({
+                name: label + ' (total)',
+                statIdx: idx,
+                prop: 'val'
+            });
+            arr.push({
+                name: label + ' (growth)',
+                statIdx: idx,
+                prop: 'percentGrowth'
+            });
+            return arr;
+        }, []);
+        const growthLabels = this.props.entryLabels.map((label) => label + ' growth');
         return (
             <div>
                 <span className='dib mr2 white-80'>Sort by:</span>
                 <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)}>
                     {
-                        this.props.entryLabels.map((label, idx) => {
+                        options.map(({name, statIdx, prop}) => {
                             return (
-                                <option value={idx}>{label}</option>
+                                <option value={statIdx + ':' + prop}>{name}</option>
                             );
                         })
                     }

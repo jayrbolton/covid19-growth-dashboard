@@ -2,12 +2,11 @@ import {h, Component, Fragment} from 'preact';
 import {SearchInput} from '../generic/inputs';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
-import {MetricsSelector} from './metrics-selector';
 import {DashboardEntry} from '../../types/dashboard';
 
 interface Props {
     onFilterLocation?: (string) => void;
-    onSort?: (string) => void;
+    onSort: (number, string) => void;
     entryLabels: Array<string>;
 }
 
@@ -26,10 +25,8 @@ export class FiltersAndSorts extends Component<Props, State> {
         }
     }
 
-    handleSort(inp: string) {
-        if (this.props.onSort) {
-            this.props.onSort(inp);
-        }
+    handleSort(idx: number, prop: string) {
+        this.props.onSort(idx, prop);
     }
 
     render() {
@@ -39,8 +36,7 @@ export class FiltersAndSorts extends Component<Props, State> {
                     <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                 </div>
                 <div className='flex items-center'>
-                    <MetricsSelector />
-                    <Sorts onSort={inp => this.handleSort(inp)} entryLabels={this.props.entryLabels} />
+                    <Sorts onSort={(idx, prop) => this.handleSort(idx, prop)} entryLabels={this.props.entryLabels} />
                 </div>
             </div>
         );

@@ -18,6 +18,13 @@ export class RegionStats extends Component<Props, State> {
     }
 
     renderStat(stat) {
+        // For pushing the percentage growth stat left a little
+        let percentLeft = '0';
+        if (stat.percentGrowth > 0) {
+            percentLeft = '-0.5rem';
+        } else if (stat.percentGrowth < 0) {
+            percentLeft = '-0.3rem';
+        }
         return (
             <div className='mb3 ba b--white-20'>
                 <div className='pa2'>
@@ -30,8 +37,9 @@ export class RegionStats extends Component<Props, State> {
                     </div>
                     <div className='mb1'>
                         <div style={{width: '10rem'}} className='dib white-70'>Average change</div>
-                        <div style={{width: '4rem'}} className='dib b white-70'>
-                            {stat.percentGrowth > 0 ? '+' : ''}
+                        <div
+                            style={{width: '4rem', left: percentLeft}}
+                            className='dib b white-70 relative'>
                             {formatNumber(stat.percentGrowth)}%
                         </div>
                     </div>
@@ -44,7 +52,7 @@ export class RegionStats extends Component<Props, State> {
     renderRow(row) {
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
         return (
-            <div className='bb b--white-40 bw2 pb3 mb2'>
+            <div className='bb b--white-40 bw2 pb1 mb3'>
                 <div className='f4 mb2 b'> {row.location} </div>
                 <div className='w-100 flex flex-wrap justify-between'>
                     {row.stats.map(stat => this.renderStat(stat))}
