@@ -5,6 +5,7 @@ import * as dataSources from '../../constants/data-sources.json';
 import * as states from '../../constants/states.json';
 import * as stateCodes from '../../constants/state-codes.json';
 
+import {getPercentGrowth, getGrowthRate} from '../../utils/math';
 import {DashboardData} from '../../types/dashboard';
 
 const CONFIRMED_COLOR = 'rgb(53, 126, 221)';
@@ -28,9 +29,9 @@ export function transformData(sourceData): DashboardData {
             }
             const id = String(row[dataSources.latIdx]) + ',' + String(row[dataSources.lngIdx]);
             if (!(id in agg)) {
+                const location = [row[dataSources.provinceIdx], row[dataSources.countryIdx]].filter(x => x).join(', ');
                 agg[id] = {
-                    province: row[dataSources.provinceIdx],
-                    country: row[dataSources.countryIdx],
+                    location,
                     cases: {},
                 };
             }
@@ -62,17 +63,28 @@ function removeExtras(entries) {
 
 function computeStats(entries) {
     for (const entry of entries) {
-        const confirmed = entry.cases.confirmed[entry.cases.confirmed.length - 1];
-        const deaths = entry.cases.deaths[entry.cases.deaths.length - 1];
-        const maxConfirmed = entry.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
+        const confirmed = entry.cases.confirmed;
+        const deaths = entry.cases.deaths;
         entry.stats = [
             {
                 label: 'Confirmed',
-                val: confirmed,
+                val: confirmed[confirmed.length - 1],
+                percentGrowth: getPercentGrowth(confirmed),
+                growthRate: getGrowthRate(confirmed),
+                timeSeries: {
+                    values: confirmed.slice(0, 50),
+                    color: '#AA3377',
+                }
             },
             {
                 label: 'Deaths',
-                val: deaths,
+                val: deaths[deaths.length - 1],
+                percentGrowth: getPercentGrowth(deaths),
+                growthRate: getGrowthRate(deaths),
+                timeSeries: {
+                    values: deaths.slice(0, 50),
+                    color: '#BBBBBB',
+                }
             },
         ];
     }
@@ -164,14 +176,8 @@ function parseColumnVal(val) {
  * @param rows
  */
 function insertAggregations(rows) {
-    // A set of colonial countries that have an entry for the country as a
-    // whole, plus a handful of additional entries that represent outlying managed
-    // colonies. For example, there is an entry for "Denmark" as well as for
-    // "Faroe Islands, Denmark". We don't want to aggregate these examples.
-    const skips = {'France': true, 'Denmark': true, 'Netherlands': true, 'United Kingdom': true};
     const worldwide = {
-        province: null,
-        country: 'Worldwide',
+        location: 'Worldwide',
         cases: {}
     }
     const totalCases = {};
@@ -191,46 +197,6 @@ function insertAggregations(rows) {
     }
     worldwide.cases = totalCases;
     rows.push(worldwide);
-    // Aggregate each country that has split-up province entries
-    // A mapping from country name to row idx
-    const byCountry = {}
-    rows.forEach((row, idx) => {
-        if (!row.province || row.country in skips) {
-            return;
-        }
-        if (!(row.country in byCountry)) {
-            byCountry[row.country] = [];
-        }
-        byCountry[row.country].push(idx);
-    });
-    for (const country in byCountry) {
-        const countryRow = {
-            province: null,
-            country,
-            cases: {}
-        };
-        const totalCases = {};
-        for (const key of dataSources.categoryKeys) {
-            totalCases[key] = [];
-        }
-        // Aggregate case totals for every province in this country
-        for (const row of rows) {
-            if (row.country !== country) {
-                continue;
-            }
-            for (const key of dataSources.categoryKeys) { // 3 iterations
-                row.cases[key].forEach((total, idx) => {
-                    if (totalCases[key].length === idx) {
-                        totalCases[key].push(total);
-                    } else {
-                        totalCases[key][idx] += total;
-                    }
-                });
-            }
-        }
-        countryRow.cases = totalCases;
-        rows.push(countryRow);
-    }
 }
 
 // Calculate percentage stats for the cases (eg. what is the percentage of deaths as compared to confirmed)?
@@ -257,8 +223,8 @@ function renameCountries(rows) {
         'US': 'USA',
     };
     for (const row of rows) {
-        if (row.country in mapping) {
-            row.country = mapping[row.country];
+        if (row.location in mapping) {
+            row.location = mapping[row.location];
         }
     }
 }

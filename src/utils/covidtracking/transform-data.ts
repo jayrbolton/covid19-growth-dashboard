@@ -5,6 +5,7 @@
 import * as stateCodes from '../../constants/state-codes.json';
 import {DashboardData} from '../../types/dashboard';
 import {genericSort} from '../../utils/sort-data';
+import {percent, getPercentGrowth, getGrowthRate} from '../../utils/math';
 
 const COLORS = [
     '#AA3377',
@@ -188,36 +189,4 @@ function getMortalityStat(row) {
         timeSeries,
     };
     return stat;
-}
-
-/**
- * Average daily percent change 
- */
-function getPercentGrowth(series: Array<number>): number {
-    const percentages = series.map((val, idx) => {
-        if (idx === 0) {
-            return 0;
-        }
-        let prev = series[idx - 1];
-        if (prev === 0) {
-            return 0;
-        }
-        return (val - prev) * 100 / prev;
-    });
-    const sum = percentages.reduce((sum, n) => sum + n, 0);
-    return Math.round(sum / series.length * 100) / 100;
-}
-
-function getGrowthRate(series) {
-    const first = series.find(n => n > 0);
-    const current = series[series.length - 1];
-    const growth = Math.log(current / first) / series.length;
-    return Math.round(growth * 100) / 100;
-}
-
-function percent(n, total) {
-    if (total === 0) {
-        return 0;
-    }
-    return Math.round(n * 100 / total * 10) / 10;
 }
