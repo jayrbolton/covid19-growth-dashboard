@@ -1,18 +1,23 @@
 
 // Average daily percent change of a series of values
 export function getPercentGrowth(series: Array<number>): number {
-    const percentages = series.map((val, idx) => {
-        if (idx === 0) {
-            return 0;
-        }
-        let prev = series[idx - 1];
-        if (prev === 0) {
+    const nonulls = series.filter(val => val !== null);
+    if (!nonulls.length) {
+        return 0;
+    }
+    const percentages = nonulls.map((val, idx) => {
+        let prev = nonulls[idx - 1];
+        if (idx === 0 || prev === 0) {
             return 0;
         }
         return (val - prev) * 100 / prev;
     });
     const sum = percentages.reduce((sum, n) => sum + n, 0);
-    return Math.round(sum / series.length * 100) / 100;
+    const ret = Math.round(sum / nonulls.length * 100) / 100;
+    if (isNaN(ret)) {
+        console.log('infinity', nonulls);
+    }
+    return ret;
 }
 
 // Get the exponential growth rate of a time series

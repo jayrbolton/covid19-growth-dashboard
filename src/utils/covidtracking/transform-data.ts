@@ -28,11 +28,6 @@ export function transformData(resp: string): DashboardData {
             }
             // For some reason, many of these keys are sometimes set to null.
             const numberKeys = ['positive', 'negative', 'pending', 'hospitalized', 'death', 'totalTestResults', 'totalTestResults', 'deathIncrease', 'hospitalizedIncrease', 'negativeIncrease', 'positiveIncrease', 'totalTestResultsIncrease'];
-            for (const key of numberKeys) {
-                if (row[key] === null) {
-                    row[key] = 0;
-                }
-            }
             accum[state].series.unshift(row);
             return accum;
         }, {});
@@ -127,9 +122,10 @@ function getLocation(row) {
 
 function getStat(label, color, series) {
     const timeSeries = {values: series, color}
+    let current = series[series.length - 1];
     const stat = {
         label,
-        val: series[series.length - 1],
+        val: current,
         isPercentage: false,
         percentGrowth: getPercentGrowth(series),
         growthRate: getGrowthRate(series),

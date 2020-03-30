@@ -18,7 +18,7 @@ export interface DashboardEntry {
 
 export interface EntryStat {
     label: string;
-    val: number;
+    val: number | null;
     isPercentage: boolean;
     percentGrowth: number;
     growthRate: number;
