@@ -11,7 +11,6 @@ window.addEventListener('resize', handleResize);
 
 function handleResize () {
     const width = window.outerWidth;
-    console.log(width);
     if (width <= 500) {
         metaViewport.setAttribute('content', 'width=500');
     } else if (metaViewport.getAttribute('content') !== 'width=device-width') {
