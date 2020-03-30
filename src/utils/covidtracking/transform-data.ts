@@ -5,10 +5,17 @@
 import * as stateCodes from '../../constants/state-codes.json';
 import {DashboardData} from '../../types/dashboard';
 import {genericSort} from '../../utils/sort-data';
+import {percent, getPercentGrowth, getGrowthRate} from '../../utils/math';
 
-const TESTS_TOTAL_COLOR = 'rgb(53, 126, 221)';
-const NEG_COLOR = '#00449E';
-const POS_COLOR = '#FF6300';
+const COLORS = [
+    '#AA3377',
+    '#BBBBBB',
+    '#66CCEE',
+    '#CCBB44',
+    '#4477AA',
+    '#228833',
+    '#EE6677'
+]
 
 export function transformData(resp: string): DashboardData {
     // TODO on any server or parse error, show a UI message "failed to load data"
@@ -58,89 +65,88 @@ export function transformData(resp: string): DashboardData {
         country: 'US Totals',
         series: aggregateArr
     }
+    /*
+    const negative = getStat('Negative cases', COLORS[5], series.map(each => each.negative));
+    const totalTests = getStat('Total tests', COLORS[1], series.map(each => each.totalTestResults));
+    // Percentage stats
+    const mortality = getPercentageStat('Percent death', COLORS[0], series.map(each => {
+        return percent(each.death, each.positive);
+    }));
+    const percentHospitalized = getPercentageStat('Percent hospitalized', COLORS[3], data[state].series.map(each => {
+        return percent(each.hospitalized, each.positive);
+    }));
+    */
     // Convert the data into DashboardData
     let entries = [];
-    // Labels and accessor functions for each entry stats const entryStats = [
     const entryStats = [
         {
             label: 'Positive cases',
-            accessor: entry => entry.positive,
-            percentage: false
-        },
-        {
-            label: 'Total tests',
-            accessor: entry => entry.totalTestResults,
-            percentage: false
+            stat(series) {
+                return getStat(this.label, COLORS[0], series.map(each => each.positive));
+            }
         },
         {
             label: 'Percent positive',
-            accessor: entry => Math.round(entry.positive * 100 / entry.totalTestResults * 10) / 10,
-            percentage: true
+            stat (series) {
+                return getPercentageStat(this.label, COLORS[4], series.map(each => {
+                    return percent(each.positive, each.totalTestResults);
+                }));
+            }
         },
         {
             label: 'Hospitalized',
-            accessor: entry => entry.hospitalized,
-            percentage: false
+            stat (series) {
+                return getStat(this.label, COLORS[3], series.map(each => each.hospitalized));
+            }
         },
         {
             label: 'Deaths',
-            accessor: entry => entry.death,
-            percentage: false
-        },
-        {
-            label: 'Mortality rate',
-            accessor: entry => Math.round(entry.death * 100 / entry.positive * 10) / 10,
-            percentage: true,
-        },
+            stat (series) {
+                return getStat(this.label, COLORS[2], series.map(each => each.death));
+            }
+        }
     ];
+    // Labels and accessor functions for each entry stats const entryStats = [
     for (const state in data) {
         const stateName = stateCodes[state];
-        const {series} = data[state];
-        const latest = series[series.length - 1];
-        let percentPositive = 0;
-        if (latest.totalTestResults > 0) {
-            percentPositive = Math.round(latest.positive * 100 / latest.totalTestResults * 10) / 10;
-        }
-        const stats = entryStats.map(({label, accessor, percentage}, idx) => {
-            return {label, percentage, val: accessor(latest)};
-        });
-        const maxPos = series.reduce((max, each) => each.positive > max ? each.positive : max, 0);
-        const minPos = series.reduce((min, each) => each.positive < min ? each.positive : min, Infinity);
-        const percentages = series.map(each => {
-            // const neg = Math.round(each.negative * 100 / maxPos * 100) / 100;
-            const pos = Math.round(each.positive * 100 / maxPos * 100) / 100;
-            return [pos];
-        });
-        const amounts = series.map(each => {
-            return [each.positive];
-        });
-        while (percentages.length < 50) {
-            percentages.unshift([0]);
-            amounts.unshift([0]);
-        }
-        const startDate = series[0].dateChecked; // TODO format
-        const endDate = series[series.length - 1].dateChecked; // TODO format
-        const timeSeries = {
-            percentages,
-            amounts,
-            colors: [POS_COLOR],
-            labels: ['Positive cases'],
-            yMax: maxPos,
-            yMin: minPos,
-            xMin: startDate,
-            xMax: endDate,
-            yLabel: 'Test results',
-            xLabel: 'Days',
-        };
+        const series = data[state].series;
         const entry = {
-            city: null,
-            province: stateName,
-            country: data[state].country || 'US',
-            stats,
-            timeSeries,
+            location: getLocation(data[state]),
+            stats: entryStats.map(each => each.stat(series)),
         };
         entries.push(entry);
     }
     const entryLabels = entryStats.map(({label}) => label);
     return {entries, entryLabels};
+}
+
+function getLocation(row) {
+    const stateName = stateCodes[row.state];
+    return [stateName, row.country || 'US'].filter(x => x).join(', ');
+}
+
+function getStat(label, color, series) {
+    const timeSeries = {values: series, color}
+    const stat = {
+        label,
+        val: series[series.length - 1],
+        isPercentage: false,
+        percentGrowth: getPercentGrowth(series),
+        growthRate: getGrowthRate(series),
+        timeSeries,
+    };
+    return stat;
+}
+
+function getPercentageStat(label, color, series) {
+    const timeSeries = {values: series, color};
+    const stat = {
+        label,
+        val: series[series.length - 1],
+        isPercentage: true,
+        percentGrowth: getPercentGrowth(series),
+        growthRate: getGrowthRate(series),
+        timeSeries,
+    };
+    return stat;
 }

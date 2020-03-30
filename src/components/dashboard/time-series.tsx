@@ -27,56 +27,31 @@ export class TimeSeriesBars extends Component<Props, State> {
         this.state = {}
     }
 
-    vertBar(percentages, idx, colors, labels) {
+    vertBar(perc, idx, val, color, len) {
+        const width = 100 / len;
         return (
             <div
-                class='flex flex-column flex-column-reverse justify-start h-100'
-                style={{width: '1.5%', margin: '0px 0.25%'}}>
-                {
-                    percentages.map((perc, idx) => {
-                        const bg = colors[idx];
-                        const label = labels[idx];
-                        return (
-                            <div
-                                title={label + ': ' + perc + '%'}
-                                style={{height: perc + '%', background: bg}}
-                            >
-                            </div>
-                        );
-                    })
-                }
+                title={formatNumber(val)}
+                style={{height: perc + '%', background: color, width: width + '%', border: '1px solid #333'}}>
             </div>
         );
     }
 
-    yAxisLabels(labels, colors) {
-        return labels.map((label, idx) => {
-            const color = colors[idx];
-            return (
-                <Fragment>
-                    <span style={{color: color}} className='b'>{label}</span>
-                    {idx === (labels.length - 1) ? ' ' : ', '}
-                </Fragment>
-            );
-        });
-    }
-
     render() {
-        const {percentages, colors, labels} = this.props.data;
-        const start = new Date(this.props.data.xMin).toLocaleDateString();
-        const end = new Date(this.props.data.xMax).toLocaleDateString();
+        const {color, values} = this.props.data
+        const days = values.length;
+        const max = values.reduce((max, n) => n > max ? n : max, 0);
+        const percentages = values.map(v => percent(v, max));
         return (
             <Fragment>
-                <div className='flex w-100 items-end bg-dark-gray' style={{height: '100px'}}>
-                    {percentages.map((perc, idx) => this.vertBar(perc, idx, colors, labels))}
-                </div>
-
-                <div className='white-90 f6 mt2'>
-                    {this.yAxisLabels(this.props.data.labels, this.props.data.colors)}{' '}
-                    from <b>{formatNumber(this.props.data.yMin)}</b> on <b>{start}</b>{' '}
-                    up to <b>{formatNumber(this.props.data.yMax)}</b> on <b>{end}</b>
+                <div className='flex justify-between items-end w-100 bg-dark-gray' style={{height: '80px'}}>
+                    {percentages.map((perc, idx) => this.vertBar(perc, idx, values[idx], color, values.length))}
                 </div>
             </Fragment>
         );
     }
+}
+
+function percent(val, max) {
+    return Math.round(val * 100 / max * 10) / 10;
 }

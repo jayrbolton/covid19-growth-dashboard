@@ -17,30 +17,46 @@ export class RegionStats extends Component<Props, State> {
         this.state = {};
     }
 
-    stat(stat) {
+    renderStat(stat) {
+        // For pushing the percentage growth stat left a little
+        let percentLeft = '0';
+        if (stat.percentGrowth > 0) {
+            percentLeft = '-0.5rem';
+        } else if (stat.percentGrowth < 0) {
+            percentLeft = '-0.3rem';
+        }
         return (
-            <div className='mr3 pb2 mb2 bb b--white-20 dib' style={{width: '14rem'}}>
-                <div style={{width: '9rem'}} className='dib white-90'>{stat.label}</div>
-                <div style={{width: '4rem'}} className='dib b'>
-                    {formatNumber(stat.val)}
-                    <ShowIf bool={stat.percentage}>%</ShowIf>
+            <div className='mb3 mh1 ba b--white-20'>
+                <div className='pa2'>
+                    <div className='pb1 mb1'>
+                        <div style={{width: '10rem'}} className='dib white-90 b'>{stat.label}</div>
+                        <div style={{width: '4rem'}} className='dib b'>
+                            {formatNumber(stat.val)}
+                            <ShowIf bool={stat.isPercentage}>%</ShowIf>
+                        </div>
+                    </div>
+                    <div className='mb1'>
+                        <div style={{width: '10rem'}} className='dib white-70'>Average change</div>
+                        <div
+                            style={{width: '4rem', left: percentLeft}}
+                            className='dib b white-70 relative'>
+                            {stat.percentGrowth > 0 ? '+' : ''}
+                            {formatNumber(stat.percentGrowth)}%
+                        </div>
+                    </div>
                 </div>
+                <TimeSeriesBars data={stat.timeSeries} />
             </div>
         );
     }
 
-    rowView(row) {
+    renderRow(row) {
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
         return (
-            <div className='bb b--white-40 pb3 mb3'>
-                <div className='f4 mb2 b'> {title} </div>
-                <div className='w-100 flex flex-wrap justify-between'>
-                    <div className='w-100 w-100-m w-50-ns flex flex-column flex-wrap' style={{minWidth: '15rem', height: '7rem'}}>
-                        {row.stats.map(stat => this.stat(stat))}
-                    </div>
-                    <div className='w-100 w-100-m mt3 mt3-m mt0-ns w-50-ns'>
-                        <TimeSeriesBars data={row.timeSeries} />
-                    </div>
+            <div className='bb b--white-40 bw2 pb1 mb3'>
+                <div className='f4 mb2 b'> {row.location} </div>
+                <div className='w-100 flex flex-wrap'>
+                    {row.stats.map(stat => this.renderStat(stat))}
                 </div>
             </div>
         );
@@ -57,7 +73,7 @@ export class RegionStats extends Component<Props, State> {
         }
         return (
             <Fragment>
-                {rows.map(row => this.rowView(row))}
+                {rows.map(row => this.renderRow(row))}
             </Fragment>
         );
     }

@@ -2,8 +2,8 @@
  * Sorting functions
  */
 
-export function sortByStat(rows, index, dir='desc') {
-    genericSort(rows, row => row.stats[index].val, dir);
+export function sortByStat(rows, {idx, prop}, dir='desc') {
+    genericSort(rows, row => row.stats[idx][prop], dir);
 }
 
 export function genericSort(rows, accessor, dir='desc') {

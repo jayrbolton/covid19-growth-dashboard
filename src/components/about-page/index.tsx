@@ -12,7 +12,7 @@ export class AboutPage extends Component<Props, State> {
     render() {
         return (
             <div className='mw7'>
-                <p>This website is created by {extLink('https://www.jayrbolton.com', 'Jay R Bolton')} and maintained by volunteers.
+                <p>This website was created by {extLink('https://www.jayrbolton.com', 'Jay R Bolton')} and maintained by volunteers.
                 </p>
 
                 <p className='b'>

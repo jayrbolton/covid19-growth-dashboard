@@ -6,7 +6,7 @@ import {DashboardEntry} from '../../types/dashboard';
 
 interface Props {
     onFilterLocation?: (string) => void;
-    onSort?: (string) => void;
+    onSort: (number, string) => void;
     entryLabels: Array<string>;
 }
 
@@ -25,20 +25,18 @@ export class FiltersAndSorts extends Component<Props, State> {
         }
     }
 
-    handleSort(inp: string) {
-        if (this.props.onSort) {
-            this.props.onSort(inp);
-        }
+    handleSort(idx: number, prop: string) {
+        this.props.onSort(idx, prop);
     }
 
     render() {
         return (
-            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between' style={{top: 0, position: 'sticky'}}>
+            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between items-center' style={{top: 0, position: 'sticky'}}>
                 <div>
                     <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                 </div>
-                <div>
-                    <Sorts onSort={inp => this.handleSort(inp)} entryLabels={this.props.entryLabels} />
+                <div className='flex items-center'>
+                    <Sorts onSort={(idx, prop) => this.handleSort(idx, prop)} entryLabels={this.props.entryLabels} />
                 </div>
             </div>
         );
