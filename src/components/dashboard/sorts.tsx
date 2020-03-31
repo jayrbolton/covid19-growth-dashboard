@@ -35,7 +35,7 @@ export class Sorts extends Component<Props, State> {
                 prop: 'val'
             });
             arr.push({
-                name: label + ' (growth)',
+                name: label + ' (change)',
                 statIdx: idx,
                 prop: 'percentGrowth'
             });
