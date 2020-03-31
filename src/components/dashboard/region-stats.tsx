@@ -58,6 +58,7 @@ export class RegionStats extends Component<Props, State> {
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
         let stats = row.stats;
         if (stats.length < 4) {
+            // Push some filler elements to help with spacing
             stats.push(null);
             stats.push(null);
         }
