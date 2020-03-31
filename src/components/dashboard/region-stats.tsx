@@ -26,7 +26,7 @@ export class RegionStats extends Component<Props, State> {
             percentLeft = '-0.3rem';
         }
         return (
-            <div className='mb3 mh1 ba b--white-20'>
+            <div className='mb3 ba b--white-20'>
                 <div className='pa2'>
                     <div className='pb1 mb1'>
                         <div style={{width: '10rem'}} className='dib white-90 b'>{stat.label}</div>
@@ -55,7 +55,7 @@ export class RegionStats extends Component<Props, State> {
         return (
             <div className='bb b--white-40 bw2 pb1 mb3'>
                 <div className='f4 mb2 b'> {row.location} </div>
-                <div className='w-100 flex flex-wrap'>
+                <div className='w-100 flex flex-wrap justify-between'>
                     {row.stats.map(stat => this.renderStat(stat))}
                 </div>
             </div>

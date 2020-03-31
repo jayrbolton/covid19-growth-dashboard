@@ -22,7 +22,7 @@ export class Dashboard extends Component<Props, State> {
     // Total count of results before pagination
     resultsCount: number = 0;
     // Pagination count
-    displayCount: number = 100;
+    displayCount: number = 50;
     sourceData: DashboardData;
     filterLocation: string | null = null;
     sortBy: {idx: number, prop: string} = {idx: 0, prop: 'val'};

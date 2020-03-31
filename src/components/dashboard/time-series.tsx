@@ -10,15 +10,8 @@ interface Props {
 interface State {
 }
 
-// Purposes of these sections:
-// - show current state
-//   - show total cases, deaths
-//   - compare the above values (bars)
-// - show growth rate
-//    - average new cases all time
-//    - average new cases this week
-//    - horizontal bar chart over time of total cases
-
+const ROW_HEIGHT = '1rem';
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export class TimeSeriesBars extends Component<Props, State> {
 
@@ -27,27 +20,53 @@ export class TimeSeriesBars extends Component<Props, State> {
         this.state = {}
     }
 
+    barText(perc, idx, val, date) {
+        return (
+            <div className='flex justify-between' style={{height: ROW_HEIGHT}}>
+                <div>{date}</div>
+                <div>{formatNumber(val)}</div>
+            </div>
+        );
+    }
+
     vertBar(perc, idx, val, color, len) {
-        const width = 100 / len;
+        const border = '2px solid #333';
         return (
             <div
                 title={formatNumber(val)}
-                style={{height: perc + '%', background: color, width: width + '%', border: '1px solid #333'}}>
+                style={{width: perc + '%', background: color, height: ROW_HEIGHT, borderTop: border, borderBottom: border}}>
             </div>
         );
     }
 
     render() {
         const {color, values} = this.props.data
-        const days = values.length;
-        const max = values.reduce((max, n) => n > max ? n : max, 0);
-        const percentages = values.map(v => percent(v, max));
+        const vals = values.slice(-14);
+        const max = vals.reduce((max, n) => n > max ? n : max, 0);
+        const percentages = vals.map(v => percent(v, max));
+        const dates = vals.map((_, idx) => {
+            const daysAgo = vals.length - idx;
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            return `${MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}`;
+        });
         return (
-            <Fragment>
-                <div className='flex justify-between items-end w-100 bg-dark-gray' style={{height: '80px'}}>
-                    {percentages.map((perc, idx) => this.vertBar(perc, idx, values[idx], color, values.length))}
+            <div className='pa2' style={{background: 'rgb(40, 40, 40)'}}>
+                <div className='bb b--white-20 pb1 mb1 f6'>
+                    <div className='flex justify-between pr2 b white-80' style={{width: '55%'}}>
+                        <div>Date</div>
+                        <div>Amount</div>
+                    </div>
                 </div>
-            </Fragment>
+                <div className='flex justify-between'>
+                    <div className='flex flex-column-reverse justify-between f6 pr2' style={{width: '55%'}}>
+                        {percentages.map((perc, idx) => this.barText(perc, idx, vals[idx], dates[idx]))}
+                    </div>
+                    <div className='flex flex-column-reverse justify-between' style={{width: '45%'}}>
+                        {percentages.map((perc, idx) => this.vertBar(perc, idx, vals[idx], color, vals.length))}
+                    </div>
+                </div>
+            </div>
         );
     }
 }
