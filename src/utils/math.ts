@@ -14,9 +14,6 @@ export function getPercentGrowth(series: Array<number>): number {
     });
     const sum = percentages.reduce((sum, n) => sum + n, 0);
     const ret = Math.round(sum / nonulls.length * 100) / 100;
-    if (isNaN(ret)) {
-        console.log('infinity', nonulls);
-    }
     return ret;
 }
 
@@ -28,7 +25,7 @@ export function getGrowthRate(series) {
     return Math.round(growth * 100) / 100;
 }
 
-// Get the rounded percentage of n out of `total`
+// Get the rounded percentage of n out of `total` (two decimal places)
 export function percent(n, total) {
     if (total === 0) {
         return 0;

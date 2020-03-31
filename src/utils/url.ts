@@ -9,6 +9,7 @@ export function updateURLQuery(updates: object, query: string | null = null): st
     return objToQuery(Object.assign(obj, updates));
 }
 
+// Convert a URL search/query string into an object of keyvals
 export function queryToObj(query: string | null = null): any {
     if (!query) {
         query = location.search;
@@ -22,6 +23,7 @@ export function queryToObj(query: string | null = null): any {
         }, {})
 }
 
+// Convert a flat object of keyvals into a url query string
 export function objToQuery(obj: object): string {
     let ret = '?';
     let keyvals = [];

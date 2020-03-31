@@ -1,6 +1,6 @@
 // Time series bar chart
 import {h, Component, Fragment} from 'preact';
-import {formatUTCDate, formatNumber} from '../../utils/formatting';
+import {formatNumber} from '../../utils/formatting';
 import {TimeSeriesData} from '../../types/dashboard';
 
 interface Props {

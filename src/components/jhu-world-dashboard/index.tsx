@@ -3,7 +3,6 @@ import {Dashboard} from '../dashboard';
 import {DashboardData} from '../../types/dashboard';
 import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformData} from '../../utils/jhu/transform-data';
-import {formatUTCDate} from '../../utils/formatting';
 import * as dataSources from '../../constants/data-sources.json';
 
 interface Props {};
