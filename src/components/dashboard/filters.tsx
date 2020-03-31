@@ -18,8 +18,7 @@ export class Filters extends Component<Props, State> {
     }
 
     // From an input event, call the callback at most every 200 milliseconds
-    handleFilterLocation(ev) {
-        const inp = ev.currentTarget.value.trim().toLowerCase();
+    handleFilterLocation(inp: string) {
         const callback = () => {
             if (this.props.onFilterLocation) {
                 this.props.onFilterLocation(inp);
