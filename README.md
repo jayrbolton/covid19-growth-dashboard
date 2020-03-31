@@ -4,9 +4,7 @@
 
 A dashboard to visualize and examine the activity of COVID-19 around the world.
 
-Credit goes to [Johns Hopkins University](https://coronavirus.jhu.edu/) for the initial dashboard and the source data. The JHU Dashboard can be found [here](https://coronavirus.jhu.edu/map.html)
-
-Source data is found in [this repo](https://github.com/CSSEGISandData/COVID-19). This is updated nightly, and further data sources can be found in the README at that link.
+Credit goes to [The COVID Tracking Project](https://covidtracking.com/) and [Johns Hopkins University](https://coronavirus.jhu.edu/) for the initial dashboard and the source data.
 
 Thanks to Github for the hosting.
 
