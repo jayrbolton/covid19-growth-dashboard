@@ -48,7 +48,6 @@ export function transformData(sourceData): DashboardData {
     insertAggregations(entries); // This must go before the below transformations
     renameCountries(entries);
     computeStats(entries);
-    computeTimeSeries(entries);
     removeExtras(entries);
     const entryLabels = ['Confirmed', 'Deaths'];
     return {entries, entryLabels};
@@ -74,7 +73,7 @@ function computeStats(entries) {
                 percentGrowth: getPercentGrowth(confirmed),
                 growthRate: getGrowthRate(confirmed),
                 timeSeries: {
-                    values: confirmed.slice(0, 50),
+                    values: confirmed,
                     color: '#AA3377',
                 }
             },
@@ -85,7 +84,7 @@ function computeStats(entries) {
                 percentGrowth: getPercentGrowth(deaths),
                 growthRate: getGrowthRate(deaths),
                 timeSeries: {
-                    values: deaths.slice(0, 50),
+                    values: deaths,
                     color: '#BBBBBB',
                 }
             },
@@ -96,37 +95,11 @@ function computeStats(entries) {
                 percentGrowth: getPercentGrowth(mortality),
                 growthRate: getGrowthRate(mortality),
                 timeSeries: {
-                    values: mortality.slice(0, 50),
+                    values: mortality,
                     color: '#CCBB44',
                 }
             },
         ];
-    }
-}
-
-function computeTimeSeries(entries) {
-    const colors = [CONFIRMED_COLOR];
-    const labels = ['Confirmed'];
-    for (const entry of entries) {
-        const {confirmed} = entry.cases;
-        const max = entry.cases.confirmed.reduce((max, n) => n > max ? n : max, 0);
-        const min = entry.cases.confirmed.reduce((min, n) => n < min ? n : min, Infinity);
-        const percentages = confirmed.slice(-50)
-            .map(n => [Math.round(n * 100 / max)]);
-        const start = new Date();
-        start.setDate(start.getDate() - 50);
-        const end = new Date();
-        entry.timeSeries = {
-            percentages,
-            colors,
-            labels,
-            yMax: max,
-            yMin: min,
-            xMin: start,
-            xMax: end,
-            yLabel: 'cases',
-            xLabel: 'days'
-        }
     }
 }
 
