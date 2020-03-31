@@ -5,7 +5,7 @@ import * as dataSources from '../../constants/data-sources.json';
 import * as states from '../../constants/states.json';
 import * as stateCodes from '../../constants/state-codes.json';
 
-import {getPercentGrowth, getGrowthRate} from '../../utils/math';
+import {getPercentGrowth, getGrowthRate, percent} from '../../utils/math';
 import {DashboardData} from '../../types/dashboard';
 
 const CONFIRMED_COLOR = 'rgb(53, 126, 221)';
@@ -65,10 +65,12 @@ function computeStats(entries) {
     for (const entry of entries) {
         const confirmed = entry.cases.confirmed;
         const deaths = entry.cases.deaths;
+        const mortality = deaths.map((d, idx) => percent(d, confirmed[idx]));
         entry.stats = [
             {
                 label: 'Confirmed',
                 val: confirmed[confirmed.length - 1],
+                isPercentage: false,
                 percentGrowth: getPercentGrowth(confirmed),
                 growthRate: getGrowthRate(confirmed),
                 timeSeries: {
@@ -79,11 +81,23 @@ function computeStats(entries) {
             {
                 label: 'Deaths',
                 val: deaths[deaths.length - 1],
+                isPercentage: false,
                 percentGrowth: getPercentGrowth(deaths),
                 growthRate: getGrowthRate(deaths),
                 timeSeries: {
                     values: deaths.slice(0, 50),
                     color: '#BBBBBB',
+                }
+            },
+            {
+                label: 'Mortality rate',
+                val: mortality[mortality.length - 1],
+                isPercentage: true,
+                percentGrowth: getPercentGrowth(mortality),
+                growthRate: getGrowthRate(mortality),
+                timeSeries: {
+                    values: mortality.slice(0, 50),
+                    color: '#CCBB44',
                 }
             },
         ];

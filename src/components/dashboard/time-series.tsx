@@ -31,10 +31,11 @@ export class TimeSeriesBars extends Component<Props, State> {
 
     vertBar(perc, idx, val, color, len) {
         const border = '2px solid #333';
+        const width = perc === '?' ? '0%' : perc + '%';
         return (
             <div
                 title={formatNumber(val)}
-                style={{width: perc + '%', background: color, height: ROW_HEIGHT, borderTop: border, borderBottom: border}}>
+                style={{width, background: color, height: ROW_HEIGHT, borderTop: border, borderBottom: border}}>
             </div>
         );
     }
@@ -42,8 +43,12 @@ export class TimeSeriesBars extends Component<Props, State> {
     render() {
         const {color, values} = this.props.data
         const vals = values.slice(-14);
-        const max = vals.reduce((max, n) => n > max ? n : max, 0);
-        const percentages = vals.map(v => percent(v, max));
+        const nonulls = vals.filter(n => n !== null);
+        let max = 0;
+        if (nonulls.length) {
+            max = vals.reduce((max, n) => n > max ? n : max, 0);
+        }
+        const percentages = vals.map(v => v === null ? '?' : percent(v, max));
         const dates = vals.map((_, idx) => {
             const daysAgo = vals.length - idx;
             const date = new Date();
