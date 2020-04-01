@@ -9,7 +9,7 @@ interface Props {
 interface State {
 }
 
-export type Page = "about" | "world-data" | "us-data";
+export type Page = "about" | "world-data" | "us-states" | "us-counties";
 
 export class Nav extends Component<Props, State> {
 
@@ -42,8 +42,9 @@ export class Nav extends Component<Props, State> {
             <div className='absolute top left bg-dark-gray white w-100 sans-serif'>
                 <div className='flex justify-between container mw8 center pt2 ph2 pb1 items-center' style={{height: '3rem'}}>
                     <ul className='list pa0 ma0 flex items-center'>
-                        {this.navItem('USA Data', 'us-data')}
-                        {this.navItem('Worldwide Data', 'world-data')}
+                        {this.navItem('US States', 'us-states')}
+                        {this.navItem('US Counties', 'us-counties')}
+                        {this.navItem('Worldwide', 'world-data')}
                         {this.navItem('About this site', 'about')}
                     </ul>
                 </div>

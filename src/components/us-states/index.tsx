@@ -9,7 +9,7 @@ interface Props {};
 
 interface State {};
 
-export class USADashboard extends Component<Props, State> {
+export class USStates extends Component<Props, State> {
 
     componentDidMount() {
     }
@@ -17,7 +17,7 @@ export class USADashboard extends Component<Props, State> {
     render() {
         return (
             <Fragment>
-                <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 United States Growth</h1>
+                <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 USA Growth by State</h1>
                 <p className='f6'>
                     Data is updated daily from{' '}
                     <a className='light-blue' href={DATA_SOURCE_URL} target='_blank'>The COVID Tracking Project</a>.
