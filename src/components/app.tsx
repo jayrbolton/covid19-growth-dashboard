@@ -24,7 +24,7 @@ export class App extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        const defaultPage = 'us-counties';
+        const defaultPage = 'us-states';
         this.state = {
             currentPage: defaultPage
         };
