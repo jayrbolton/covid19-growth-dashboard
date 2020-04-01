@@ -43,7 +43,7 @@ export class Dashboard extends Component<Props, State> {
     }
 
     handleFilterLocation(inp: string) {
-        this.filterLocation = inp;
+        this.filterLocation = inp.trim();
         this.transformSourceData()
     }
 

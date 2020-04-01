@@ -17,7 +17,7 @@ export class SearchInput extends Component<SearchProps, SearchState> {
     }
 
     handleInput(ev) {
-        const val = ev.currentTarget.value.trim().toLowerCase();
+        const val = ev.currentTarget.value.toLowerCase();
         this.props.onInput(val);
         this.setState({hasInput: Boolean(val), val});
     }
