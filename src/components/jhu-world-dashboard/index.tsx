@@ -19,7 +19,7 @@ export class JHUWorldDashboard extends Component<Props, State> {
     render() {
         return (
             <Fragment>
-                <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth</h1>
+                <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth by Country</h1>
                 <p className='f6'>
                     Data is updated daily from the{' '}
                     <a href={dataSources.sourceURL} target='_blank' className='light-blue'>

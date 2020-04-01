@@ -6,7 +6,8 @@ import {queryToObj, updateURLQuery} from '../utils/url';
 // Components
 import {Nav, Page} from './nav';
 import {JHUWorldDashboard} from './jhu-world-dashboard';
-import {USADashboard} from './usa-dashboard';
+import {USStates} from './us-states';
+import {USCounties} from './us-counties';
 import {AboutPage} from './about-page';
 
 const history = createBrowserHistory();
@@ -23,7 +24,7 @@ export class App extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        const defaultPage = 'us-data';
+        const defaultPage = 'us-states';
         this.state = {
             currentPage: defaultPage
         };
@@ -50,11 +51,18 @@ export class App extends Component<Props, State> {
         return (<JHUWorldDashboard />);
     }
 
-    usDataPage() {
-        if (this.state.currentPage !== 'us-data') {
+    usStatesPage() {
+        if (this.state.currentPage !== 'us-states') {
             return '';
         }
-        return (<USADashboard />);
+        return (<USStates />);
+    }
+
+    usCountiesPage() {
+        if (this.state.currentPage !== 'us-counties') {
+            return '';
+        }
+        return (<USCounties />);
     }
 
     aboutPage() {
@@ -70,7 +78,8 @@ export class App extends Component<Props, State> {
                 <Nav onClickNavItem={pageName => this.handleClickNavItem(pageName)} currentPage={this.state.currentPage} />
                 <div className='mw8 center pa2' style={{paddingTop: '4rem'}}>
                     {this.worldDataPage()}
-                    {this.usDataPage()}
+                    {this.usStatesPage()}
+                    {this.usCountiesPage()}
                     {this.aboutPage()}
                 </div>
             </div>
