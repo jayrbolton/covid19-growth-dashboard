@@ -5,16 +5,30 @@ export function getPercentGrowth(series: Array<number>): number {
     if (!nonulls.length) {
         return 0;
     }
-    const percentages = nonulls.map((val, idx) => {
-        let prev = nonulls[idx - 1];
-        if (idx === 0 || prev === 0) {
-            return 0;
+    // Differences between today and yesterday
+    const diffs = nonulls.map((val, idx) => {
+        if (idx === 0) {
+            return val;
         }
-        return (val - prev) * 100 / prev;
+        return val - nonulls[idx - 1];
     });
+    const percentages = diffs.reduce((agg, val, idx) => {
+        if (idx === 0) {
+            return agg;
+        }
+        const prev = nonulls[idx - 1];
+        if (prev === 0) {
+            return agg;
+        }
+        agg.push(val * 100 / prev);
+        return agg;
+    }, []);
+    if (!percentages.length) {
+        return 0;
+    }
     const sum = percentages.reduce((sum, n) => sum + n, 0);
-    const ret = Math.round(sum / nonulls.length * 100) / 100;
-    return ret;
+    const ret = sum / percentages.length;
+    return Math.round(ret * 100) / 100;
 }
 
 // Get the exponential growth rate of a time series
