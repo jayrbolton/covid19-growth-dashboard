@@ -1,7 +1,7 @@
 
 // Pretty-print a number. eg. 123456 -> 123,456
 export function formatNumber(x): string {
-    if (x === null) {
+    if (x === null || isNaN(x)) {
         // In our data sources, null values are interpreted as "Unknown"
         return '?';
     }
