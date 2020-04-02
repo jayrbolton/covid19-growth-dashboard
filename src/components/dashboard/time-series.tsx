@@ -31,7 +31,7 @@ export class TimeSeriesBars extends Component<Props, State> {
 
     vertBar(perc, idx, val, color, len) {
         const border = '2px solid #333';
-        const width = perc === '?' ? '0%' : perc + '%';
+        const width = perc === '?'  || perc === null || isNaN(perc)? '0%' : perc + '%';
         return (
             <div
                 title={formatNumber(val)}

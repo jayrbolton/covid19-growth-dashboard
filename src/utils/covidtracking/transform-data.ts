@@ -83,7 +83,10 @@ export function transformData(resp: string): DashboardData {
         {
             label: 'Percent positive',
             stat (series) {
-                return getPercentageStat(this.label, COLORS[4], series.map(each => {
+                const nonulls = series.filter(each => {
+                    return each.positive !== null && each.totalTestResults !== null
+                });
+                return getPercentageStat(this.label, COLORS[4], nonulls.map(each => {
                     return percent(each.positive, each.totalTestResults);
                 }));
             }

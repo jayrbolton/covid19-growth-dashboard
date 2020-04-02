@@ -1,7 +1,7 @@
 
 // Average daily percent change of a series of values
 export function getPercentGrowth(series: Array<number>): number {
-    const nonulls = series.filter(val => val !== null);
+    const nonulls = series.filter(val => val !== null && !isNaN(val));
     if (!nonulls.length) {
         return 0;
     }
