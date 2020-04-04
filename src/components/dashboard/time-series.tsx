@@ -5,6 +5,7 @@ import {TimeSeriesData} from '../../types/dashboard';
 
 interface Props {
     data: TimeSeriesData;
+    isPercentage: boolean;
 }
 
 interface State {
@@ -20,11 +21,14 @@ export class TimeSeriesBars extends Component<Props, State> {
         this.state = {}
     }
 
-    barText(perc, idx, val, date) {
+    barText(perc, idx, val, date, isPercentage) {
         return (
             <div className='flex justify-between' style={{height: ROW_HEIGHT}}>
                 <div>{date}</div>
-                <div>{formatNumber(val)}</div>
+                <div>
+                    {formatNumber(val)}
+                    <span className='white-80'>{isPercentage ? '%' : ''}</span>
+                </div>
             </div>
         );
     }
@@ -65,7 +69,7 @@ export class TimeSeriesBars extends Component<Props, State> {
                 </div>
                 <div className='flex justify-between'>
                     <div className='flex flex-column-reverse justify-between f6 pr2' style={{width: '55%'}}>
-                        {percentages.map((perc, idx) => this.barText(perc, idx, vals[idx], dates[idx]))}
+                        {percentages.map((perc, idx) => this.barText(perc, idx, vals[idx], dates[idx], this.props.isPercentage))}
                     </div>
                     <div className='flex flex-column-reverse justify-between' style={{width: '45%'}}>
                         {percentages.map((perc, idx) => this.vertBar(perc, idx, vals[idx], color, vals.length))}

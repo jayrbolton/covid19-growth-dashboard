@@ -31,7 +31,7 @@ export class FiltersAndSorts extends Component<Props, State> {
 
     render() {
         return (
-            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between items-center' style={{top: 0, position: 'sticky'}}>
+            <div className='bg-near-black pv2 bb bw2 mb3 b--gray flex justify-between items-center z-1' style={{top: 0, position: 'sticky'}}>
                 <div>
                     <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                 </div>
