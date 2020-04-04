@@ -3,6 +3,7 @@ import {SearchInput} from '../generic/inputs';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
 import {DashboardEntry} from '../../types/dashboard';
+import {MetricsSelector} from '../../types/dashboard';
 
 interface Props {
     onFilterLocation?: (string) => void;

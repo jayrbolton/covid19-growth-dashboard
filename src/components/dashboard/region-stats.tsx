@@ -6,6 +6,8 @@ import {DashboardData} from '../../types/dashboard';
 
 interface Props {
     data: DashboardData;
+    // Array of indexes of which stats to show for each region
+    showStats?: Array<number>;
 };
 
 interface State {};
@@ -52,13 +54,26 @@ export class RegionStats extends Component<Props, State> {
     }
 
     renderRow(row) {
+        let showStats = this.props.showStats;
+        if (!showStats) {
+            // Initialize the stats to show based on device width
+            const width = window.outerWidth;
+            console.log('width', width);
+            if (width >= 1023) {
+                showStats = [0, 1, 2, 3];
+            } else if (width >= 769) {
+                showStats = [0, 1, 2];
+            } else {
+                showStats = [0, 1];
+            }
+        }
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
-        let stats = row.stats;
+        const stats = showStats.map(idx => row.stats[idx]).filter(Boolean).map(this.renderStat)
         return (
             <div className='bb b--white-40 bw2 pb1 mb3'>
                 <div className='f4 mb2 b'> {row.location} </div>
                 <div className='w-100' style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 15.25rem)', gridColumnGap: '0.65rem'}}>
-                    {row.stats.map(stat => this.renderStat(stat))}
+                    {showStats.map(idx => row.stats[idx]).filter(Boolean).map(this.renderStat)}
                 </div>
             </div>
         );
