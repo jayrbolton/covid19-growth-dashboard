@@ -11,11 +11,11 @@ export function transformData(resp: string): DashboardData {
     // First we need to aggregate all the rows by location
     const agg = {};
     for (const row of rows) {
-        const fips = row[3];
-        if (!(fips in agg)) {
-            agg[fips] = [];
+        const id = [row[1], row[2], row[3]].join(':');
+        if (!(id in agg)) {
+            agg[id] = [];
         }
-        agg[fips].push(row);
+        agg[id].push(row);
     }
     const ret = {
         entries: [],
@@ -29,7 +29,7 @@ export function transformData(resp: string): DashboardData {
         const location = [series[0][1], series[0][2]].join(', ');
         const stats = [
             {
-                label: 'Cases',
+                label: 'Cases (cumulative)',
                 val: cases[cases.length - 1],
                 isPercentage: false,
                 percentGrowth: getPercentGrowth(cases),

@@ -35,10 +35,10 @@ export class Filters extends Component<Props, State> {
         return (
             <div className='flex items-center'>
                 <div>
-                    <label className='dib mr2 white-80'>Search location:</label>
+                    <label className='dib mr2 white-80'>Search:</label>
                     <SearchInput
-                        type='text'
-                        onInput={ev => this.handleFilterLocation(ev)}
+                        placeholder={'Location'}
+                        onInput={inp => this.handleFilterLocation(inp)}
                     />
                 </div>
             </div>

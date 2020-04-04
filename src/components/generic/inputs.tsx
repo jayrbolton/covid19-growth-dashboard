@@ -3,7 +3,7 @@ import {ShowIf} from './show-if';
 
 interface SearchProps {
     onInput: (string) => void;
-    labelText: string;
+    placeholder?: string;
 };
 interface SearchState {
     hasInput: boolean;
@@ -34,7 +34,7 @@ export class SearchInput extends Component<SearchProps, SearchState> {
                 className='bg-black input-reset outline-0 white ph2 pv1 w4 ba b--white-50'
                 type='text'
                 value={this.state.val}
-                placeholder={this.props.labelText}
+                placeholder={this.props.placeholder}
                 onInput={ev => this.handleInput(ev)}
             />
             <ShowIf bool={this.state.hasInput}>

@@ -68,7 +68,7 @@ function computeStats(entries) {
         const mortality = deaths.map((d, idx) => percent(d, confirmed[idx]));
         entry.stats = [
             {
-                label: 'Confirmed',
+                label: 'Confirmed cases, cumulative',
                 val: confirmed[confirmed.length - 1],
                 isPercentage: false,
                 percentGrowth: getPercentGrowth(confirmed),

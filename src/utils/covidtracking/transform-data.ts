@@ -26,8 +26,6 @@ export function transformData(resp: string): DashboardData {
             if (!(state in accum)) {
                 accum[state] = {state, series: []};
             }
-            // For some reason, many of these keys are sometimes set to null.
-            const numberKeys = ['positive', 'negative', 'pending', 'hospitalized', 'death', 'totalTestResults', 'totalTestResults', 'deathIncrease', 'hospitalizedIncrease', 'negativeIncrease', 'positiveIncrease', 'totalTestResultsIncrease'];
             accum[state].series.unshift(row);
             return accum;
         }, {});
@@ -75,7 +73,7 @@ export function transformData(resp: string): DashboardData {
     let entries = [];
     const entryStats = [
         {
-            label: 'Positive cases',
+            label: 'Positive cases, cumulative',
             stat(series) {
                 return getStat(this.label, COLORS[0], series.map(each => each.positive));
             }
@@ -92,9 +90,9 @@ export function transformData(resp: string): DashboardData {
             }
         },
         {
-            label: 'Hospitalized',
+            label: 'Hospitalized, current',
             stat (series) {
-                return getStat(this.label, COLORS[3], series.map(each => each.hospitalized));
+                return getStat(this.label, COLORS[3], series.map(each => each.hospitalizedCurrently));
             }
         },
         {

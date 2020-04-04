@@ -15,6 +15,11 @@ export class AboutPage extends Component<Props, State> {
                 <p>This website was created by {extLink('https://www.jayrbolton.com', 'Jay R Bolton')} and maintained by volunteers.
                 </p>
 
+                <p>
+                    Thanks to Bill Riehl for code contribution and{' '}
+                    {extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")} for data visualization feedback.
+                </p>
+
                 <p className='b'>
                     {extLink(CONTRIBUTORS_URL, 'View the list of contributors to this project')}.
                 </p>
@@ -36,6 +41,7 @@ export class AboutPage extends Component<Props, State> {
                     Acknowledgments:
                     <ul>
                         <li>{extLink('https://covidtracking.com/', 'The COVID Tracking Project')} for US state testing data</li>
+                        <li>{extLink('https://nytimes.com/', 'The New York Times')} for county-level US data</li>
                         <li>{extLink('https://coronavirus.jhu.edu/map.html', 'Johns Hopkins University')} for worldwide data</li>
                         <li>{extLink('https://github.com', 'Github')} for hosting</li>
                     </ul>

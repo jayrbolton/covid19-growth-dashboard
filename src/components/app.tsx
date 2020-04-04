@@ -12,6 +12,15 @@ import {AboutPage} from './about-page';
 
 const history = createBrowserHistory();
 
+let initialPage = 'us-states';
+(function getInitialPage() {
+    const query = queryToObj();
+    if (query.p) {
+        initialPage = query.p;
+    }
+})();
+
+
 interface Props {
 }
 
@@ -24,7 +33,7 @@ export class App extends Component<Props, State> {
 
     constructor(props) {
         super(props);
-        const defaultPage = 'us-states';
+        const defaultPage = initialPage;
         this.state = {
             currentPage: defaultPage
         };

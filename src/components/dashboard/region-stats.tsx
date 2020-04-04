@@ -32,18 +32,19 @@ export class RegionStats extends Component<Props, State> {
         return (
             <div className='mb3 ba b--white-20'>
                 <div className='pa2'>
+                    <div className='mb2 b'>{stat.label}</div>
                     <div className='pb1 mb1'>
-                        <div style={{width: '9rem'}} className='dib white-90 b'>{stat.label}</div>
-                        <div style={{width: '5rem'}} className='dib b'>
+                        <div style={{width: '9.5rem'}} className='dib white-70'>Total</div>
+                        <div style={{width: '4.5rem'}} className='dib b white-90'>
                             {formatNumber(stat.val)}
                             <ShowIf bool={stat.isPercentage}>%</ShowIf>
                         </div>
                     </div>
                     <div className='mb1'>
-                        <div style={{width: '9rem'}} className='dib white-70'>Average change</div>
+                        <div style={{width: '9.5rem'}} className='dib white-70'>Avg. daily growth</div>
                         <div
-                            style={{width: '5rem', left: percentLeft}}
-                            className='dib b white-70 relative'>
+                            style={{width: '4.5rem', left: percentLeft}}
+                            className='dib b white-90 relative'>
                             {stat.percentGrowth > 0 ? '+' : ''}
                             {formatNumber(stat.percentGrowth)}%
                         </div>

@@ -35,7 +35,7 @@ export class Sorts extends Component<Props, State> {
                 prop: 'val'
             });
             arr.push({
-                name: label + ' (change)',
+                name: label + ' (growth)',
                 statIdx: idx,
                 prop: 'percentGrowth'
             });
@@ -44,7 +44,7 @@ export class Sorts extends Component<Props, State> {
         const growthLabels = this.props.entryLabels.map((label) => label + ' growth');
         return (
             <div>
-                <span className='dib mr2 white-80'>Sort by:</span>
+                <span className='dib mr2 white-80'>Sort:</span>
                 <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)}>
                     {
                         options.map(({name, statIdx, prop}) => {
