@@ -58,17 +58,6 @@ export function transformData(resp: string): DashboardData {
         country: 'US Totals',
         series: aggregateArr
     }
-    /*
-    const negative = getStat('Negative cases', COLORS[5], series.map(each => each.negative));
-    const totalTests = getStat('Total tests', COLORS[1], series.map(each => each.totalTestResults));
-    // Percentage stats
-    const mortality = getPercentageStat('Percent death', COLORS[0], series.map(each => {
-        return percent(each.death, each.positive);
-    }));
-    const percentHospitalized = getPercentageStat('Percent hospitalized', COLORS[3], data[state].series.map(each => {
-        return percent(each.hospitalized, each.positive);
-    }));
-    */
     // Convert the data into DashboardData
     let entries = [];
     const entryStats = [
@@ -99,6 +88,46 @@ export function transformData(resp: string): DashboardData {
             label: 'Deaths',
             stat (series) {
                 return getStat(this.label, COLORS[2], series.map(each => each.death));
+            }
+        },
+        {
+            label: 'Mortality rate',
+            stat (series) {
+                const nonulls = series.filter(each => {
+                    return each.death !== null && each.positive !== null;
+                });
+                return getPercentageStat(this.label, COLORS[2], nonulls.map(each => {
+                    return percent (each.death, each.positive);
+                }));
+            }
+        },
+        {
+            label: 'Negative tests, cumulative',
+            stat (series) {
+                return getStat(this.label, COLORS[5], series.map(each => each.negative));
+            }
+        },
+        {
+            label: 'Total tests, cumulative',
+            stat (series) {
+                return getStat(this.label, COLORS[6], series.map(each => each.totalTestResults));
+            }
+        },
+        {
+            label: 'Hospitalized, cumulative',
+            stat (series) {
+                return getStat(this.label, COLORS[1], series.map(each => each.hospitalizedCumulative));
+            }
+        },
+        {
+            label: 'Percent positive hospitalized',
+            stat (series) {
+                const nonulls = series.filter(each => {
+                    return each.hospitalizedCumulative !== null && each.positive !== null;
+                });
+                return getPercentageStat(this.label, COLORS[2], nonulls.map(each => {
+                    return percent (each.hospitalizedCumulative, each.positive);
+                }));
             }
         }
     ];
