@@ -8,6 +8,19 @@ import {sortByStat} from '../../utils/sort-data';
 // Types
 import {DashboardData} from '../../types/dashboard';
 
+// The default set of stats to show for each region based on device width
+let defaultDisplayedStats;
+(function initDefaultDisplayedStats() {
+    const width = window.outerWidth;
+    if (width >= 1023) {
+        defaultDisplayedStats = [0, 1, 2, 3];
+    } else if (width >= 769) {
+        defaultDisplayedStats = [0, 1, 2];
+    } else {
+        defaultDisplayedStats = [0, 1];
+    }
+})();
+
 interface Props {
     fetchSourceData: () => Promise<DashboardData>;
 };
@@ -100,6 +113,7 @@ export class Dashboard extends Component<Props, State> {
                 <FiltersAndSorts
                     entryLabels={this.state.displayData.entryLabels}
                     onFilterLocation={inp => this.handleFilterLocation(inp)}
+                    defaultDisplayedStats={defaultDisplayedStats}
                     onSort={(idx, prop) => this.handleSort(idx, prop)}
                 />
                 <RegionStats data={this.state.displayData} />

@@ -58,7 +58,6 @@ export class RegionStats extends Component<Props, State> {
         if (!showStats) {
             // Initialize the stats to show based on device width
             const width = window.outerWidth;
-            console.log('width', width);
             if (width >= 1023) {
                 showStats = [0, 1, 2, 3];
             } else if (width >= 769) {

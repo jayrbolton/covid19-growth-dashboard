@@ -33,7 +33,7 @@ export class Filters extends Component<Props, State> {
 
     render() {
         return (
-            <div className='flex items-center'>
+            <div className='flex items-center mr3'>
                 <div>
                     <label className='dib mr2 white-80'>Search:</label>
                     <SearchInput
