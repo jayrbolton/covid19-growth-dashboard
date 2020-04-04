@@ -4,15 +4,16 @@ import {App} from './components/app';
 
 render(<App />, document.body);
 
-// Minimum width for the page is 500px
-// Replace device-width with 500 when the window gets small
+// Enforce a minimum width for the page
+// Replace device-width with the minimum when the window gets small
+const MIN = 516;
 const metaViewport = document.querySelector('meta[name="viewport"]'); 
 window.addEventListener('resize', handleResize);
 
 function handleResize () {
     const width = window.outerWidth;
-    if (width <= 500) {
-        metaViewport.setAttribute('content', 'width=500');
+    if (width <= MIN) {
+        metaViewport.setAttribute('content', 'width=' + MIN);
     } else if (metaViewport.getAttribute('content') !== 'width=device-width') {
         metaViewport.setAttribute('content', 'width=device-width');
     }

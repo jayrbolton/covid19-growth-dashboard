@@ -66,7 +66,7 @@ export class RegionStats extends Component<Props, State> {
         return (
             <div className='bb b--white-40 bw2 pb1 mb3'>
                 <div className='f4 mb2 b'> {row.location} </div>
-                <div className='w-100 flex flex-wrap justify-between'>
+                <div className='w-100' style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 15.25rem)', gridColumnGap: '0.65rem'}}>
                     {row.stats.map(stat => this.renderStat(stat))}
                 </div>
             </div>
