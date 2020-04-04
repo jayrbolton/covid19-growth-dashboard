@@ -18,10 +18,6 @@ export class RegionStats extends Component<Props, State> {
     }
 
     renderStat(stat) {
-        if (stat === null) {
-            // Filler element for spacing
-            return (<div style={{width: '12rem'}}></div>);
-        }
         // For pushing the percentage growth stat left a little
         let percentLeft = '0';
         if (stat.percentGrowth > 0) {
@@ -58,11 +54,6 @@ export class RegionStats extends Component<Props, State> {
     renderRow(row) {
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
         let stats = row.stats;
-        if (stats.length < 4) {
-            // Push some filler elements to help with spacing
-            stats.push(null);
-            stats.push(null);
-        }
         return (
             <div className='bb b--white-40 bw2 pb1 mb3'>
                 <div className='f4 mb2 b'> {row.location} </div>
