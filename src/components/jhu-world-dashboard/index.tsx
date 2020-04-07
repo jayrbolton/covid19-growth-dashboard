@@ -5,10 +5,7 @@ import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformData} from '../../utils/jhu/transform-data';
 import * as dataSources from '../../constants/data-sources.json';
 
-interface Props {
-    hide: boolean;
-};
-
+interface Props {};
 interface State {};
 
 export class JHUWorldDashboard extends Component<Props, State> {
@@ -19,9 +16,6 @@ export class JHUWorldDashboard extends Component<Props, State> {
     }
 
     render() {
-        if (this.props.hide) {
-          return '';
-        }
         return (
             <Fragment>
                 <div className='mw8 ph4'>

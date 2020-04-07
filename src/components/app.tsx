@@ -54,7 +54,10 @@ export class App extends Component<Props, State> {
     }
 
     worldDataPage() {
-        return (<JHUWorldDashboard hide={this.state.currentPage !== 'world-data'} />);
+        if (this.state.currentPage !== 'world-data') {
+            return '';
+        }
+        return (<JHUWorldDashboard />);
     }
 
     usStatesPage() {

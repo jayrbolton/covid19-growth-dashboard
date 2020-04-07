@@ -23,12 +23,13 @@ interface State {
 
 // Some arbitrary min device size for the top filter options to be position:sticky
 const FILTER_POS = window.outerWidth > 600 ? 'sticky' : 'relative';
+const PAGE_SIZE = 20;
 
 export class Dashboard extends Component<Props, State> {
     // Total count of results before pagination
     resultsCount: number = 0;
     // Pagination count
-    displayCount: number = 20;
+    displayCount: number = PAGE_SIZE;
     sourceData: DashboardData;
     filterLocation: string | null = null;
     sortBy: {idx: number, prop: string} = {idx: 0, prop: 'val'};
@@ -69,7 +70,7 @@ export class Dashboard extends Component<Props, State> {
     }
 
     handleClickShowMore() {
-        this.displayCount = this.displayCount += 20;
+        this.displayCount = this.displayCount += PAGE_SIZE;
         if (this.displayCount > this.resultsCount) {
             this.displayCount = this.resultsCount;
         }
