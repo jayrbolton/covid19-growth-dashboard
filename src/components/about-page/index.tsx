@@ -16,8 +16,9 @@ export class AboutPage extends Component<Props, State> {
                 </p>
 
                 <p>
-                    Thanks to Bill Riehl for code contribution and{' '}
-                    {extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")} for data visualization feedback.
+                    Thanks to Bill Riehl for code contribution.{' '}
+                    {extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")} and Annette Greiner{' '}
+                    gave data visualization feedback.
                 </p>
 
                 <p className='b'>
