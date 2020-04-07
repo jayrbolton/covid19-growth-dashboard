@@ -3,11 +3,12 @@ import {ShowIf} from '../generic/show-if';
 import {formatNumber} from '../../utils/formatting';
 import {TimeSeriesBars} from './time-series';
 import {DashboardData} from '../../types/dashboard';
+import './style.css';
 
 interface Props {
     data: DashboardData;
-    // Array of indexes of which stats to show for each region
-    showStats?: Array<number>;
+    // Map of stat indexes of which ones to show for each region
+    selectedStats: Map<number, boolean>;
 };
 
 interface State {};
@@ -20,6 +21,9 @@ export class RegionStats extends Component<Props, State> {
     }
 
     renderStat(stat) {
+        if (stat === null || stat === undefined) {
+            return '';
+        }
         // For pushing the percentage growth stat left a little
         let percentLeft = '0';
         if (stat.percentGrowth > 0) {
@@ -28,52 +32,39 @@ export class RegionStats extends Component<Props, State> {
             percentLeft = '-0.3rem';
         }
         return (
-            <div className='mb3 ba b--white-20'>
+            <div className='mb3 ba b--white-20 relative'>
                 <div className='pa2'>
-                    <div className='mb2 b'>{stat.label}</div>
-                    <div className='pb1 mb1'>
-                        <div style={{width: '9.5rem'}} className='dib white-70'>Total</div>
-                        <div style={{width: '4.5rem'}} className='dib b white-90'>
-                            {formatNumber(stat.val)}
-                            <ShowIf bool={stat.isPercentage}>%</ShowIf>
-                        </div>
-                    </div>
-                    <div className='mb1'>
-                        <div style={{width: '9.5rem'}} className='dib white-70'>Avg. daily growth</div>
-                        <div
-                            style={{width: '4.5rem', left: percentLeft}}
-                            className='dib b white-90 relative'>
+                    <div className='b'>{stat.label}</div>
+                </div>
+                <TimeSeriesBars data={stat.timeSeries} isPercentage={stat.isPercentage} />
+                <div className='pa2 flex justify-between bt b--white-20' style={{background: 'rgb(40, 40, 40)'}}>
+                    <div className='dib white-80 items-center f6'>Average daily growth:</div>
+                    <div>
+                        <div className='dib b white-90 relative'>
                             {stat.percentGrowth > 0 ? '+' : ''}
                             {formatNumber(stat.percentGrowth)}%
                         </div>
                     </div>
                 </div>
-                <TimeSeriesBars data={stat.timeSeries} isPercentage={stat.isPercentage} />
             </div>
         );
     }
 
     renderRow(row) {
-        let showStats = this.props.showStats;
-        if (!showStats) {
-            // Initialize the stats to show based on device width
-            const width = window.outerWidth;
-            console.log('width', width);
-            if (width >= 1023) {
-                showStats = [0, 1, 2, 3];
-            } else if (width >= 769) {
-                showStats = [0, 1, 2];
-            } else {
-                showStats = [0, 1];
-            }
-        }
+        let showStats = this.props.selectedStats;
         const title = [row.city, row.province, row.country].filter(s => s).join(', ');
-        const stats = showStats.map(idx => row.stats[idx]).filter(Boolean).map(this.renderStat)
+        const stats = [];
+        showStats.forEach((show, idx) => {
+            if (!show) {
+                return;
+            }
+            stats.push(this.renderStat(row.stats[idx]));
+        });
         return (
-            <div className='bb b--white-40 bw2 pb1 mb3'>
-                <div className='f4 mb2 b'> {row.location} </div>
+            <div className='ph2 ph2-m ph4-ns pv2 pb1 region-stats-row bb b--white-10 bg-near-black'>
+                <h2 className='f4 mv2 b'> {row.location}</h2>
                 <div className='w-100' style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 15.25rem)', gridColumnGap: '0.65rem'}}>
-                    {showStats.map(idx => row.stats[idx]).filter(Boolean).map(this.renderStat)}
+                    {stats}
                 </div>
             </div>
         );
@@ -83,7 +74,7 @@ export class RegionStats extends Component<Props, State> {
         const rows = this.props.data.entries;
         if (!rows.length) {
             return (
-                <p className='pv4'>
+                <p className='pa4'>
                     No results.
                 </p>
             );

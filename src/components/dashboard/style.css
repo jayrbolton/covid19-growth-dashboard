@@ -1,0 +1,4 @@
+
+.region-stats-row:nth-child(even) {
+    background: #141414;
+}

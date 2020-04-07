@@ -26,7 +26,7 @@ export class Nav extends Component<Props, State> {
             linkClass += 'lightest-blue pointer dim';
         }
         return (
-            <li className='pr4'>
+            <li className='pr3 pr3-m pr4-ns'>
                 <a
                     onClick={() => this.handleClickNavItem(pageName)}
                     className={linkClass}
@@ -39,8 +39,8 @@ export class Nav extends Component<Props, State> {
 
     render() {
         return (
-            <div className='absolute top left bg-dark-gray white w-100 sans-serif'>
-                <div className='flex justify-between container mw8 center pt2 ph2 pb1 items-center' style={{height: '3rem'}}>
+            <div className='bg-dark-gray white w-100 sans-serif'>
+                <div className='flex justify-between container mw8 ph2 ph2-m ph4-ns pt2 pb1 items-center' style={{height: '3rem'}}>
                     <ul className='list pa0 ma0 flex items-center'>
                         {this.navItem('US States', 'us-states')}
                         {this.navItem('US Counties', 'us-counties')}

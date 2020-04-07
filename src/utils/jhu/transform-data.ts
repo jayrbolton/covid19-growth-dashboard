@@ -50,7 +50,7 @@ export function transformData(sourceData): DashboardData {
     renameCountries(entries);
     computeStats(entries);
     removeExtras(entries);
-    const entryLabels = ['Confirmed', 'Deaths'];
+    const entryLabels = ['Confirmed cases, cumulative', 'Deaths', 'Mortality rate'];
     return {entries, entryLabels};
 }
 

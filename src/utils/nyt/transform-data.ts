@@ -19,7 +19,7 @@ export function transformData(resp: string): DashboardData {
     }
     const ret = {
         entries: [],
-        entryLabels: ['Cases', 'Deaths', 'Mortality rate'],
+        entryLabels: ['Confirmed cases, cumulative', 'Deaths', 'Mortality rate'],
     };
     for (const fips in agg) {
         const series = agg[fips];
@@ -29,7 +29,7 @@ export function transformData(resp: string): DashboardData {
         const location = [series[0][1], series[0][2]].join(', ');
         const stats = [
             {
-                label: 'Cases (cumulative)',
+                label: 'Confirmed cases, cumulative',
                 val: cases[cases.length - 1],
                 isPercentage: false,
                 percentGrowth: getPercentGrowth(cases),
