@@ -11,7 +11,7 @@ export class AboutPage extends Component<Props, State> {
 
     render() {
         return (
-            <div className='mw7'>
+            <div className='mw7 ph4'>
                 <p>This website was created by {extLink('https://www.jayrbolton.com', 'Jay R Bolton')} and maintained by volunteers.
                 </p>
 

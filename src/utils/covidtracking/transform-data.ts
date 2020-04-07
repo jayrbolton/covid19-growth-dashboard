@@ -97,7 +97,7 @@ export function transformData(resp: string): DashboardData {
                     return each.death !== null && each.positive !== null;
                 });
                 return getPercentageStat(this.label, COLORS[2], nonulls.map(each => {
-                    return percent (each.death, each.positive);
+                    return percent(each.death, each.positive);
                 }));
             }
         },
@@ -105,6 +105,17 @@ export function transformData(resp: string): DashboardData {
             label: 'Negative tests, cumulative',
             stat (series) {
                 return getStat(this.label, COLORS[5], series.map(each => each.negative));
+            }
+        },
+        {
+            label: 'Percent of tests negative',
+            stat (series) {
+                const nonulls = series.filter(each => {
+                    return each.negative !== null && each.totalTestResults !== null;
+                });
+                return getPercentageStat(this.label, COLORS[5], nonulls.map(each => {
+                    return percent(each.negative, each.totalTestResults);
+                }));
             }
         },
         {

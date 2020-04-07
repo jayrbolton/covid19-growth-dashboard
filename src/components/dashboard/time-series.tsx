@@ -12,6 +12,7 @@ interface State {
 }
 
 const ROW_HEIGHT = '1rem';
+const ROW_HEIGHT_FIRST = '1.25rem';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export class TimeSeriesBars extends Component<Props, State> {
@@ -21,9 +22,14 @@ export class TimeSeriesBars extends Component<Props, State> {
         this.state = {}
     }
 
-    barText(perc, idx, val, date, isPercentage) {
+    barText(perc, idx, val, date, isPercentage, len) {
+        const isLast = idx === (len - 1);
+        const height = isLast ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
+        const fontSize = isLast ? '1rem': 'inherit';
+        const fontWeight = isLast ? 'bold': 'normal';
+        const color = isLast ? 'white': '#d8d8d8';
         return (
-            <div className='flex justify-between' style={{height: ROW_HEIGHT}}>
+            <div className='flex justify-between' style={{height, fontSize, fontWeight, color}}>
                 <div>{date}</div>
                 <div>
                     {formatNumber(val)}
@@ -36,10 +42,11 @@ export class TimeSeriesBars extends Component<Props, State> {
     vertBar(perc, idx, val, color, len) {
         const border = '2px solid #333';
         const width = perc === '?'  || perc === null || isNaN(perc)? '0%' : perc + '%';
+        const height = idx === (len - 1) ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
         return (
             <div
                 title={formatNumber(val)}
-                style={{width, background: color, height: ROW_HEIGHT, borderTop: border, borderBottom: border}}>
+                style={{width, background: color, height, borderTop: border, borderBottom: border}}>
             </div>
         );
     }
@@ -61,17 +68,11 @@ export class TimeSeriesBars extends Component<Props, State> {
         });
         return (
             <div className='pa2' style={{background: 'rgb(40, 40, 40)'}}>
-                <div className='bb b--white-20 pb1 mb1 f6'>
-                    <div className='flex justify-between pr2 b white-80' style={{width: '55%'}}>
-                        <div>Date</div>
-                        <div>Amount</div>
-                    </div>
-                </div>
                 <div className='flex justify-between'>
-                    <div className='flex flex-column-reverse justify-between f6 pr2' style={{width: '55%'}}>
-                        {percentages.map((perc, idx) => this.barText(perc, idx, vals[idx], dates[idx], this.props.isPercentage))}
+                    <div className='flex flex-column-reverse justify-between f6 pr2' style={{width: '60%'}}>
+                        {percentages.map((perc, idx) => this.barText(perc, idx, vals[idx], dates[idx], this.props.isPercentage, vals.length))}
                     </div>
-                    <div className='flex flex-column-reverse justify-between' style={{width: '45%'}}>
+                    <div className='flex flex-column-reverse justify-between' style={{width: '40%'}}>
                         {percentages.map((perc, idx) => this.vertBar(perc, idx, vals[idx], color, vals.length))}
                     </div>
                 </div>

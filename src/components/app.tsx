@@ -12,7 +12,7 @@ import {AboutPage} from './about-page';
 
 const history = createBrowserHistory();
 
-let initialPage = 'us-states';
+let initialPage: Page = 'us-states';
 (function getInitialPage() {
     const query = queryToObj();
     if (query.p) {
@@ -54,10 +54,7 @@ export class App extends Component<Props, State> {
     }
 
     worldDataPage() {
-        if (this.state.currentPage !== 'world-data') {
-            return '';
-        }
-        return (<JHUWorldDashboard />);
+        return (<JHUWorldDashboard hide={this.state.currentPage !== 'world-data'} />);
     }
 
     usStatesPage() {
@@ -83,9 +80,9 @@ export class App extends Component<Props, State> {
 
     render() {
         return (
-            <div className='bg-near-black sans-serif white'>
+            <div className='sans-serif white' style={{background: '#1d1d1d'}}>
                 <Nav onClickNavItem={pageName => this.handleClickNavItem(pageName)} currentPage={this.state.currentPage} />
-                <div className='mw8 center pa2' style={{paddingTop: '4rem'}}>
+                <div className='pt2'>
                     {this.worldDataPage()}
                     {this.usStatesPage()}
                     {this.usCountiesPage()}

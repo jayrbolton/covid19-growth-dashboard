@@ -5,7 +5,9 @@ import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformData} from '../../utils/jhu/transform-data';
 import * as dataSources from '../../constants/data-sources.json';
 
-interface Props {};
+interface Props {
+    hide: boolean;
+};
 
 interface State {};
 
@@ -17,15 +19,20 @@ export class JHUWorldDashboard extends Component<Props, State> {
     }
 
     render() {
+        if (this.props.hide) {
+          return '';
+        }
         return (
             <Fragment>
-                <h1 className='light-gray tc f4 f2-m f2-ns'>COVID-19 Worldwide Growth by Country</h1>
-                <p className='f6'>
-                    Data is updated daily from the{' '}
-                    <a href={dataSources.sourceURL} target='_blank' className='light-blue'>
-                        Johns Hopkins University CSSE COVID-19 Data Repository
-                    </a>.
-                </p>
+                <div className='mw8 ph4'>
+                    <h1 className='light-gray f4 f2-m f2-ns'>COVID-19 Worldwide Growth by Country</h1>
+                    <p className='f6'>
+                        Data is updated daily from the{' '}
+                        <a href={dataSources.sourceURL} target='_blank' className='light-blue'>
+                            Johns Hopkins University CSSE COVID-19 Data Repository
+                        </a>.
+                    </p>
+                </div>
                 <Dashboard fetchSourceData={fetchSourceData} />
             </Fragment>
         );

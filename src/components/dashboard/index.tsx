@@ -1,25 +1,14 @@
 import {h, Component} from 'preact';
 // Components
-import {FiltersAndSorts} from './filters-and-sorts';
 import {RegionStats} from './region-stats';
+import {MetricsSelector} from './metrics-selector';
+import {Filters} from './filters';
+import {Sorts} from './sorts';
 // Utils
 import {filterLocation} from '../../utils/filter-data';
 import {sortByStat} from '../../utils/sort-data';
 // Types
 import {DashboardData} from '../../types/dashboard';
-
-// The default set of stats to show for each region based on device width
-let defaultDisplayedStats;
-(function initDefaultDisplayedStats() {
-    const width = window.outerWidth;
-    if (width >= 1023) {
-        defaultDisplayedStats = [0, 1, 2, 3];
-    } else if (width >= 769) {
-        defaultDisplayedStats = [0, 1, 2];
-    } else {
-        defaultDisplayedStats = [0, 1];
-    }
-})();
 
 interface Props {
     fetchSourceData: () => Promise<DashboardData>;
@@ -29,21 +18,35 @@ interface State {
     // A copy of sourceData with sorts and filters applied
     displayData?: DashboardData;
     loading: boolean;
+    selectedStats: Map<number, boolean>;
 };
+
+// Some arbitrary min device size for the top filter options to be position:sticky
+const FILTER_POS = window.outerWidth > 600 ? 'sticky' : 'relative';
 
 export class Dashboard extends Component<Props, State> {
     // Total count of results before pagination
     resultsCount: number = 0;
     // Pagination count
-    displayCount: number = 30;
+    displayCount: number = 20;
     sourceData: DashboardData;
     filterLocation: string | null = null;
     sortBy: {idx: number, prop: string} = {idx: 0, prop: 'val'};
 
     constructor(props: Props) {
         super(props);
+        const width = window.outerWidth;
+        let selectedStats;
+        if (width >= 1023) {
+            selectedStats = new Map([[0, true], [1, true], [2, true], [3, true]]);
+        } else if (width >= 769) {
+            selectedStats = new Map([[0, true], [1, true], [2, true]]);
+        } else {
+            selectedStats = new Map([[0, true], [1, true]]);
+        }
         this.state = {
-            loading: true
+            loading: true,
+            selectedStats,
         };
     }
 
@@ -66,11 +69,15 @@ export class Dashboard extends Component<Props, State> {
     }
 
     handleClickShowMore() {
-        this.displayCount = this.displayCount += 100;
+        this.displayCount = this.displayCount += 20;
         if (this.displayCount > this.resultsCount) {
             this.displayCount = this.resultsCount;
         }
         this.transformSourceData();
+    }
+
+    handleSelectMetrics(selectedStats: Map<number, boolean>) {
+        this.setState({selectedStats});
     }
 
     // Paginate, filter, and sort the source data
@@ -106,17 +113,26 @@ export class Dashboard extends Component<Props, State> {
 
     render() {
         if (this.state.loading || !this.state.displayData) {
-            return <p className='white sans-serif pt3'>Loading data...</p>
+            return <p className='white sans-serif pa4'>Loading data...</p>
         }
         return (
             <div className='mt2'>
-                <FiltersAndSorts
-                    entryLabels={this.state.displayData.entryLabels}
-                    onFilterLocation={inp => this.handleFilterLocation(inp)}
-                    defaultDisplayedStats={defaultDisplayedStats}
-                    onSort={(idx, prop) => this.handleSort(idx, prop)}
-                />
-                <RegionStats data={this.state.displayData} />
+                <div
+                    className='pv2 ph2 ph2-m ph4-ns z-1 bb b--white-30'
+                    style={{position: FILTER_POS, top: 0, marginLeft: '-0.5rem', marginRight: '-0.5rem', background: '#1d1d1d'}}>
+                    <div className='flex flex-wrap items-center mw8'>
+                        <MetricsSelector
+                            onSelect={selected => this.handleSelectMetrics(selected)}
+                            entryLabels={this.state.displayData.entryLabels}
+                            defaultDisplayedStats={this.state.selectedStats} />
+                        <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
+                        <Sorts
+                            onSort={(idx, prop) => this.handleSort(idx, prop)}
+                            selectedStats={this.state.selectedStats}
+                            entryLabels={this.state.displayData.entryLabels} />
+                    </div>
+                </div>
+                <RegionStats data={this.state.displayData} selectedStats={this.state.selectedStats} />
                 {this.showMoreButton()}
             </div>
         );
