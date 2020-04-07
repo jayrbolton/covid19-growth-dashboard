@@ -104,7 +104,7 @@ export class Dashboard extends Component<Props, State> {
             return '';
         }
         return (
-            <p>
+            <p className='ph2 ph2-m ph4-ns pb4'>
                 <a onClick={() => this.handleClickShowMore()} className='pointer link b light-blue dim'>
                     Show more ({diff} remaining)
                 </a>
