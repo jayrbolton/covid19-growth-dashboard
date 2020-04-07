@@ -1,13 +1,11 @@
 import {h, Component, Fragment} from 'preact';
 
-
 interface Props {
     currentPage: Page;
     onClickNavItem: (Page) => void;
 }
 
-interface State {
-}
+interface State {}
 
 export type Page = "about" | "world-data" | "us-states" | "us-counties";
 

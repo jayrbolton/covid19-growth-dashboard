@@ -121,16 +121,16 @@ export class Dashboard extends Component<Props, State> {
                 <div
                     className='pv2 ph2 ph2-m ph4-ns z-1 bb b--white-30'
                     style={{position: FILTER_POS, top: 0, marginLeft: '-0.5rem', marginRight: '-0.5rem', background: '#1d1d1d'}}>
-                    <div className='flex flex-wrap items-center mw8'>
+                    <div className='flex flex-wrap items-center'>
                         <MetricsSelector
                             onSelect={selected => this.handleSelectMetrics(selected)}
                             entryLabels={this.state.displayData.entryLabels}
                             defaultDisplayedStats={this.state.selectedStats} />
-                        <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                         <Sorts
                             onSort={(idx, prop) => this.handleSort(idx, prop)}
                             selectedStats={this.state.selectedStats}
                             entryLabels={this.state.displayData.entryLabels} />
+                        <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                     </div>
                 </div>
                 <RegionStats data={this.state.displayData} selectedStats={this.state.selectedStats} />
