@@ -28,7 +28,7 @@ export function transformData(sourceData): DashboardData {
             if (!row || !row.length) {
                 return;
             }
-            const id = String(row[dataSources.latIdx]) + ',' + String(row[dataSources.lngIdx]);
+            const id = String(row[dataSources.provinceIdx]) + ',' + String(row[dataSources.countryIdx]);
             if (!(id in agg)) {
                 const location = [row[dataSources.provinceIdx], row[dataSources.countryIdx]].filter(x => x).join(', ');
                 agg[id] = {
@@ -136,6 +136,10 @@ function insertAggregations(rows) {
     }
     for (const row of rows) {
         for (const key of dataSources.categoryKeys) { // 3 iterations
+            if (!row.cases[key]) {
+                console.log(row);
+                continue;
+            }
             row.cases[key].forEach((total, idx) => {
                 if (totalCases[key].length === idx) {
                     totalCases[key].push(total);
