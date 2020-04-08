@@ -8,3 +8,6 @@
     border-color: rgba(255, 255, 255, 0.5);
     transform: scale(1.025);
 }
+.region-stats-row-stat[data-selected=true] {
+    border-color: #FFD700;
+}

@@ -78,7 +78,7 @@ export class MetricsSelector extends Component<Props, State> {
                     onClick={() => this.handleClick()}
                     style={{padding: '0.3rem 0.5rem 0.3rem 0.5rem'}}
                     className='pointer link dib flex justify-between'>
-                    <div>Select metrics to display</div>
+                    <div>Choose metrics to display</div>
                     <div>{this.state.dropdownOpen ? '▴' : '▾'}</div>
                 </a>
                 <div

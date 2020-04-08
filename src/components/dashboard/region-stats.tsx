@@ -39,10 +39,9 @@ export class RegionStats extends Component<Props, State> {
         }
         const selectedId = row.location + ':' + idx;
         const isSelected = selectedStats.has(selectedId);
-        const borderColor = isSelected ? '#FFD700' : 'rgba(255, 255, 255, 0.2)';
         return (
             <div
-                style={{borderColor}}
+                data-selected={isSelected}
                 onClick={() => this.handleClickStat(stat, row, idx)}
                 className='mb3 ba b--white-20 relative pointer region-stats-row-stat grow'>
                 <div className='pa2'>

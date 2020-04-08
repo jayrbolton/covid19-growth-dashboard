@@ -38,7 +38,7 @@ export class SearchInput extends Component<SearchProps, SearchState> {
                 onInput={ev => this.handleInput(ev)}
             />
             <ShowIf bool={this.state.hasInput}>
-                <a className='dib ml2 light-blue pointer' onClick={() => this.handleClear()}>
+                <a className='dib ml2 light-blue pointer f6' onClick={() => this.handleClear()}>
                     Clear
                 </a>
             </ShowIf>

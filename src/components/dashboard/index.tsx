@@ -4,9 +4,12 @@ import {RegionStats} from './region-stats';
 import {MetricsSelector} from './metrics-selector';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
+import {ShowIf} from '../generic/show-if';
+import {Button} from '../generic/button';
 // Utils
 import {filterLocation} from '../../utils/filter-data';
 import {sortByStat} from '../../utils/sort-data';
+import {pluralize} from '../../utils/formatting';
 // Types
 import {DashboardData} from '../../types/dashboard';
 
@@ -131,10 +134,15 @@ export class Dashboard extends Component<Props, State> {
         if (this.state.loading || !this.state.displayData) {
             return <p className='white sans-serif pa4'>Loading data...</p>
         }
+        const selectedCount = this.state.selectedStats.size;
+        let selectedText = 'Select some metrics to graph and compare';
+        if (this.state.selectedStats.size > 0) {
+            selectedText = `You've selected ${selectedCount} ${pluralize('metric', selectedCount)}:`;
+        }
         return (
             <div className='mt2'>
                 <div
-                    className='pv2 ph2 ph2-m ph4-ns z-1 bb b--white-30'
+                    className='ph2 ph2-m ph4-ns z-1 bb b--white-30 w-100'
                     style={{position: FILTER_POS, top: 0, marginLeft: '-0.5rem', marginRight: '-0.5rem', background: '#1d1d1d'}}>
                     <div className='flex flex-wrap items-center'>
                         <MetricsSelector
@@ -146,6 +154,9 @@ export class Dashboard extends Component<Props, State> {
                             displayedStats={this.state.displayedStats}
                             entryLabels={this.state.displayData.entryLabels} />
                         <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
+                        <div className='mh2 bl pl2 ml2'>
+                            {Button({text: `Graph ${selectedCount} selected`, background: '#137752', disabled: selectedCount === 0, onClick: null})}
+                        </div>
                     </div>
                 </div>
                 <RegionStats
