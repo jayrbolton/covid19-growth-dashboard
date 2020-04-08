@@ -23,6 +23,7 @@ export interface EntryStat {
     percentGrowth: number;
     growthRate: number;
     timeSeries: TimeSeriesData;
+    isComparing?: boolean;
 }
 
 export interface TimeSeriesData {

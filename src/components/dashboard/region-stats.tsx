@@ -2,15 +2,14 @@ import {h, Component, Fragment} from 'preact';
 import {ShowIf} from '../generic/show-if';
 import {formatNumber} from '../../utils/formatting';
 import {TimeSeriesBars} from './time-series';
-import {DashboardData} from '../../types/dashboard';
+import {DashboardData, DashboardEntry} from '../../types/dashboard';
 import './style.css';
 
 interface Props {
     data: DashboardData;
     // Map of stat indexes of which ones to show for each region
     displayedStats: Map<number, boolean>;
-    onSelectStat: ({location: string, statIdx: number}) => void;
-    selectedStats: Map<string, {location: string, statIdx: number}>;
+    onSelectStat: (entry: DashboardEntry, statIdx: number) => void;
 };
 
 interface State {};
@@ -22,11 +21,11 @@ export class RegionStats extends Component<Props, State> {
         this.state = {};
     }
 
-    handleClickStat(stat, row, idx) {
-        this.props.onSelectStat({location: row.location, statIdx: idx});
+    handleClickStat(entry, statIdx) {
+        this.props.onSelectStat(entry, statIdx);
     }
 
-    renderStat(stat, row, idx, selectedStats) {
+    renderStat(stat, entry, idx) {
         if (stat === null || stat === undefined) {
             return '';
         }
@@ -37,13 +36,13 @@ export class RegionStats extends Component<Props, State> {
         } else if (stat.percentGrowth < 0) {
             percentLeft = '-0.3rem';
         }
-        const selectedId = row.location + ':' + idx;
-        const isSelected = selectedStats.has(selectedId);
+        const selectedId = entry.location + ':' + idx;
+        const isSelected = stat.isComparing;
         return (
             <div
                 data-selected={isSelected}
-                onClick={() => this.handleClickStat(stat, row, idx)}
-                className='mb3 ba b--white-20 relative pointer region-stats-row-stat grow'>
+                onClick={() => this.handleClickStat(entry, idx)}
+                className='mb3 ba b--white-20 relative pointer region-stats-row-stat'>
                 <div className='pa2'>
                     <div className='b'>{stat.label}</div>
                 </div>
@@ -61,19 +60,18 @@ export class RegionStats extends Component<Props, State> {
         );
     }
 
-    renderRow(row, selectedStats) {
+    renderEntry(entry) {
         let showStats = this.props.displayedStats;
-        const title = [row.city, row.province, row.country].filter(s => s).join(', ');
         const stats = [];
         showStats.forEach((show, idx) => {
             if (!show) {
                 return;
             }
-            stats.push(this.renderStat(row.stats[idx], row, idx, selectedStats));
+            stats.push(this.renderStat(entry.stats[idx], entry, idx));
         });
         return (
             <div className='ph2 ph2-m ph4-ns pv2 pb1 region-stats-row bb b--white-10 bg-near-black'>
-                <h2 className='f4 mv2 b'>{row.location}</h2>
+                <h2 className='f4 mv2 b'>{entry.location}</h2>
                 <div className='w-100' style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 15.25rem)', gridColumnGap: '0.65rem'}}>
                     {stats}
                 </div>
@@ -92,7 +90,7 @@ export class RegionStats extends Component<Props, State> {
         }
         return (
             <Fragment>
-                {rows.map(row => this.renderRow(row, this.props.selectedStats))}
+                {rows.map(entry => this.renderEntry(entry))}
             </Fragment>
         );
     }

@@ -2,6 +2,7 @@ import {h, Component} from 'preact';
 // Components
 import {RegionStats} from './region-stats';
 import {MetricsSelector} from './metrics-selector';
+import {MetricsComparison} from './metrics-comparison';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
 import {ShowIf} from '../generic/show-if';
@@ -23,7 +24,8 @@ interface State {
     loading: boolean;
     displayedStats: Map<number, boolean>;
     // Stats selected for graphing and comparing
-    selectedStats: Map<string, {location: string, statIdx: number}>;
+    showingGraph: boolean;
+    selectedCount: number;
 };
 
 // Some arbitrary min device size for the top filter options to be position:sticky
@@ -53,7 +55,8 @@ export class Dashboard extends Component<Props, State> {
         this.state = {
             loading: true,
             displayedStats,
-            selectedStats: new Map(),
+            showingGraph: false,
+            selectedCount: 0,
         };
     }
 
@@ -75,7 +78,7 @@ export class Dashboard extends Component<Props, State> {
         this.transformSourceData()
     }
 
-    handleClickShowMore() {
+    handleShowMore() {
         this.displayCount = this.displayCount += PAGE_SIZE;
         if (this.displayCount > this.resultsCount) {
             this.displayCount = this.resultsCount;
@@ -88,15 +91,24 @@ export class Dashboard extends Component<Props, State> {
     }
 
     // Change which stats to graph & compare
-    handleSelectStat(selection) {
-        const id = selection.location + ':' + selection.statIdx;
-        const selectedStats = this.state.selectedStats;
-        if (selectedStats.has(id)) {
-            selectedStats.delete(id);
+    handleSelectStat(entry, statIdx) {
+        console.log(entry, statIdx);
+        let count = this.state.selectedCount;
+        if (entry.stats[statIdx].isComparing) {
+            count -= 1;
         } else {
-            selectedStats.set(id, selection);
+            count += 1;
         }
-        this.setState({selectedStats});
+        entry.stats[statIdx].isComparing = !entry.stats[statIdx].isComparing;
+        this.setState({selectedCount: count});
+    }
+
+    handleShowGraph() {
+        this.setState({showingGraph: true});
+    }
+
+    handleHideGraph() {
+        this.setState({showingGraph: false});
     }
 
     // Paginate, filter, and sort the source data
@@ -123,7 +135,7 @@ export class Dashboard extends Component<Props, State> {
         }
         return (
             <p className='ph2 ph2-m ph4-ns pb4'>
-                <a onClick={() => this.handleClickShowMore()} className='pointer link b light-blue dim'>
+                <a onClick={() => this.handleShowMore()} className='pointer link b light-blue dim'>
                     Show more ({diff} remaining)
                 </a>
             </p>
@@ -134,9 +146,9 @@ export class Dashboard extends Component<Props, State> {
         if (this.state.loading || !this.state.displayData) {
             return <p className='white sans-serif pa4'>Loading data...</p>
         }
-        const selectedCount = this.state.selectedStats.size;
+        const selectedCount = this.state.selectedCount;
         let selectedText = 'Select some metrics to graph and compare';
-        if (this.state.selectedStats.size > 0) {
+        if (selectedCount > 0) {
             selectedText = `You've selected ${selectedCount} ${pluralize('metric', selectedCount)}:`;
         }
         return (
@@ -154,17 +166,25 @@ export class Dashboard extends Component<Props, State> {
                             displayedStats={this.state.displayedStats}
                             entryLabels={this.state.displayData.entryLabels} />
                         <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
-                        <div className='mh2 bl pl2 ml2'>
-                            {Button({text: `Graph ${selectedCount} selected`, background: '#137752', disabled: selectedCount === 0, onClick: null})}
+                        <div className='mh2 bl b--white-30 pl3 ml2'>
+                            {Button({
+                                text: `Graph ${selectedCount} selected`,
+                                background: '#137752',
+                                disabled: selectedCount === 0,
+                                onClick: () => this.handleShowGraph(),
+                            })}
                         </div>
                     </div>
                 </div>
                 <RegionStats
                     data={this.state.displayData}
-                    onSelectStat={selection => this.handleSelectStat(selection)}
-                    selectedStats={this.state.selectedStats}
+                    onSelectStat={(entry, statIdx) => this.handleSelectStat(entry, statIdx)}
                     displayedStats={this.state.displayedStats} />
                 {this.showMoreButton()}
+                <MetricsComparison
+                    hidden={!this.state.showingGraph}
+                    sourceData={this.sourceData}
+                    onClose={() => this.handleHideGraph()} />
             </div>
         );
     }
