@@ -7,7 +7,7 @@ interface Props {
     onSort?: (number, string) => void;
     // Used to automatically fill in the sort options
     entryLabels: Array<string>;
-    selectedStats: Map<number, boolean>;
+    displayedStats: Map<number, boolean>;
 }
 
 interface State {}
@@ -30,7 +30,7 @@ export class Sorts extends Component<Props, State> {
 
     render() {
         const statIdxs = [];
-        this.props.selectedStats.forEach((bool, idx) => {
+        this.props.displayedStats.forEach((bool, idx) => {
             if (!bool) {
                 return;
             }

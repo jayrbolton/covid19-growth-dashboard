@@ -18,7 +18,9 @@ interface State {
     // A copy of sourceData with sorts and filters applied
     displayData?: DashboardData;
     loading: boolean;
-    selectedStats: Map<number, boolean>;
+    displayedStats: Map<number, boolean>;
+    // Stats selected for graphing and comparing
+    selectedStats: Map<string, {location: string, statIdx: number}>;
 };
 
 // Some arbitrary min device size for the top filter options to be position:sticky
@@ -37,17 +39,18 @@ export class Dashboard extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         const width = window.outerWidth;
-        let selectedStats;
+        let displayedStats;
         if (width >= 1023) {
-            selectedStats = new Map([[0, true], [1, true], [2, true], [3, true]]);
+            displayedStats = new Map([[0, true], [1, true], [2, true], [3, true]]);
         } else if (width >= 769) {
-            selectedStats = new Map([[0, true], [1, true], [2, true]]);
+            displayedStats = new Map([[0, true], [1, true], [2, true]]);
         } else {
-            selectedStats = new Map([[0, true], [1, true]]);
+            displayedStats = new Map([[0, true], [1, true]]);
         }
         this.state = {
             loading: true,
-            selectedStats,
+            displayedStats,
+            selectedStats: new Map(),
         };
     }
 
@@ -77,7 +80,19 @@ export class Dashboard extends Component<Props, State> {
         this.transformSourceData();
     }
 
-    handleSelectMetrics(selectedStats: Map<number, boolean>) {
+    handleChangeStatsDisplayed(displayedStats: Map<number, boolean>) {
+        this.setState({displayedStats});
+    }
+
+    // Change which stats to graph & compare
+    handleSelectStat(selection) {
+        const id = selection.location + ':' + selection.statIdx;
+        const selectedStats = this.state.selectedStats;
+        if (selectedStats.has(id)) {
+            selectedStats.delete(id);
+        } else {
+            selectedStats.set(id, selection);
+        }
         this.setState({selectedStats});
     }
 
@@ -123,17 +138,21 @@ export class Dashboard extends Component<Props, State> {
                     style={{position: FILTER_POS, top: 0, marginLeft: '-0.5rem', marginRight: '-0.5rem', background: '#1d1d1d'}}>
                     <div className='flex flex-wrap items-center'>
                         <MetricsSelector
-                            onSelect={selected => this.handleSelectMetrics(selected)}
+                            onSelect={selected => this.handleChangeStatsDisplayed(selected)}
                             entryLabels={this.state.displayData.entryLabels}
-                            defaultDisplayedStats={this.state.selectedStats} />
+                            defaultDisplayedStats={this.state.displayedStats} />
                         <Sorts
                             onSort={(idx, prop) => this.handleSort(idx, prop)}
-                            selectedStats={this.state.selectedStats}
+                            displayedStats={this.state.displayedStats}
                             entryLabels={this.state.displayData.entryLabels} />
                         <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                     </div>
                 </div>
-                <RegionStats data={this.state.displayData} selectedStats={this.state.selectedStats} />
+                <RegionStats
+                    data={this.state.displayData}
+                    onSelectStat={selection => this.handleSelectStat(selection)}
+                    selectedStats={this.state.selectedStats}
+                    displayedStats={this.state.displayedStats} />
                 {this.showMoreButton()}
             </div>
         );
