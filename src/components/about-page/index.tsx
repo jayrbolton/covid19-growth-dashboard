@@ -21,7 +21,7 @@ export class AboutPage extends Component<Props, State> {
                         <li>Bill Riehl</li>
                         <li>{extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")}</li>
                         <li>Omree Gal-Oz</li>
-                        <li>Annette Greiner</lito>
+                        <li>Annette Greiner</li>
                         <li>Dylan Chivian</li>
                     </ul>
                 </p>

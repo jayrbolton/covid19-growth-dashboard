@@ -29,7 +29,6 @@ interface State {
 };
 
 // Some arbitrary min device size for the top filter options to be position:sticky
-const FILTER_POS = window.outerWidth > 600 ? 'sticky' : 'relative';
 const PAGE_SIZE = 20;
 
 export class Dashboard extends Component<Props, State> {
@@ -165,13 +164,7 @@ export class Dashboard extends Component<Props, State> {
         }
         return (
             <div className='flex mt4 bt b--white-50'>
-                <div
-                    className='ph3 z-1 h-100'
-                    style={{
-                        position: FILTER_POS,
-                        top: 0,
-                        left: 0,
-                    }}>
+                <div className='ph3 z-1 sidebar bg-near-black'>
                     <div>
                         <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                         <MetricsSelector

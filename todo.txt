@@ -1,8 +1,5 @@
-sidebar stuff
-- get it to have nested scroll on short windows
-
-graph button
-- css highlight animation on select
+general
+- Add more data viz colors and try not to repeat
 
 graph
 - fix the date alignments (eg. us totals vs NYC)
@@ -12,3 +9,4 @@ graph
 
 mobile
 - ??? need to figure out design and implementation
+  (maybe just skip mobile support for now)
