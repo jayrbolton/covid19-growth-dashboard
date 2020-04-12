@@ -1,13 +1,14 @@
 import {h, Component} from 'preact';
 
-export function Button({text, disabled, onClick, background}) {
+export function Button({text, disabled, onClick, background, className}) {
+    const cn = ['dib pa2 br2 b f6 ', className || ''].join(' ');
     if (disabled) {
         return (
-            <a className='dib pa2 br2 b bg-dark-gray gray f6'>{text}</a>
+            <a className={cn + ' bg-dark-gray gray'}>{text}</a>
         );
     }
     return (
-        <a className='dib pa2 br2 b f6 pointer grow' style={{background}} onClick={onClick}>
+        <a className={cn + ' pointer grow'} style={{background}} onClick={onClick}>
             {text}
         </a>
     );

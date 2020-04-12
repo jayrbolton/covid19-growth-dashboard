@@ -33,13 +33,10 @@ export class Filters extends Component<Props, State> {
 
     render() {
         return (
-            <div className='flex items-center ma2'>
+            <div className='bb b--white-40 mb3 pv3'>
                 <div>
-                    <label className='dib mr2 white-80'>Search:</label>
-                    <SearchInput
-                        placeholder={'Location'}
-                        onInput={inp => this.handleFilterLocation(inp)}
-                    />
+                    <label className='db white-80 b mb2'>Search by location:</label>
+                    <SearchInput onInput={inp => this.handleFilterLocation(inp)} />
                 </div>
             </div>
         );

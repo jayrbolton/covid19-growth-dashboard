@@ -54,9 +54,9 @@ export class Sorts extends Component<Props, State> {
             return '';
         }
         return (
-            <div className='ma2' style={{width: '20.65rem'}}>
-                <span className='dib mr2 white-80'>Sort:</span>
-                <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)} style={{width: '18rem'}}>
+            <div>
+                <label className='db white-80 b mb2'>Sort by:</label>
+                <select className='bg-black white ba b--white-50 pa1' onChange={ev => this.handleSort(ev)}>
                     {
                         options.map(({name, statIdx, prop}) => {
                             return (

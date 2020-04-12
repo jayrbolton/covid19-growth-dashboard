@@ -31,14 +31,14 @@ export class SearchInput extends Component<SearchProps, SearchState> {
         return (
             <Fragment>
             <input
-                className='bg-black input-reset outline-0 white ph2 pv1 w4 ba b--white-50'
+                className='bg-black input-reset outline-0 white ph2 pv1 ba b--white-50'
                 type='text'
                 value={this.state.val}
                 placeholder={this.props.placeholder}
                 onInput={ev => this.handleInput(ev)}
             />
             <ShowIf bool={this.state.hasInput}>
-                <a className='dib ml2 light-blue pointer f6' onClick={() => this.handleClear()}>
+                <a className='dib ml2 light-blue pointer' onClick={() => this.handleClear()}>
                     Clear
                 </a>
             </ShowIf>

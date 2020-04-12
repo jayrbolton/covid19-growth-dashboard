@@ -1,5 +1,5 @@
 .region-stats-row:nth-child(even) {
-    background: #141414;
+    background: #171717;
 }
 .region-stats-row-stat {
     transition: transform .25s ease-out;
@@ -10,4 +10,12 @@
 }
 .region-stats-row-stat[data-selected=true] {
     border-color: #FFD700;
+}
+@keyframes anim-yellow-fade {
+    from { background: yellow; }
+    to { background: rgb(19, 119, 82); }
+}
+.yellow-fade {
+    animation-name: anim-yellow-fade;
+    animation-duration: 1s;
 }

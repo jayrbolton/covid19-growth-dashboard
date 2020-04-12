@@ -1,0 +1,14 @@
+sidebar stuff
+- get it to have nested scroll on short windows
+
+graph button
+- css highlight animation on select
+
+graph
+- fix the date alignments (eg. us totals vs NYC)
+- make the lines straight
+- show gridlines as white
+- update labels to include metrics name (eg. "US Totals - Deaths")
+
+mobile
+- ??? need to figure out design and implementation

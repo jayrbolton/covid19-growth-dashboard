@@ -85,12 +85,10 @@ export class App extends Component<Props, State> {
         return (
             <div className='sans-serif white' style={{background: '#1d1d1d'}}>
                 <Nav onClickNavItem={pageName => this.handleClickNavItem(pageName)} currentPage={this.state.currentPage} />
-                <div className='pt2'>
-                    {this.worldDataPage()}
-                    {this.usStatesPage()}
-                    {this.usCountiesPage()}
-                    {this.aboutPage()}
-                </div>
+                {this.worldDataPage()}
+                {this.usStatesPage()}
+                {this.usCountiesPage()}
+                {this.aboutPage()}
             </div>
         );
     }

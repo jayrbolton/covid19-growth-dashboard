@@ -68,22 +68,12 @@ export class MetricsSelector extends Component<Props, State> {
     }
 
     render() {
-        const width = '16rem';
         return (
-            <div
-                className='relative bg-dark-gray ma2 ba b--white-30'
-                style={{width}}
-                id='metrics-selector-wrapper'>
-                <a
-                    onClick={() => this.handleClick()}
-                    style={{padding: '0.3rem 0.5rem 0.3rem 0.5rem'}}
-                    className='pointer link dib flex justify-between'>
-                    <div>Choose metrics to display</div>
-                    <div>{this.state.dropdownOpen ? '▴' : '▾'}</div>
-                </a>
-                <div
-                    className='absolute w-100 pa2 bg-dark-gray z-2 bl br bb b--white-30'
-                    style={{top: '100%', left: '-1px', display: this.state.dropdownOpen ? 'block' : 'none', width}}>
+            <div id='metrics-selector-wrapper' class='mb3 pb3 bb b--white-40'>
+                <div class='b white-80 mb2'>
+                    Displaying metrics:
+                </div>
+                <div>
                     {this.props.entryLabels.map((label, idx) => this.renderOption(label, idx))}
                 </div>
             </div>
