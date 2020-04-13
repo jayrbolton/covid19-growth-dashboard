@@ -3,7 +3,7 @@ body {
   height: 100%;
 }
 html, body, .sans-serif {
-  font-family: Open Sans, Helvetica, Ubuntu, Roboto, sans-serif;
+  font-family: 'Open Sans', Helvetica, Ubuntu, Roboto, sans-serif;
 }
 body {
   overflow-y: scroll;

@@ -42,7 +42,7 @@ export class RegionStats extends Component<Props, State> {
                 data-selected={isSelected}
                 onClick={() => this.handleClickStat(entry, idx)}
                 className='mb3 ba b--white-20 relative pointer region-stats-row-stat'>
-                <div className='pa2'>
+                <div className='pa2 nowrap overflow-hidden'>
                     <div className='b'>{stat.label}</div>
                 </div>
                 <TimeSeriesBars data={stat.timeSeries} isPercentage={stat.isPercentage} />
