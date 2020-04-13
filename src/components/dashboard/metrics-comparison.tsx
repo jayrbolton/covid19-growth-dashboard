@@ -21,6 +21,13 @@ export class MetricsComparison extends Component<Props, State> {
         this.props.onClose();
     }
 
+    handleClickWrapper(ev) {
+        if (ev.target.id !== 'metrics-comparison-wrapper') {
+            return;
+        }
+        this.handleClickClose();
+    }
+
     componentDidMount() {
         Chart.defaults.global.defaultFontColor = 'white';
         Chart.defaults.global.defaultFontSize = 16;
@@ -72,12 +79,18 @@ export class MetricsComparison extends Component<Props, State> {
         const width = window.outerWidth - 200;
         return (
             <div
-                className='fixed w-100 h-100 z-2 bg-near-black pa4'
+                className='fixed w-100 h-100 z-2 bg-black-80 pa4'
+                id='metrics-comparison-wrapper'
+                onClick={ev => this.handleClickWrapper(ev)}
                 style={{display: this.props.hidden ? 'none' : 'block', top: 0, left: 0}}>
-                <a className='f4 b pointer dim' onClick={() => this.handleClickClose()}>
-                    🠘 Close and return
-                </a>
-                <canvas id="comparison-chart" height={height} width={width}></canvas>
+                <div className='mb3'>
+                    <a className='f4 b pointer dim white' onClick={() => this.handleClickClose()}>
+                        🠘 Close and return
+                    </a>
+                </div>
+                <div className='flex justify-center items-center bg-near-black pa2 ba b--white-40'>
+                    <canvas id="comparison-chart" height={height} width={width}></canvas>
+                </div>
             </div>
         );
     }

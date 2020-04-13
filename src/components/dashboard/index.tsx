@@ -163,7 +163,7 @@ export class Dashboard extends Component<Props, State> {
             selectedText = `You've selected ${selectedCount} ${pluralize('metric', selectedCount)}:`;
         }
         return (
-            <div className='flex mt4 bt b--white-50'>
+            <div className='flex mt4 bt b--white-20'>
                 <div className='ph3 z-1 sidebar bg-near-black'>
                     <div>
                         <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
