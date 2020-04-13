@@ -32,7 +32,7 @@ export function transformData(resp: string): DashboardData {
                 label: 'Confirmed cases, cumulative',
                 val: cases[cases.length - 1],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(cases),
+                percentGrowth: getPercentGrowth(cases.slice(-14)),
                 growthRate: getGrowthRate(cases),
                 timeSeries: {
                     values: cases,
@@ -43,7 +43,7 @@ export function transformData(resp: string): DashboardData {
                 label: 'Deaths',
                 val: deaths[deaths.length - 1],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(deaths),
+                percentGrowth: getPercentGrowth(deaths.slice(-14)),
                 growthRate: getGrowthRate(deaths),
                 timeSeries: {
                     values: deaths,
@@ -54,7 +54,7 @@ export function transformData(resp: string): DashboardData {
                 label: 'Mortality rate',
                 val: mortality[mortality.length - 1],
                 isPercentage: true,
-                percentGrowth: getPercentGrowth(mortality),
+                percentGrowth: getPercentGrowth(mortality.slice(-14)),
                 growthRate: getGrowthRate(mortality),
                 timeSeries: {
                     values: mortality,

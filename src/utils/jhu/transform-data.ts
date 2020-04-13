@@ -70,7 +70,7 @@ function computeStats(entries) {
                 label: 'Confirmed cases, cumulative',
                 val: confirmed[confirmed.length - 1],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(confirmed),
+                percentGrowth: getPercentGrowth(confirmed.slice(-14)),
                 growthRate: getGrowthRate(confirmed),
                 timeSeries: {
                     values: confirmed,
@@ -81,7 +81,7 @@ function computeStats(entries) {
                 label: 'Deaths',
                 val: deaths[deaths.length - 1],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(deaths),
+                percentGrowth: getPercentGrowth(deaths.slice(-14)),
                 growthRate: getGrowthRate(deaths),
                 timeSeries: {
                     values: deaths,
@@ -92,7 +92,7 @@ function computeStats(entries) {
                 label: 'Mortality rate',
                 val: mortality[mortality.length - 1],
                 isPercentage: true,
-                percentGrowth: getPercentGrowth(mortality),
+                percentGrowth: getPercentGrowth(mortality.slice(-14)),
                 growthRate: getGrowthRate(mortality),
                 timeSeries: {
                     values: mortality,

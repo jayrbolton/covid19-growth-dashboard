@@ -159,7 +159,7 @@ function getStat(label, color, series) {
         label,
         val: current,
         isPercentage: false,
-        percentGrowth: getPercentGrowth(series),
+        percentGrowth: getPercentGrowth(series.slice(-14)),
         growthRate: getGrowthRate(series),
         timeSeries,
     };
@@ -172,7 +172,7 @@ function getPercentageStat(label, color, series) {
         label,
         val: series[series.length - 1],
         isPercentage: true,
-        percentGrowth: getPercentGrowth(series),
+        percentGrowth: getPercentGrowth(series.slice(-14)),
         growthRate: getGrowthRate(series),
         timeSeries,
     };
