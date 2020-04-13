@@ -1,6 +1,0 @@
-graph
-- map escape key to close the graph
-
-mobile
-- ??? need to figure out design and implementation
-  (maybe just skip mobile support for now)
