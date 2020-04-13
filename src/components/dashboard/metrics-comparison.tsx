@@ -64,7 +64,7 @@ export class MetricsComparison extends Component<Props, State> {
             for (let idx = 0; idx < maxMetricsLen; idx++) {
                 const daysAgo = maxMetricsLen - idx;
                 const date = new Date();
-                date.setDate(date.getDate() - daysAgo);
+                date.setDate(date.getUTCDate() - daysAgo);
                 labels.push(date.toLocaleDateString());
             }
             this.chart.data.labels = labels;
@@ -76,6 +76,9 @@ export class MetricsComparison extends Component<Props, State> {
                         }
                         return yVal
                     });
+                while (data.length < maxMetricsLen) {
+                    data.unshift(0);
+                }
                 return {
                     label: m.location,
                     data,

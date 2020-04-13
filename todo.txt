@@ -1,8 +1,4 @@
-general
-- Add more data viz colors and try not to repeat
-
 graph
-- fix the date alignments (eg. us totals vs NYC)
 - make the lines straight
 - show gridlines as white
 - update labels to include metrics name (eg. "US Totals - Deaths")
