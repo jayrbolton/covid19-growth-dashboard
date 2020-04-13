@@ -36,7 +36,7 @@ export function transformData(resp: string): DashboardData {
                 growthRate: getGrowthRate(cases),
                 timeSeries: {
                     values: cases,
-                    color: colors[6],
+                    color: colors[0],
                 }
             },
             {
@@ -47,7 +47,7 @@ export function transformData(resp: string): DashboardData {
                 growthRate: getGrowthRate(deaths),
                 timeSeries: {
                     values: deaths,
-                    color: colors[5],
+                    color: colors[3],
                 }
             },
             {

@@ -70,7 +70,7 @@ export class RegionStats extends Component<Props, State> {
             stats.push(this.renderStat(entry.stats[idx], entry, idx));
         });
         return (
-            <div className='ph2 ph2-m ph4-ns pv2 pb1 region-stats-row bb b--white-20 bg-near-black'>
+            <div className='ph3 pv2 pb1 region-stats-row bb b--white-20 bg-near-black'>
                 <h2 className='f4 mv2 b'>{entry.location}</h2>
                 <div className='w-100' style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 15.25rem)', gridColumnGap: '0.65rem'}}>
                     {stats}

@@ -4,12 +4,11 @@
 import * as dataSources from '../../constants/data-sources.json';
 import * as states from '../../constants/states.json';
 import * as stateCodes from '../../constants/state-codes.json';
+import * as colors from '../../constants/graph-colors.json';
 
 import {rowToArray} from '../csv-parse';
 import {getPercentGrowth, getGrowthRate, percent} from '../math';
 import {DashboardData} from '../../types/dashboard';
-
-const CONFIRMED_COLOR = 'rgb(53, 126, 221)';
 
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
 export function transformData(sourceData): DashboardData {
@@ -75,7 +74,7 @@ function computeStats(entries) {
                 growthRate: getGrowthRate(confirmed),
                 timeSeries: {
                     values: confirmed,
-                    color: '#AA3377',
+                    color: colors[0],
                 }
             },
             {
@@ -86,7 +85,7 @@ function computeStats(entries) {
                 growthRate: getGrowthRate(deaths),
                 timeSeries: {
                     values: deaths,
-                    color: '#BBBBBB',
+                    color: colors[3],
                 }
             },
             {
@@ -97,7 +96,7 @@ function computeStats(entries) {
                 growthRate: getGrowthRate(mortality),
                 timeSeries: {
                     values: mortality,
-                    color: '#CCBB44',
+                    color: colors[4],
                 }
             },
         ];
