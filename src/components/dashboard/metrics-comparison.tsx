@@ -2,6 +2,7 @@ import {h, Component, Fragment} from 'preact';
 import {DashboardData} from '../../types/dashboard';
 import Chart from 'chart.js';
 import * as colors from '../../constants/graph-colors.json';
+import {computeLineChartData} from '../../utils/compute-linechart';
 
 interface Props {
     hidden: boolean;
@@ -65,48 +66,7 @@ export class MetricsComparison extends Component<Props, State> {
 
     render() {
         if (this.chart) {
-            const metrics = [];
-            this.props.sourceData.entries.forEach(entry => {
-                entry.stats.forEach(stat => {
-                    if (stat.isComparing) {
-                        metrics.push({location: entry.location, stat: stat});
-                    }
-                });
-            });
-            const maxMetricsLen = metrics.reduce((max, metric) => {
-                const len = metric.stat.timeSeries.values.length;
-                return len > max ? len : max;
-            }, 0);
-            const labels = [];
-            for (let idx = 0; idx < maxMetricsLen; idx++) {
-                const daysAgo = maxMetricsLen - idx;
-                const date = new Date();
-                date.setDate(date.getUTCDate() - daysAgo);
-                labels.push(date.toLocaleDateString());
-            }
-            this.chart.data.labels = labels;
-            const datasets = metrics.map((m, idx) => {
-                const data = m.stat.timeSeries.values
-                    .map((yVal, idx) => {
-                        if (isNaN(yVal) || yVal === null || yVal === undefined) {
-                            yVal = 0;
-                        }
-                        return yVal
-                    });
-                while (data.length < maxMetricsLen) {
-                    data.unshift(0);
-                }
-                return {
-                    label: m.location,
-                    data,
-                    borderColor: colors[idx],
-                    backgroundColor: colors[idx],
-                    fill: false,
-                }
-            });
-            this.chart.data.datasets = datasets;
-            console.log(this.chart.data);
-            this.chart.update();
+            computeLineChartData(this.props.sourceData, this.chart);
         }
         const height = window.outerHeight - 200;
         const width = window.outerWidth - 200;
