@@ -1,5 +1,4 @@
 import {h, Component, Fragment} from 'preact';
-import {ShowIf} from '../generic/show-if';
 import {formatNumber} from '../../utils/formatting';
 import {TimeSeriesBars} from './time-series';
 import {DashboardData, DashboardEntry} from '../../types/dashboard';

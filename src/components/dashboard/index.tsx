@@ -5,7 +5,6 @@ import {MetricsSelector} from './metrics-selector';
 import {MetricsComparison} from './metrics-comparison';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
-import {ShowIf} from '../generic/show-if';
 import {Button} from '../generic/button';
 // Utils
 import {filterLocation} from '../../utils/filter-data';
