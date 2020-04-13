@@ -34,7 +34,24 @@ export class MetricsComparison extends Component<Props, State> {
                 }
             },
             options: {
+                scales: {
+                    yAxes: [{
+                        gridLines: {
+                            color: 'rgb(255,255,255,0.3)'
+                        }
+                    }],
+                    xAxes: [{
+                        gridLines: {
+                            color: 'rgb(255,255,255,0.3)'
+                        }
+                    }]
+                },
                 responsive: false,
+                elements: {
+                    line: {
+                        tension: 0, // disables bezier curves
+                    }
+                },
                 animation: {
                     duration: 0 // general animation time
                 },
@@ -85,7 +102,6 @@ export class MetricsComparison extends Component<Props, State> {
                     borderColor: colors[idx],
                     backgroundColor: colors[idx],
                     fill: false,
-                    lineTension: 0,
                 }
             });
             this.chart.data.datasets = datasets;

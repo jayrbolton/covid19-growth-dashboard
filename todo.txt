@@ -1,5 +1,4 @@
 graph
-- show gridlines as white
 - precompute chart data, not on render
 - update labels to include metrics name (eg. "US Totals - Deaths")
 - style up the layout a bit better
