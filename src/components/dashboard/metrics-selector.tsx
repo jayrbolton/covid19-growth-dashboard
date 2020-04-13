@@ -4,12 +4,12 @@ import {hasParentId} from '../../utils/dom';
 interface Props {
     defaultDisplayedStats: Map<number, boolean>;
     entryLabels: Array<string>;
-    onSelect: (selectedStats: Map<number, boolean>) => void;
+    onSelect: (displayedStats: Map<number, boolean>) => void;
 }
 
 interface State {
     dropdownOpen: boolean;
-    selectedStats: Map<number, boolean>;
+    displayedStats: Map<number, boolean>;
 }
 
 export class MetricsSelector extends Component<Props, State> {
@@ -17,7 +17,7 @@ export class MetricsSelector extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            selectedStats: this.props.defaultDisplayedStats,
+            displayedStats: this.props.defaultDisplayedStats,
             dropdownOpen: false
         };
     }
@@ -38,19 +38,19 @@ export class MetricsSelector extends Component<Props, State> {
     handleChange(ev) {
         const idx = Number(ev.currentTarget.getAttribute('data-idx'));
         const checked = ev.currentTarget.checked;
-        const selected = this.state.selectedStats;
+        const selected = this.state.displayedStats;
         if (checked) {
             selected.set(idx, true);
         } else {
             selected.delete(idx);
         }
-        this.setState({selectedStats: selected});
+        this.setState({displayedStats: selected});
         this.props.onSelect(selected);
     }
 
     renderOption(label, idx) {
         const id = label + '-select-display';
-        const selected = this.state.selectedStats;
+        const selected = this.state.displayedStats;
         return (
             <div className='white-80 mb1 flex items-center'>
                 <input
@@ -68,22 +68,12 @@ export class MetricsSelector extends Component<Props, State> {
     }
 
     render() {
-        const width = '16rem';
         return (
-            <div
-                className='relative bg-dark-gray ma2 ba b--white-30'
-                style={{width}}
-                id='metrics-selector-wrapper'>
-                <a
-                    onClick={() => this.handleClick()}
-                    style={{padding: '0.3rem 0.5rem 0.3rem 0.5rem'}}
-                    className='pointer link dib flex justify-between'>
-                    <div>Select metrics to display</div>
-                    <div>{this.state.dropdownOpen ? '▴' : '▾'}</div>
-                </a>
-                <div
-                    className='absolute w-100 pa2 bg-dark-gray z-2 bl br bb b--white-30'
-                    style={{top: '100%', left: '-1px', display: this.state.dropdownOpen ? 'block' : 'none', width}}>
+            <div id='metrics-selector-wrapper' class='mb3 pb3 bb b--white-40'>
+                <div class='b white-80 mb2'>
+                    Displaying metrics:
+                </div>
+                <div>
                     {this.props.entryLabels.map((label, idx) => this.renderOption(label, idx))}
                 </div>
             </div>

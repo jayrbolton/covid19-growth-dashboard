@@ -25,9 +25,10 @@
   },
   "homepage": "https://github.com/jayrbolton/covid19-growth-dashboard#readme",
   "dependencies": {
-    "classnames": "^2.2.6",
-    "csv-parse": "^4.8.8",
-    "history": "^4.10.1",
+    "chart.js": "^2.9.3",
+    "classnames": "2.2.6",
+    "csv-parse": "4.8.8",
+    "history": "4.10.1",
     "preact": "10.3.4"
   },
   "devDependencies": {

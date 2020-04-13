@@ -11,3 +11,7 @@ export function formatNumber(x): string {
 export function formatUTCDateStr(date: string) {
     return new Date(date).toLocaleDateString();
 }
+
+export function pluralize(word: string, count: number): string {
+    return count > 1 ? word + 's' : word;
+}

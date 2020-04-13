@@ -11,18 +11,23 @@ export class AboutPage extends Component<Props, State> {
 
     render() {
         return (
-            <div className='mw7 ph4'>
+            <div className='mw7 ph4 pt4'>
                 <p>This website was created by {extLink('https://www.jayrbolton.com', 'Jay R Bolton')} and maintained by volunteers.
                 </p>
 
                 <p>
-                    Thanks to Bill Riehl for code contribution.{' '}
-                    {extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")} and Annette Greiner{' '}
-                    gave data visualization feedback.
+                    Additional contributors:
+                    <ul>
+                        <li>Bill Riehl</li>
+                        <li>{extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")}</li>
+                        <li>Omree Gal-Oz</li>
+                        <li>Annette Greiner</li>
+                        <li>Dylan Chivian</li>
+                    </ul>
                 </p>
 
                 <p className='b'>
-                    {extLink(CONTRIBUTORS_URL, 'View the list of contributors to this project')}.
+                    {extLink(CONTRIBUTORS_URL, 'View the code contributions for this project')}.
                 </p>
 
                 <p>

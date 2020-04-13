@@ -2,11 +2,14 @@ import {h, Component} from 'preact';
 // Components
 import {RegionStats} from './region-stats';
 import {MetricsSelector} from './metrics-selector';
+import {MetricsComparison} from './metrics-comparison';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
+import {Button} from '../generic/button';
 // Utils
 import {filterLocation} from '../../utils/filter-data';
 import {sortByStat} from '../../utils/sort-data';
+import {pluralize} from '../../utils/formatting';
 // Types
 import {DashboardData} from '../../types/dashboard';
 
@@ -18,11 +21,13 @@ interface State {
     // A copy of sourceData with sorts and filters applied
     displayData?: DashboardData;
     loading: boolean;
-    selectedStats: Map<number, boolean>;
+    displayedStats: Map<number, boolean>;
+    // Stats selected for graphing and comparing
+    showingGraph: boolean;
+    selectedCount: number;
 };
 
 // Some arbitrary min device size for the top filter options to be position:sticky
-const FILTER_POS = window.outerWidth > 600 ? 'sticky' : 'relative';
 const PAGE_SIZE = 20;
 
 export class Dashboard extends Component<Props, State> {
@@ -33,21 +38,25 @@ export class Dashboard extends Component<Props, State> {
     sourceData: DashboardData;
     filterLocation: string | null = null;
     sortBy: {idx: number, prop: string} = {idx: 0, prop: 'val'};
+    // Boolean to track if the user just clicked a stat for highlighting purposes
+    justSelectedStat = false;
 
     constructor(props: Props) {
         super(props);
         const width = window.outerWidth;
-        let selectedStats;
+        let displayedStats;
         if (width >= 1023) {
-            selectedStats = new Map([[0, true], [1, true], [2, true], [3, true]]);
+            displayedStats = new Map([[0, true], [1, true], [2, true], [3, true]]);
         } else if (width >= 769) {
-            selectedStats = new Map([[0, true], [1, true], [2, true]]);
+            displayedStats = new Map([[0, true], [1, true], [2, true]]);
         } else {
-            selectedStats = new Map([[0, true], [1, true]]);
+            displayedStats = new Map([[0, true], [1, true]]);
         }
         this.state = {
             loading: true,
-            selectedStats,
+            displayedStats,
+            showingGraph: false,
+            selectedCount: 0,
         };
     }
 
@@ -69,7 +78,7 @@ export class Dashboard extends Component<Props, State> {
         this.transformSourceData()
     }
 
-    handleClickShowMore() {
+    handleShowMore() {
         this.displayCount = this.displayCount += PAGE_SIZE;
         if (this.displayCount > this.resultsCount) {
             this.displayCount = this.resultsCount;
@@ -77,8 +86,39 @@ export class Dashboard extends Component<Props, State> {
         this.transformSourceData();
     }
 
-    handleSelectMetrics(selectedStats: Map<number, boolean>) {
-        this.setState({selectedStats});
+    handleChangeStatsDisplayed(displayedStats: Map<number, boolean>) {
+        this.setState({displayedStats});
+    }
+
+    // Change which stats to graph & compare
+    handleSelectStat(entry, statIdx) {
+        let count = this.state.selectedCount;
+        if (entry.stats[statIdx].isComparing) {
+            count -= 1;
+        } else {
+            count += 1;
+            this.justSelectedStat = true;
+        }
+        entry.stats[statIdx].isComparing = !entry.stats[statIdx].isComparing;
+        this.setState({selectedCount: count});
+    }
+
+    handleClearSelectedStats() {
+        // Mutate the source data and update all stats to have isComparing=false
+        this.sourceData.entries.forEach(entry => {
+            entry.stats.forEach(stat => {
+                stat.isComparing = false;
+            });
+        });
+        this.setState({selectedCount: 0});
+    }
+
+    handleShowGraph() {
+        this.setState({showingGraph: true});
+    }
+
+    handleHideGraph() {
+        this.setState({showingGraph: false});
     }
 
     // Paginate, filter, and sort the source data
@@ -105,7 +145,7 @@ export class Dashboard extends Component<Props, State> {
         }
         return (
             <p className='ph2 ph2-m ph4-ns pb4'>
-                <a onClick={() => this.handleClickShowMore()} className='pointer link b light-blue dim'>
+                <a onClick={() => this.handleShowMore()} className='pointer link b light-blue dim'>
                     Show more ({diff} remaining)
                 </a>
             </p>
@@ -114,28 +154,74 @@ export class Dashboard extends Component<Props, State> {
 
     render() {
         if (this.state.loading || !this.state.displayData) {
-            return <p className='white sans-serif pa4'>Loading data...</p>
+            return <p className='white sans-serif ph3 pv4'>Loading data...</p>
+        }
+        const selectedCount = this.state.selectedCount;
+        let selectedText = 'Select some metrics to graph and compare';
+        if (selectedCount > 0) {
+            selectedText = `You've selected ${selectedCount} ${pluralize('metric', selectedCount)}:`;
         }
         return (
-            <div className='mt2'>
-                <div
-                    className='pv2 ph2 ph2-m ph4-ns z-1 bb b--white-30'
-                    style={{position: FILTER_POS, top: 0, marginLeft: '-0.5rem', marginRight: '-0.5rem', background: '#1d1d1d'}}>
-                    <div className='flex flex-wrap items-center'>
+            <div className='flex mt4 bt b--white-20'>
+                <div className='ph3 z-1 sidebar bg-near-black'>
+                    <div>
+                        <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                         <MetricsSelector
-                            onSelect={selected => this.handleSelectMetrics(selected)}
+                            onSelect={selected => this.handleChangeStatsDisplayed(selected)}
                             entryLabels={this.state.displayData.entryLabels}
-                            defaultDisplayedStats={this.state.selectedStats} />
+                            defaultDisplayedStats={this.state.displayedStats} />
                         <Sorts
                             onSort={(idx, prop) => this.handleSort(idx, prop)}
-                            selectedStats={this.state.selectedStats}
+                            displayedStats={this.state.displayedStats}
                             entryLabels={this.state.displayData.entryLabels} />
-                        <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
+                        {renderGraphButton(this, selectedCount, () => this.handleClearSelectedStats())}
                     </div>
                 </div>
-                <RegionStats data={this.state.displayData} selectedStats={this.state.selectedStats} />
-                {this.showMoreButton()}
+                <div class='w-100 bl b--white-40'>
+                    {this.props.children}
+                    <RegionStats
+                        data={this.state.displayData}
+                        onSelectStat={(entry, statIdx) => this.handleSelectStat(entry, statIdx)}
+                        displayedStats={this.state.displayedStats} />
+                    {this.showMoreButton()}
+                </div>
+                <MetricsComparison
+                    hidden={!this.state.showingGraph}
+                    sourceData={this.sourceData}
+                    onClose={() => this.handleHideGraph()} />
             </div>
         );
     }
+}
+
+function renderGraphButton(dashboard, selectedCount, onClear) {
+    const justSelected = dashboard.justSelectedStat;
+    if (justSelected) {
+        dashboard.justSelectedStat = false;
+    }
+    // Anchor to clear all current selections
+    function renderClearSelection() {
+        return (
+            <a onClick={onClear} class='light-blue pointer'>
+                Clear selections
+            </a>
+        );
+    }
+    return (
+        <div class='mt3 pt3 bt b--white-40 pb3'>
+            <div class='flex justify-between items-center'>
+                <span>{selectedCount} metrics selected:</span>
+                {Button({
+                    text: 'Graph & compare', // `Graph ${selectedCount} selected`,
+                    background: '#137752',
+                    className: justSelected ? 'yellow-fade' : '',
+                    disabled: selectedCount === 0,
+                    onClick: () => dashboard.handleShowGraph(),
+                })}
+            </div>
+            <div class='right'>
+                {selectedCount > 0 ? renderClearSelection() : ''}
+            </div>
+        </div>
+    );
 }
