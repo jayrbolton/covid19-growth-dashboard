@@ -84,7 +84,8 @@ export class MetricsComparison extends Component<Props, State> {
                     data,
                     borderColor: colors[idx],
                     backgroundColor: colors[idx],
-                    fill: false
+                    fill: false,
+                    lineTension: 0,
                 }
             });
             this.chart.data.datasets = datasets;
