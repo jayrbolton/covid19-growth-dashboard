@@ -7,14 +7,25 @@ import * as stateCodes from '../../constants/state-codes.json';
 import * as colors from '../../constants/graph-colors.json';
 
 import {rowToArray} from '../csv-parse';
-import {getPercentGrowth, getGrowthRate, percent} from '../math';
+import {percent} from '../math';
+import {setTimeSeriesWindow} from '../transform-data';
+import {sortByStat} from '../sort-data';
 import {DashboardData} from '../../types/dashboard';
+
+const LABELS = [
+    'Confirmed cases, cumulative',
+    'Recovered, cumulative',
+    'Active cases',
+    'Deaths',
+    'Mortality rate',
+    'Percent recovered'
+];
 
 // Convert a blob of csv text into an array of objects with some normalization on dates, etc
 export function transformData(sourceData): DashboardData {
     let dates = null; // All date columns, values parsed from the headers
     let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
-    // Largest totals for creating bars
+    // Parse and aggregate the data
     for (const key in sourceData) {
         const text = sourceData[key];
         const lines = text.split('\n');
@@ -27,16 +38,26 @@ export function transformData(sourceData): DashboardData {
             if (!row || !row.length) {
                 return;
             }
-            const id = String(row[dataSources.provinceIdx]) + ',' + String(row[dataSources.countryIdx]);
-            if (!(id in agg)) {
-                const location = [row[dataSources.provinceIdx], row[dataSources.countryIdx]].filter(x => x).join(', ');
+            const id = row[dataSources.countryIdx];
+            const timeSeries = row.slice(dataSources.seriesIdx);
+            if (id in agg) {
+                if (key in agg[id].cases) {
+                    const cases = agg[id].cases[key];
+                    for (let idx = 0; idx < timeSeries.length; idx++) {
+                        cases[idx] += timeSeries[idx];
+                    }
+                } else {
+                    agg[id].cases[key] = timeSeries;
+                }
+            } else {
+                const location = row[dataSources.countryIdx];
                 agg[id] = {
                     location,
-                    cases: {},
+                    cases: {
+                        [key]: timeSeries
+                    },
                 };
             }
-            const timeSeries = row.slice(dataSources.seriesIdx);
-            agg[id].cases[key] = timeSeries;
         });
     }
     // Convert the aggregation object into an array
@@ -49,8 +70,9 @@ export function transformData(sourceData): DashboardData {
     renameCountries(entries);
     computeStats(entries);
     removeExtras(entries);
-    const entryLabels = ['Confirmed cases, cumulative', 'Deaths', 'Mortality rate'];
-    return {entries, entryLabels};
+    setTimeSeriesWindow(entries);
+    sortByStat(entries, 0);
+    return {entries, entryLabels: LABELS, timeSeriesOffset: 0};
 }
 
 // Remove unneeded intermediate data
@@ -64,40 +86,40 @@ function computeStats(entries) {
     for (const entry of entries) {
         const confirmed = entry.cases.confirmed;
         const deaths = entry.cases.deaths;
+        const recovered = entry.cases.recovered;
+        const active = confirmed.map((con, idx) => con - recovered[idx]);
         const mortality = deaths.map((d, idx) => percent(d, confirmed[idx]));
+        const percentRecovered = recovered.map((rec, idx) => percent(rec, confirmed[idx]));
         entry.stats = [
             {
-                label: 'Confirmed cases, cumulative',
-                val: confirmed[confirmed.length - 1],
+                label: LABELS[0],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(confirmed.slice(-14)),
-                growthRate: getGrowthRate(confirmed),
-                timeSeries: {
-                    values: confirmed,
-                    color: colors[0],
-                }
+                timeSeries: confirmed,
             },
             {
-                label: 'Deaths',
-                val: deaths[deaths.length - 1],
+                label: LABELS[1],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(deaths.slice(-14)),
-                growthRate: getGrowthRate(deaths),
-                timeSeries: {
-                    values: deaths,
-                    color: colors[3],
-                }
+                timeSeries: recovered,
             },
             {
-                label: 'Mortality rate',
-                val: mortality[mortality.length - 1],
+                label: LABELS[2],
+                isPercentage: false,
+                timeSeries: active,
+            },
+            {
+                label: LABELS[3],
+                isPercentage: false,
+                timeSeries: deaths
+            },
+            {
+                label: LABELS[4],
                 isPercentage: true,
-                percentGrowth: getPercentGrowth(mortality.slice(-14)),
-                growthRate: getGrowthRate(mortality),
-                timeSeries: {
-                    values: mortality,
-                    color: colors[4],
-                }
+                timeSeries: mortality,
+            },
+            {
+                label: LABELS[5],
+                isPercentage: true,
+                timeSeries: percentRecovered,
             },
         ];
     }
@@ -118,12 +140,9 @@ function parseDatesFromHeaders (headers) {
     return ret;
 }
 
-/**
- * Compute additional region entries in `rows` as aggregations of countries,
- * continents, or the whole world.
- * Mutates rows
- * @param rows
- */
+// Compute additional region entries in `rows` as aggregations of countries,
+// continents, or the whole world.
+// Mutates rows
 function insertAggregations(rows) {
     const worldwide = {
         location: 'Worldwide',
@@ -151,24 +170,8 @@ function insertAggregations(rows) {
     rows.push(worldwide);
 }
 
-// Calculate percentage stats for the cases (eg. what is the percentage of deaths as compared to confirmed)?
-// Mutates rows
-function getPercentages (rows) {
-    for (const row of rows) {
-        const {confirmed, deaths} = row.currentTotals;
-        let deathsPercentage = 0;
-        if (confirmed > 0) {
-            deathsPercentage = Math.round(deaths * 1000 / confirmed) / 10;
-        }
-        row.percentages = {deathsPercentage}
-    }
-}
-
-/**
- * Some of the country names used by JHU are not ideal. This replaces them with clearer names.
- * mutates rows
- * @param rows
- */
+// Some of the country names used by JHU are not ideal. This replaces them with clearer names.
+// mutates rows
 function renameCountries(rows) {
     const mapping = {
         'Korea, South': 'South Korea',

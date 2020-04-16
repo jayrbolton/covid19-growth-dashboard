@@ -9,8 +9,6 @@ export interface DashboardData {
     // Master list of metric label names for each entry (so we know what to sort on)
     // Indexes should correspond to the same order in DashboardEntry.stats
     entryLabels: Array<string>;
-    // the timeSeriesWindow has changed without any re-sort
-    needsSort?: boolean;
     // Number of days ago to offset timeSeriesWindow
     // This will probably always default to 0
     timeSeriesOffset: number;
