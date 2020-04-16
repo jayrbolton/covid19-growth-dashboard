@@ -7,7 +7,7 @@ import {computeLineChartData} from '../../utils/compute-linechart';
 interface Props {
     hidden: boolean;
     onClose: () => void;
-    sourceData: DashboardData;
+    data: DashboardData;
 }
 
 interface State {
@@ -73,7 +73,7 @@ export class MetricsComparison extends Component<Props, State> {
 
     render() {
         if (this.chart) {
-            computeLineChartData(this.props.sourceData, this.chart);
+            computeLineChartData(this.props.data, this.chart);
         }
         const height = window.outerHeight - 200;
         const width = window.outerWidth - 200;

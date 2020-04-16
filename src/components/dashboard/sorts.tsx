@@ -4,7 +4,7 @@ import {DashboardEntry} from '../../types/dashboard';
 
 
 interface Props {
-    onSort?: (number, string) => void;
+    onSort: (number, string) => void;
     // Used to automatically fill in the sort options
     entryLabels: Array<string>;
     displayedStats: Map<number, boolean>;
@@ -23,9 +23,7 @@ export class Sorts extends Component<Props, State> {
         const el = ev.currentTarget;
         const [idxStr, prop] = el.value.split(':');
         const idx = Number(idxStr);
-        if (this.props.onSort) {
-            this.props.onSort(idx, prop);
-        }
+        this.props.onSort(idx, prop === 'percentGrowth');
     }
 
     render() {
@@ -55,7 +53,7 @@ export class Sorts extends Component<Props, State> {
         }
         return (
             <div>
-                <label className='db white-80 b mb2'>Sort by:</label>
+                <label className='db white-80 b mb2'>Sorting by:</label>
                 <select className='bg-black white ba b--white-50 pa1 mw-100' onChange={ev => this.handleSort(ev)}>
                     {
                         options.map(({name, statIdx, prop}) => {

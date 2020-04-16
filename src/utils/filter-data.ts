@@ -1,17 +1,19 @@
 /*
  * Filtering functions
  */
+import {DashboardEntry} from '../types/dashboard';
 
 
-export function filterLocation(rows, query: string = '') {
-    return genericSearch(rows, row => row.location, query);
-}
-
-function genericSearch(rows, accessor, query) {
-    query = query.toLowerCase();
-    let hiddenCount = 0;
-    return rows.filter(row => {
-        const ref = String(accessor(row)).toLowerCase().trim();
-        return ref.indexOf(query) !== -1;
+// Mark entries as hidden if their location does not have the query string as a substring
+// Return the total number of entries that were not hidden
+export function filterLocation(entries: Array<DashboardEntry>, query: string = ''): number {
+    let resultsCount = 0;
+    entries.forEach((entry: DashboardEntry) => {
+        const ref = String(entry.location).toLowerCase().trim();
+        entry.hidden = ref.indexOf(query) === -1;
+        if (!entry.hidden) {
+          resultsCount += 1;
+        }
     });
+  return resultsCount;
 }

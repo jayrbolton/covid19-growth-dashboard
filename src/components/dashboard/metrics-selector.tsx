@@ -69,7 +69,7 @@ export class MetricsSelector extends Component<Props, State> {
 
     render() {
         return (
-            <div id='metrics-selector-wrapper' class='mb3 pb3 bb b--white-40'>
+            <div id='metrics-selector-wrapper' class='mb3 pb3 bb b--white-20'>
                 <div class='b white-80 mb2'>
                     Displaying metrics:
                 </div>

@@ -33,7 +33,7 @@ export class Filters extends Component<Props, State> {
 
     render() {
         return (
-            <div className='bb b--white-40 mb3 pv3'>
+            <div className='bb b--white-20 mb3 pv3'>
                 <div>
                     <label className='db white-80 b mb2'>Search by location:</label>
                     <SearchInput onInput={inp => this.handleFilterLocation(inp)} />

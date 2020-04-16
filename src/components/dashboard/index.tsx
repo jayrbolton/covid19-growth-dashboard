@@ -6,38 +6,52 @@ import {MetricsComparison} from './metrics-comparison';
 import {Filters} from './filters';
 import {Sorts} from './sorts';
 import {Button} from '../generic/button';
+import {ShowIf} from '../generic/show-if';
 // Utils
 import {filterLocation} from '../../utils/filter-data';
 import {sortByStat} from '../../utils/sort-data';
 import {pluralize} from '../../utils/formatting';
+import {setTimeSeriesWindow} from '../../utils/transform-data';
 // Types
 import {DashboardData} from '../../types/dashboard';
+// Constants
+import * as uiSettings from '../../constants/ui-settings.json';
+
+// How many days they can time travel backwards
+const MAX_RANGE = 30;
 
 interface Props {
     fetchSourceData: () => Promise<DashboardData>;
 };
 
 interface State {
-    // A copy of sourceData with sorts and filters applied
-    displayData?: DashboardData;
+    data?: DashboardData;
     loading: boolean;
     displayedStats: Map<number, boolean>;
     // Stats selected for graphing and comparing
     showingGraph: boolean;
     selectedCount: number;
+    // Number of results that match the search query
+    resultsCount: number;
+    // Pagination count
+    displayCount: number;
+    timeRangeUnsorted: boolean;
 };
 
-// Some arbitrary min device size for the top filter options to be position:sticky
-const PAGE_SIZE = 20;
+// How the source data gets transformed by user filtering:
+// (all updates are in-place mutations on the source data)
+// When users select a new sort value
+//   - re-sort the source data
+// When users filter by location
+//   - update the `hidden` flag for all source data entries in-place
+// When users change the time range (ie. 'days ago')
+//   - update the time series for each entry
+//   - re-sort the data
 
 export class Dashboard extends Component<Props, State> {
-    // Total count of results before pagination
-    resultsCount: number = 0;
-    // Pagination count
-    displayCount: number = PAGE_SIZE;
-    sourceData: DashboardData;
-    filterLocation: string | null = null;
-    sortBy: {idx: number, prop: string} = {idx: 0, prop: 'val'};
+    sortingByGrowth: boolean = false;
+    sortingStatIdx: number = 0;
+    timeRangeTimeout: null | number = null;
     // Boolean to track if the user just clicked a stat for highlighting purposes
     justSelectedStat = false;
 
@@ -57,33 +71,42 @@ export class Dashboard extends Component<Props, State> {
             displayedStats,
             showingGraph: false,
             selectedCount: 0,
+            resultsCount: 0,
+            displayCount: uiSettings.pageLen,
+            timeRangeUnsorted: false,
         };
     }
 
     componentDidMount() {
         this.props.fetchSourceData()
-            .then((sourceData) => {
-                this.sourceData = sourceData;
-                this.transformSourceData();
+            .then((data) => {
+                this.setState({data, loading: false, resultsCount: data.entries.length});
             })
     }
 
     handleFilterLocation(inp: string) {
-        this.filterLocation = inp.trim();
-        this.transformSourceData()
+        const resultsCount = filterLocation(this.state.data.entries, inp);
+        this.setState({resultsCount});
     }
 
-    handleSort(idx: number, prop: string) {
-        this.sortBy = {idx, prop};
-        this.transformSourceData()
+    handleSort(statIdx: number | null, byGrowth: boolean | null) {
+        if (statIdx) {
+            this.sortingByGrowth = byGrowth;
+        }
+        if (byGrowth) {
+            this.sortingStatIdx = statIdx;
+        }
+        sortByStat(this.state.data.entries, this.sortingStatIdx, this.sortingByGrowth)
+        this.setState({timeRangeUnsorted: false});
     }
 
     handleShowMore() {
-        this.displayCount = this.displayCount += PAGE_SIZE;
-        if (this.displayCount > this.resultsCount) {
-            this.displayCount = this.resultsCount;
+        let displayCount = this.state.displayCount;
+        displayCount += uiSettings.pageLen;
+        if (displayCount > this.state.resultsCount) {
+            displayCount = this.state.resultsCount;
         }
-        this.transformSourceData();
+        this.setState({displayCount});
     }
 
     handleChangeStatsDisplayed(displayedStats: Map<number, boolean>) {
@@ -105,7 +128,7 @@ export class Dashboard extends Component<Props, State> {
 
     handleClearSelectedStats() {
         // Mutate the source data and update all stats to have isComparing=false
-        this.sourceData.entries.forEach(entry => {
+        this.state.data.entries.forEach(entry => {
             entry.stats.forEach(stat => {
                 stat.isComparing = false;
             });
@@ -121,25 +144,22 @@ export class Dashboard extends Component<Props, State> {
         this.setState({showingGraph: false});
     }
 
-    // Paginate, filter, and sort the source data
-    transformSourceData() {
-        // Filter out any entries
-        let entries = this.sourceData.entries;
-        if (this.filterLocation) {
-            entries = filterLocation(entries, this.filterLocation);
+    handleInputTimeRange(daysAgo: number) {
+        daysAgo = Number(daysAgo);
+        if (this.timeRangeTimeout) {
+            clearTimeout(this.timeRangeTimeout)
         }
-        this.resultsCount = entries.length;
-        // Sort the results. The arrays are mutated in place by these functions.
-        sortByStat(entries, this.sortBy, 'desc');
-        // Paginate
-        entries = entries.slice(0, this.displayCount)
-        // Update state
-        const displayData = {entries, entryLabels: this.sourceData.entryLabels};
-        this.setState({displayData, loading: false});
+        const update = () => {
+            this.state.data.timeSeriesOffset = daysAgo;
+            setTimeSeriesWindow(this.state.data.entries, daysAgo);
+            // sortByStat(this.state.data.entries, this.sortingStatIdx, this.sortingByGrowth)
+            this.setState({timeRangeUnsorted: true});
+        }
+        this.timeRangeTimeout = setTimeout(update, 25);
     }
 
     showMoreButton() {
-        const diff = this.resultsCount - this.displayCount;
+        const diff = this.state.resultsCount - this.state.displayCount;
         if (diff <= 0) {
             return '';
         }
@@ -153,7 +173,7 @@ export class Dashboard extends Component<Props, State> {
     }
 
     render() {
-        if (this.state.loading || !this.state.displayData) {
+        if (this.state.loading || !this.state.data) {
             return <p className='white sans-serif ph3 pv4'>Loading data...</p>
         }
         const selectedCount = this.state.selectedCount;
@@ -168,26 +188,28 @@ export class Dashboard extends Component<Props, State> {
                         <Filters onFilterLocation={inp => this.handleFilterLocation(inp)}/>
                         <MetricsSelector
                             onSelect={selected => this.handleChangeStatsDisplayed(selected)}
-                            entryLabels={this.state.displayData.entryLabels}
+                            entryLabels={this.state.data.entryLabels}
                             defaultDisplayedStats={this.state.displayedStats} />
                         <Sorts
                             onSort={(idx, prop) => this.handleSort(idx, prop)}
                             displayedStats={this.state.displayedStats}
-                            entryLabels={this.state.displayData.entryLabels} />
+                            entryLabels={this.state.data.entryLabels} />
                         {renderGraphButton(this, selectedCount, () => this.handleClearSelectedStats())}
+                        {renderTimeRangeSlider(this)}
                     </div>
                 </div>
                 <div class='w-100 bl b--white-40'>
                     {this.props.children}
                     <RegionStats
-                        data={this.state.displayData}
+                        displayCount={this.state.displayCount}
+                        data={this.state.data}
                         onSelectStat={(entry, statIdx) => this.handleSelectStat(entry, statIdx)}
                         displayedStats={this.state.displayedStats} />
                     {this.showMoreButton()}
                 </div>
                 <MetricsComparison
                     hidden={!this.state.showingGraph}
-                    sourceData={this.sourceData}
+                    data={this.state.data}
                     onClose={() => this.handleHideGraph()} />
             </div>
         );
@@ -208,7 +230,7 @@ function renderGraphButton(dashboard, selectedCount, onClear) {
         );
     }
     return (
-        <div class='mt3 pt3 bt b--white-40 pb3'>
+        <div class='mt3 pt3 bt b--white-20'>
             <div class='flex justify-between items-center'>
                 <span>{selectedCount} metrics selected:</span>
                 {Button({
@@ -222,6 +244,31 @@ function renderGraphButton(dashboard, selectedCount, onClear) {
             <div class='right'>
                 {selectedCount > 0 ? renderClearSelection() : ''}
             </div>
+        </div>
+    );
+}
+
+function renderTimeRangeSlider(dashboard) {
+    const daysAgo = dashboard.state.data.timeSeriesOffset;
+    return (
+        <div className='mt3 pt3 bt b--white-20'>
+            <div className='flex justify-between'>
+                <span>Going back in time {daysAgo} {pluralize('day', daysAgo)}</span>
+                <ShowIf bool={dashboard.state.timeRangeUnsorted}>
+                    <a 
+                        className='dib light-blue pointer'
+                        onClick={() => dashboard.handleSort(null, null)}>
+                        Re-sort
+                    </a>
+                </ShowIf>
+            </div>
+            <input
+                className='dib w-100 outline-0 pv1 mt2'
+                style={{direction: 'rtl'}}
+                type='range'
+                min={0} max={MAX_RANGE} step={1}
+                onInput={ev => dashboard.handleInputTimeRange(ev.currentTarget.value)}
+                value={daysAgo} />
         </div>
     );
 }

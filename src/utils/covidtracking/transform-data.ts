@@ -3,13 +3,12 @@
  * Take the raw JSON response and transform it into a DashboardData type
  */
 import * as stateCodes from '../../constants/state-codes.json';
-import * as colors from '../../constants/graph-colors.json';
 import {DashboardData} from '../../types/dashboard';
-import {genericSort} from '../../utils/sort-data';
-import {percent, getPercentGrowth, getGrowthRate} from '../../utils/math';
+import {genericSort, sortByStat} from '../sort-data';
+import {percent} from '..//math';
+import {setTimeSeriesWindow} from '../transform-data';
 
 export function transformData(resp: string): DashboardData {
-    // TODO on any server or parse error, show a UI message "failed to load data"
     const data = JSON.parse(resp)
         // Combine all repeated state entries into one aggregate object
         .reduce((accum, row) => {
@@ -20,7 +19,31 @@ export function transformData(resp: string): DashboardData {
             accum[state].series.unshift(row);
             return accum;
         }, {});
-    // Compute an entry for all aggregated totals for the country
+    computeUSTotals(data);
+    // Convert the data into DashboardData
+    let entries = [];
+    for (const state in data) {
+        const stateName = stateCodes[state];
+        const series = data[state].series;
+        const entry = {
+            location: getLocation(data[state]),
+            stats: ENTRY_STATS.map(each => each.stat(series)),
+        };
+        entries.push(entry);
+    }
+    const entryLabels = ENTRY_STATS.map(({label}) => label);
+    setTimeSeriesWindow(entries, 0); 
+    sortByStat(entries, 0);
+    return {entries, entryLabels, timeSeriesOffset: 0};
+}
+
+function getLocation(row) {
+    const stateName = stateCodes[row.state];
+    return [stateName, row.country || 'US'].filter(x => x).join(', ');
+}
+
+// Compute an entry for all aggregated totals for the country
+function computeUSTotals(data) {
     // Keys are entry dates for fast lookup
     const aggregateSet = {};
     for (const key in data) {
@@ -49,132 +72,107 @@ export function transformData(resp: string): DashboardData {
         country: 'US Totals',
         series: aggregateArr
     }
-    // Convert the data into DashboardData
-    let entries = [];
-    const entryStats = [
-        {
-            label: 'Positive cases, cumulative',
-            stat(series) {
-                return getStat(this.label, colors[0], series.map(each => each.positive));
-            }
-        },
-        {
-            label: 'Percent positive',
-            stat (series) {
-                const nonulls = series.filter(each => {
-                    return each.positive !== null && each.totalTestResults !== null
-                });
-                return getPercentageStat(this.label, colors[1], nonulls.map(each => {
-                    return percent(each.positive, each.totalTestResults);
-                }));
-            }
-        },
-        {
-            label: 'Hospitalized, current',
-            stat (series) {
-                return getStat(this.label, colors[2], series.map(each => each.hospitalizedCurrently));
-            }
-        },
-        {
-            label: 'Deaths',
-            stat (series) {
-                return getStat(this.label, colors[3], series.map(each => each.death));
-            }
-        },
-        {
-            label: 'Mortality rate',
-            stat (series) {
-                const nonulls = series.filter(each => {
-                    return each.death !== null && each.positive !== null;
-                });
-                return getPercentageStat(this.label, colors[4], nonulls.map(each => {
-                    return percent(each.death, each.positive);
-                }));
-            }
-        },
-        {
-            label: 'Negative tests, cumulative',
-            stat (series) {
-                return getStat(this.label, colors[5], series.map(each => each.negative));
-            }
-        },
-        {
-            label: 'Percent of tests negative',
-            stat (series) {
-                const nonulls = series.filter(each => {
-                    return each.negative !== null && each.totalTestResults !== null;
-                });
-                return getPercentageStat(this.label, colors[6], nonulls.map(each => {
-                    return percent(each.negative, each.totalTestResults);
-                }));
-            }
-        },
-        {
-            label: 'Total tests, cumulative',
-            stat (series) {
-                return getStat(this.label, colors[7], series.map(each => each.totalTestResults));
-            }
-        },
-        {
-            label: 'Hospitalized, cumulative',
-            stat (series) {
-                return getStat(this.label, colors[8], series.map(each => each.hospitalizedCumulative));
-            }
-        },
-        {
-            label: 'Percent positive hospitalized',
-            stat (series) {
-                const nonulls = series.filter(each => {
-                    return each.hospitalizedCumulative !== null && each.positive !== null;
-                });
-                return getPercentageStat(this.label, colors[9], nonulls.map(each => {
-                    return percent (each.hospitalizedCumulative, each.positive);
-                }));
-            }
-        }
-    ];
-    // Labels and accessor functions for each entry stats const entryStats = [
-    for (const state in data) {
-        const stateName = stateCodes[state];
-        const series = data[state].series;
-        const entry = {
-            location: getLocation(data[state]),
-            stats: entryStats.map(each => each.stat(series)),
-        };
-        entries.push(entry);
-    }
-    const entryLabels = entryStats.map(({label}) => label);
-    return {entries, entryLabels};
 }
 
-function getLocation(row) {
-    const stateName = stateCodes[row.state];
-    return [stateName, row.country || 'US'].filter(x => x).join(', ');
-}
-
-function getStat(label, color, series) {
-    const timeSeries = {values: series, color}
+function getStat(label, series) {
     let current = series[series.length - 1];
     const stat = {
         label,
-        val: current,
         isPercentage: false,
-        percentGrowth: getPercentGrowth(series.slice(-14)),
-        growthRate: getGrowthRate(series),
-        timeSeries,
+        timeSeries: series,
     };
     return stat;
 }
 
-function getPercentageStat(label, color, series) {
-    const timeSeries = {values: series, color};
+function getPercentageStat(label, series) {
     const stat = {
         label,
-        val: series[series.length - 1],
         isPercentage: true,
-        percentGrowth: getPercentGrowth(series.slice(-14)),
-        growthRate: getGrowthRate(series),
-        timeSeries,
+        timeSeries: series,
     };
     return stat;
 }
+
+// A collection of EntryStat labels and generator functions
+const ENTRY_STATS = [
+    {
+        label: 'Positive cases, cumulative',
+        stat(series) {
+            return getStat(this.label, series.map(each => each.positive));
+        }
+    },
+    {
+        label: 'Percent positive',
+        stat (series) {
+            const nonulls = series.filter(each => {
+                return each.positive !== null && each.totalTestResults !== null
+            });
+            return getPercentageStat(this.label, nonulls.map(each => {
+                return percent(each.positive, each.totalTestResults);
+            }));
+        }
+    },
+    {
+        label: 'Hospitalized, current',
+        stat (series) {
+            return getStat(this.label, series.map(each => each.hospitalizedCurrently));
+        }
+    },
+    {
+        label: 'Deaths',
+        stat (series) {
+            return getStat(this.label, series.map(each => each.death));
+        }
+    },
+    {
+        label: 'Mortality rate',
+        stat (series) {
+            const nonulls = series.filter(each => {
+                return each.death !== null && each.positive !== null;
+            });
+            return getPercentageStat(this.label, nonulls.map(each => {
+                return percent(each.death, each.positive);
+            }));
+        }
+    },
+    {
+        label: 'Negative tests, cumulative',
+        stat (series) {
+            return getStat(this.label, series.map(each => each.negative));
+        }
+    },
+    {
+        label: 'Percent of tests negative',
+        stat (series) {
+            const nonulls = series.filter(each => {
+                return each.negative !== null && each.totalTestResults !== null;
+            });
+            return getPercentageStat(this.label, nonulls.map(each => {
+                return percent(each.negative, each.totalTestResults);
+            }));
+        }
+    },
+    {
+        label: 'Total tests, cumulative',
+        stat (series) {
+            return getStat(this.label, series.map(each => each.totalTestResults));
+        }
+    },
+    {
+        label: 'Hospitalized, cumulative',
+        stat (series) {
+            return getStat(this.label, series.map(each => each.hospitalizedCumulative));
+        }
+    },
+    {
+        label: 'Percent positive hospitalized',
+        stat (series) {
+            const nonulls = series.filter(each => {
+                return each.hospitalizedCumulative !== null && each.positive !== null;
+            });
+            return getPercentageStat(this.label, nonulls.map(each => {
+                return percent (each.hospitalizedCumulative, each.positive);
+            }));
+        }
+    }
+];

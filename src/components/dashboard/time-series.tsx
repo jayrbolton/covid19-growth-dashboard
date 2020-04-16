@@ -1,11 +1,19 @@
 // Time series bar chart
 import {h, Component, Fragment} from 'preact';
 import {formatNumber} from '../../utils/formatting';
-import {TimeSeriesData} from '../../types/dashboard';
+import * as colors from '../../constants/graph-colors.json';
 
 interface Props {
-    data: TimeSeriesData;
+    statIdx: number;
+    series: {
+        values: Array<number>;
+        percentages: Array<number>;
+    };
     isPercentage: boolean;
+    // How many days to show
+    timeRange: number;
+    // How many days ago for the end date
+    daysAgo: number;
 }
 
 interface State {
@@ -14,6 +22,13 @@ interface State {
 const ROW_HEIGHT = '1rem';
 const ROW_HEIGHT_FIRST = '1.25rem';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// last hundred days in readable date strings
+const DATES = Array(100).fill(null).map((_, idx) => {
+    const daysAgo = 100 - idx;
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    return `${MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}`;
+});
 
 export class TimeSeriesBars extends Component<Props, State> {
 
@@ -22,12 +37,13 @@ export class TimeSeriesBars extends Component<Props, State> {
         this.state = {}
     }
 
-    barText(perc, idx, val, date, isPercentage, len) {
+    barText(val, idx, isPercentage, len) {
         const isLast = idx === (len - 1);
         const height = isLast ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
         const fontSize = isLast ? '1rem': 'inherit';
         const fontWeight = isLast ? 'bold': 'normal';
         const color = isLast ? 'white': '#d8d8d8';
+        const date = DATES[DATES.length - len - this.props.daysAgo + idx]
         return (
             <div className='flex justify-between' style={{height, fontSize, fontWeight, color}}>
                 <div>{date}</div>
@@ -39,10 +55,11 @@ export class TimeSeriesBars extends Component<Props, State> {
         );
     }
 
-    vertBar(perc, idx, val, color, len) {
+    vertBar(val, percentage, idx, len) {
         const border = '2px solid #333';
-        const width = perc === '?'  || perc === null || isNaN(perc)? '0%' : perc + '%';
+        const width = percentage === '?'  || percentage === null || isNaN(percentage) ? '0%' : percentage + '%';
         const height = idx === (len - 1) ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
+        const color = colors[this.props.statIdx];
         return (
             <div
                 title={formatNumber(val)}
@@ -52,28 +69,15 @@ export class TimeSeriesBars extends Component<Props, State> {
     }
 
     render() {
-        const {color, values} = this.props.data
-        const vals = values.slice(-14);
-        const nonulls = vals.filter(n => n !== null);
-        let max = 0;
-        if (nonulls.length) {
-            max = vals.reduce((max, n) => n > max ? n : max, 0);
-        }
-        const percentages = vals.map(v => v === null ? '?' : percent(v, max));
-        const dates = vals.map((_, idx) => {
-            const daysAgo = vals.length - idx;
-            const date = new Date();
-            date.setDate(date.getDate() - daysAgo);
-            return `${MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}`;
-        });
+        const {values, percentages} = this.props.series;
         return (
             <div className='pa2' style={{background: 'rgb(40, 40, 40)'}}>
                 <div className='flex justify-between'>
                     <div className='flex flex-column-reverse justify-between f6 pr2' style={{width: '60%'}}>
-                        {percentages.map((perc, idx) => this.barText(perc, idx, vals[idx], dates[idx], this.props.isPercentage, vals.length))}
+                        {values.map((val, idx) => this.barText(val, idx, this.props.isPercentage, values.length))}
                     </div>
                     <div className='flex flex-column-reverse justify-between' style={{width: '40%'}}>
-                        {percentages.map((perc, idx) => this.vertBar(perc, idx, vals[idx], color, vals.length))}
+                        {values.map((val, idx) => this.vertBar(val, percentages[idx], idx, values.length))}
                     </div>
                 </div>
             </div>

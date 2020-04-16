@@ -13,5 +13,5 @@ export function formatUTCDateStr(date: string) {
 }
 
 export function pluralize(word: string, count: number): string {
-    return count > 1 ? word + 's' : word;
+    return count === 1 ? word : word + 's';
 }

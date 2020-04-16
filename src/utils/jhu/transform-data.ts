@@ -136,7 +136,6 @@ function insertAggregations(rows) {
     for (const row of rows) {
         for (const key of dataSources.categoryKeys) { // 3 iterations
             if (!row.cases[key]) {
-                console.log(row);
                 continue;
             }
             row.cases[key].forEach((total, idx) => {

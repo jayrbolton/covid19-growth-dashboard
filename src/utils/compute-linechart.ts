@@ -22,7 +22,7 @@ export function computeLineChartData(sourceData: DashboardData, chart) {
     });
     // Find the maximum stats time series length so we know how many x axis ticks to make
     const maxMetricsLen = metrics.reduce((max, metric) => {
-        const len = metric.stat.timeSeries.values.length;
+        const len = metric.stat.timeSeries.length;
         return len > max ? len : max;
     }, 0);
     // Create an array of labels for the x axis
@@ -37,7 +37,7 @@ export function computeLineChartData(sourceData: DashboardData, chart) {
     // Create the datasets for each line
     // See the chart.js documentation for line charts
     const datasets = metrics.map((m, idx) => {
-        const data = m.stat.timeSeries.values
+        const data = m.stat.timeSeries
             .map((yVal, idx) => {
                 if (isNaN(yVal) || yVal === null || yVal === undefined) {
                     yVal = 0;
