@@ -1,7 +1,16 @@
 import * as colors from '../../constants/graph-colors.json';
 import {DashboardData} from '../../types/dashboard';
 import {rowToArray} from '../csv-parse';
-import {percent, getPercentGrowth, getGrowthRate} from '../../utils/math';
+import {percent, getPercentGrowth, getGrowthRate} from '../math';
+import {setTimeSeriesWindow} from '../transform-data';
+import {sortByStat} from '../sort-data';
+
+
+const LABELS = [
+    'Confirmed cases, cumulative',
+    'Deaths',
+    'Mortality rate'
+];
 
 
 export function transformData(resp: string): DashboardData {
@@ -19,7 +28,8 @@ export function transformData(resp: string): DashboardData {
     }
     const ret = {
         entries: [],
-        entryLabels: ['Confirmed cases, cumulative', 'Deaths', 'Mortality rate'],
+        entryLabels: LABELS,
+        timeSeriesOffset: 0,
     };
     for (const fips in agg) {
         const series = agg[fips];
@@ -29,37 +39,19 @@ export function transformData(resp: string): DashboardData {
         const location = [series[0][1], series[0][2]].join(', ');
         const stats = [
             {
-                label: 'Confirmed cases, cumulative',
-                val: cases[cases.length - 1],
+                label: LABELS[0],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(cases.slice(-14)),
-                growthRate: getGrowthRate(cases),
-                timeSeries: {
-                    values: cases,
-                    color: colors[0],
-                }
+                timeSeries: cases,
             },
             {
-                label: 'Deaths',
-                val: deaths[deaths.length - 1],
+                label: LABELS[1],
                 isPercentage: false,
-                percentGrowth: getPercentGrowth(deaths.slice(-14)),
-                growthRate: getGrowthRate(deaths),
-                timeSeries: {
-                    values: deaths,
-                    color: colors[3],
-                }
+                timeSeries: deaths,
             },
             {
-                label: 'Mortality rate',
-                val: mortality[mortality.length - 1],
+                label: LABELS[2],
                 isPercentage: true,
-                percentGrowth: getPercentGrowth(mortality.slice(-14)),
-                growthRate: getGrowthRate(mortality),
-                timeSeries: {
-                    values: mortality,
-                    color: colors[4],
-                }
+                timeSeries: mortality,
             }
         ];
         const entry = {
@@ -68,5 +60,7 @@ export function transformData(resp: string): DashboardData {
         }
         ret.entries.push(entry);
     }
+    setTimeSeriesWindow(ret.entries);
+    sortByStat(ret.entries, 0);
     return ret;
 }

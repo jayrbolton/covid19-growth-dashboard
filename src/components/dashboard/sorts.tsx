@@ -35,6 +35,9 @@ export class Sorts extends Component<Props, State> {
             statIdxs.push(idx);
         });
         const options = statIdxs.reduce((arr, statIdx) => {
+            if (!this.props.entryLabels[statIdx]) {
+                return arr;
+            }
             const label = this.props.entryLabels[statIdx];
             arr.push({
                 name: label + ' (total)',
