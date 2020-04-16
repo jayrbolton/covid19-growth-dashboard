@@ -91,10 +91,10 @@ export class Dashboard extends Component<Props, State> {
     }
 
     handleSort(statIdx: number | null, byGrowth: boolean | null) {
-        if (statIdx) {
+        if (statIdx !== null) {
             this.sortingByGrowth = byGrowth;
         }
-        if (byGrowth) {
+        if (byGrowth !== null) {
             this.sortingStatIdx = statIdx;
         }
         sortByStat(this.state.data.entries, this.sortingStatIdx, this.sortingByGrowth)

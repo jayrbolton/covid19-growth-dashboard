@@ -16,14 +16,7 @@ export class AboutPage extends Component<Props, State> {
                 </p>
 
                 <p>
-                    Additional contributors:
-                    <ul>
-                        <li>Bill Riehl</li>
-                        <li>{extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")}</li>
-                        <li>Omree Gal-Oz</li>
-                        <li>Annette Greiner</li>
-                        <li>Dylan Chivian</li>
-                    </ul>
+                    Additional feedback from {extLink("https://de.linkedin.com/in/henrieke-baunack", "Henrieke Baunack")}.
                 </p>
 
                 <p className='b'>

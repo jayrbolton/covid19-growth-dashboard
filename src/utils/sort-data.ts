@@ -13,15 +13,23 @@ export function sortByStat(entries: Array<DashboardEntry>, statIdx: number, grow
         // Sort by current time series value
         genericSort(entries, entry => {
             const ts = entry.stats[statIdx].timeSeriesWindow.values;
-            return ts[ts.length - 1];
+            const val = ts[ts.length - 1];
+            console.log('sorting by', val);
+            return val;
         });
     }
 }
 
 export function genericSort(rows: Array<any>, accessor, dir='desc') {
     rows.sort((rowA, rowB) => {
-        const valA = accessor(rowA)
-        const valB = accessor(rowB)
+        let valA = accessor(rowA)
+        let valB = accessor(rowB)
+        if (isNaN(valA) || valA === null || valA === undefined) {
+            valA = 0;
+        }
+        if (isNaN(valB) || valB === null || valB === undefined) {
+            valB = 0;
+        }
         if (valA < valB) {
             return dir === 'asc' ? -1 : 1;
         } else if (valA > valB) {
