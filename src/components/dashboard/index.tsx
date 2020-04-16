@@ -35,7 +35,8 @@ interface State {
     resultsCount: number;
     // Pagination count
     displayCount: number;
-    timeRangeUnsorted: boolean;
+    // What time range did we last sort on?
+    sortedDaysAgo: number;
 };
 
 // How the source data gets transformed by user filtering:
@@ -73,7 +74,7 @@ export class Dashboard extends Component<Props, State> {
             selectedCount: 0,
             resultsCount: 0,
             displayCount: uiSettings.pageLen,
-            timeRangeUnsorted: false,
+            sortedDaysAgo: 0,
         };
     }
 
@@ -97,7 +98,7 @@ export class Dashboard extends Component<Props, State> {
             this.sortingStatIdx = statIdx;
         }
         sortByStat(this.state.data.entries, this.sortingStatIdx, this.sortingByGrowth)
-        this.setState({timeRangeUnsorted: false});
+        this.setState({sortedDaysAgo: this.state.data.timeSeriesOffset});
     }
 
     handleShowMore() {
@@ -152,8 +153,7 @@ export class Dashboard extends Component<Props, State> {
         const update = () => {
             this.state.data.timeSeriesOffset = daysAgo;
             setTimeSeriesWindow(this.state.data.entries, daysAgo);
-            // sortByStat(this.state.data.entries, this.sortingStatIdx, this.sortingByGrowth)
-            this.setState({timeRangeUnsorted: true});
+            this.setState({});
         }
         this.timeRangeTimeout = setTimeout(update, 25);
     }
@@ -254,7 +254,7 @@ function renderTimeRangeSlider(dashboard) {
         <div className='mt3 pt3 bt b--white-20'>
             <div className='flex justify-between'>
                 <span>Going back in time {daysAgo} {pluralize('day', daysAgo)}</span>
-                <ShowIf bool={dashboard.state.timeRangeUnsorted}>
+                <ShowIf bool={dashboard.state.sortedDaysAgo !== daysAgo}>
                     <a 
                         className='dib light-blue pointer'
                         onClick={() => dashboard.handleSort(null, null)}>
