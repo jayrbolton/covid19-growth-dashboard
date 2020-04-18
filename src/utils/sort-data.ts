@@ -14,10 +14,22 @@ export function sortByStat(entries: Array<DashboardEntry>, statIdx: number, grow
         genericSort(entries, entry => {
             const ts = entry.stats[statIdx].timeSeriesWindow.values;
             const val = ts[ts.length - 1];
-            console.log('sorting by', val);
             return val;
         });
     }
+}
+
+// Sort by an entry in the stats for each region offset by a number of days ago
+export function sortByDaysAgo(entries: Array<DashboardEntry>, daysAgo: number, statIdx: number): void {
+    const indexes = entries.map((_, idx) => idx);
+    genericSort(indexes, idx => {
+        const entry = entries[idx];
+        const series = entries[idx].stats[statIdx].timeSeries;
+        return series[series.length - (daysAgo + 1)];
+    });
+    indexes.forEach((idx, order) => {
+        entries[idx].order = order;
+    });
 }
 
 export function genericSort(rows: Array<any>, accessor, dir='desc') {

@@ -7,7 +7,7 @@ interface Props {
 
 interface State {}
 
-export type Page = "about" | "world-data" | "us-states" | "us-counties";
+export type Page = "about" | "world-data" | "us-states" | "us-counties" | "timeline";
 
 export class Nav extends Component<Props, State> {
 
@@ -43,6 +43,7 @@ export class Nav extends Component<Props, State> {
                         {this.navItem('US States', 'us-states')}
                         {this.navItem('US Counties', 'us-counties')}
                         {this.navItem('Worldwide', 'world-data')}
+                        {this.navItem('Animated Timeline', 'timeline')}
                         {this.navItem('About this site', 'about')}
                     </ul>
                 </div>

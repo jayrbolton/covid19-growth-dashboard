@@ -145,6 +145,7 @@ function parseDatesFromHeaders (headers) {
 // Mutates rows
 function insertAggregations(rows) {
     const worldwide = {
+        aggregate: true,
         location: 'Worldwide',
         cases: {}
     }
