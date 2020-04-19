@@ -43,6 +43,7 @@ export class RegionStats extends Component<Props, State> {
         const isSelected = stat.isComparing;
         return (
             <div
+                key={stat.label}
                 data-selected={isSelected}
                 onClick={() => this.handleClickStat(entry, idx)}
                 className='mb3 ba b--white-20 relative pointer region-stats-row-stat'>
@@ -78,7 +79,9 @@ export class RegionStats extends Component<Props, State> {
             stats.push(this.renderStat(entry.stats[idx], entry, idx));
         });
         return (
-            <div className='ph3 pv2 pb1 region-stats-row bb b--white-20 bg-near-black'>
+            <div
+                key={entry.location}
+                className='ph3 pv2 pb1 region-stats-row bb b--white-20 bg-near-black'>
                 <h2 className='f4 mv2 b'>{entry.location}</h2>
                 <div className='w-100' style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 15.25rem)', gridColumnGap: '0.65rem'}}>
                     {stats}

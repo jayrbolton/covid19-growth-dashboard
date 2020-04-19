@@ -26,6 +26,7 @@ const RECOVERED_COLOR_LIGHT = 'rgb(99, 203, 116)';
 const BAR_WIDTH = 48; // rem
 const LEFT_SPACE = 15; // rem
 const LEFT_MARGIN = 1; // rem
+const ROW_HEIGHT = 1.5; // rem
 
 export class Timeline extends Component<Props, State> {
 
@@ -64,7 +65,7 @@ export class Timeline extends Component<Props, State> {
         const dataRows = this.state.data.regions.map((region, idx) => {
             return renderDataRow(region, idx, this.state.daysAgo);
         });
-        const rowHeight = this.state.data.regions.length * 1.25 + 'rem';
+        const rowHeight = this.state.data.regions.length * ROW_HEIGHT + 'rem';
         return (
             <div>
                 <div className='ph3 pt3 bb b--white-20 mb3'>
@@ -111,7 +112,7 @@ function getDates(daysAgo: number) {
 }
 
 function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
-    const top = region.order * 1.5 + 'rem';
+    const top = region.order * ROW_HEIGHT + 'rem';
     const percs = region.percentages;
     const totalWidth = idxDaysAgo(percs.confirmedGlobal, daysAgo);
     const activeWidth = idxDaysAgo(percs.active, daysAgo);
