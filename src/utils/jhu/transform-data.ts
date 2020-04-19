@@ -21,8 +21,8 @@ const LABELS = [
     'Percent recovered'
 ];
 
-// Convert a blob of csv text into an array of objects with some normalization on dates, etc
-export function transformData(sourceData): DashboardData {
+// Parse the CSV headers and rows into a mapping of location to arrays of metrics
+export function parseData(sourceData) {
     let dates = null; // All date columns, values parsed from the headers
     let agg = {}; // An aggregated mapping of id (constructed from lat/lng) to row data
     // Parse and aggregate the data
@@ -38,20 +38,19 @@ export function transformData(sourceData): DashboardData {
             if (!row || !row.length) {
                 return;
             }
-            const id = row[dataSources.countryIdx];
+            const location = row[dataSources.countryIdx];
             const timeSeries = row.slice(dataSources.seriesIdx);
-            if (id in agg) {
-                if (key in agg[id].cases) {
-                    const cases = agg[id].cases[key];
+            if (location in agg) {
+                if (key in agg[location].cases) {
+                    const cases = agg[location].cases[key];
                     for (let idx = 0; idx < timeSeries.length; idx++) {
                         cases[idx] += timeSeries[idx];
                     }
                 } else {
-                    agg[id].cases[key] = timeSeries;
+                    agg[location].cases[key] = timeSeries;
                 }
             } else {
-                const location = row[dataSources.countryIdx];
-                agg[id] = {
+                agg[location] = {
                     location,
                     cases: {
                         [key]: timeSeries
@@ -60,6 +59,13 @@ export function transformData(sourceData): DashboardData {
             }
         });
     }
+    return agg;
+}
+
+// Convert a blob of csv text into an array of objects with some normalization on dates, etc
+// Used for the the Dashboard component
+export function transformData(sourceData): DashboardData {
+    const agg = parseData(sourceData);
     // Convert the aggregation object into an array
     let entries = [];
     for (const key in agg) {

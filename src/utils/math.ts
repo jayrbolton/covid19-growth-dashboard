@@ -46,4 +46,3 @@ export function percent(n, total) {
     }
     return Math.round(n * 100 / total * 10) / 10;
 }
-

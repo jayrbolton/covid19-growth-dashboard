@@ -1,9 +1,10 @@
 import {h, Component, Fragment} from 'preact';
 import {percent} from '../../utils/math';
 import {fetchData} from '../../utils/jhu/fetch-data';
-import {transformData} from '../../utils/jhu/transform-data';
+import {transformDataTimeline} from '../../utils/jhu/transform-data-timeline';
 import {sortByDaysAgo} from '../../utils/sort-data';
-import {DashboardData, DashboardEntry} from '../../types/dashboard';
+import {TimelineData, TimelineRegion} from '../../types/timeline-data';
+import {formatNumber} from '../../utils/formatting';
 import './index.css';
 import * as colors from '../../constants/graph-colors.json';
 import * as dataSources from '../../constants/data-sources.json';
@@ -13,7 +14,7 @@ interface State {
     dateStr: string;
     timestamp: number;
     daysAgo: number;
-    data?: DashboardData;
+    data?: TimelineData;
     loading: boolean;
 };
 
@@ -38,9 +39,8 @@ export class Timeline extends Component<Props, State> {
 
     componentDidMount() {
         fetchData()
-            .then(transformData)
+            .then(transformDataTimeline)
             .then(data => {
-                calculatePercentages(data);
                 this.setState({
                     loading: false,
                     data,
@@ -51,8 +51,7 @@ export class Timeline extends Component<Props, State> {
     handleInputTime(ev) {
         const val = ev.currentTarget.value;
         const daysAgo = RANGE - val;
-        sortByDaysAgo(this.state.data.entries, daysAgo, 0); // index 0 is confirmed cases
-        console.log('indexes', this.state.data.entries.map(e => e.order));
+        sortByDaysAgo(this.state.data, daysAgo, 'confirmed'); // index 0 is confirmed cases
         this.setState(getDates(daysAgo));
     }
 
@@ -62,12 +61,10 @@ export class Timeline extends Component<Props, State> {
                 <p className='ph4 mt4'>Loading data...</p>
             );
         }
-        const dataRows = [];
-        for (let idx = 0; idx < this.state.data.entries.length; idx++) {
-            const entry = this.state.data.entries[idx];
-            dataRows.push(renderDataRow(entry, idx, this.state.daysAgo));
-        }
-        const rowHeight = this.state.data.entries.length * 1.25 + 'rem';
+        const dataRows = this.state.data.regions.map((region, idx) => {
+            return renderDataRow(region, idx, this.state.daysAgo);
+        });
+        const rowHeight = this.state.data.regions.length * 1.25 + 'rem';
         return (
             <div>
                 <div className='ph3 pt3 bb b--white-20 mb3'>
@@ -88,12 +85,12 @@ export class Timeline extends Component<Props, State> {
                         max={RANGE}
                         onInput={ev => this.handleInputTime(ev)}
                         value={RANGE - this.state.daysAgo} />
-                </div>
-                <div className='pt3'>
-                    <div className='f4 flex mb3 mw5 justify-between' style={{marginLeft: LEFT_SPACE + LEFT_MARGIN + 'rem'}}>
+                    <div className='flex items-end w-100'>
                         <span className='b' style={{color: ACTIVE_COLOR}}>Active cases</span>
                         <span className='b' style={{color: RECOVERED_COLOR}}>Recovered</span>
                     </div>
+                </div>
+                <div className='mt3 bg-near-black pt3'>
                     <div style={{height: rowHeight, position: 'relative'}}>
                         {dataRows}
                     </div>
@@ -113,90 +110,46 @@ function getDates(daysAgo: number) {
     }
 }
 
-function renderDataRow(entry: DashboardEntry, idx: number, daysAgo: number) {
-    if (entry.aggregate) {
-        return '';
-    }
-    const top = (entry.order === undefined ? idx : entry.order) * 1.5 + 'rem';
-    const totalWidth = entry.percentages.totals[entry.percentages.totals.length - (daysAgo + 1)];
-    const activeWidth = entry.percentages.active[entry.percentages.active.length - (daysAgo + 1)];
-    const recoveredWidth = entry.percentages.recovered[entry.percentages.recovered.length - (daysAgo + 1)];
-    const confirmed = entry.stats[0].timeSeries;
-    const currentConfirmed = confirmed[confirmed.length - (daysAgo + 1)];
+function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
+    const top = region.order * 1.5 + 'rem';
+    const percs = region.percentages;
+    const totalWidth = idxDaysAgo(percs.confirmedGlobal, daysAgo);
+    const activeWidth = idxDaysAgo(percs.active, daysAgo);
+    const recoveredWidth = idxDaysAgo(percs.recovered, daysAgo);
+    const {confirmed, active, recovered} = region.totals;
+    const currentConfirmed = idxDaysAgo(confirmed, daysAgo);
+    const currentActive = idxDaysAgo(active, daysAgo);
+    const currentRecovered = idxDaysAgo(recovered, daysAgo);
     return (
         <div
             className='flex mb2 items-center'
-            key={entry.location}
-            id={entry.location.replace(' ', '-')}
+            key={region.id}
             style={{position: 'absolute', top, width: '90%', left: LEFT_MARGIN, transition: 'top 0.75s'}}>
             <div className='tr mr2 br b--white-20 pr2 truncate f4' style={{width: LEFT_SPACE + 'rem'}}>
-                {entry.location}
+                {region.name}
             </div>
             <div style={{flexGrow: 1}}>
                 <div
                     className='flex hello'
                     style={{width: totalWidth + '%', transition: 'width 0.25s', overflow: 'visible'}}>
                     <div
+                        title={`${formatNumber(currentActive)} active cases`}
                         className='f6 b w-50 data-bar data-bar-active'
                         style={{background: ACTIVE_COLOR, width: activeWidth + '%'}}>
                     </div>
                     <div
+                        title={`${formatNumber(currentRecovered)} recovered`}
                         className='f6 b w-50 data-bar data-bar-recovered'
                         style={{background: RECOVERED_COLOR, width: recoveredWidth + '%'}}>
                     </div>
-                    <span className='dib ml1'>{currentConfirmed || 0}</span>
+                    <span className='dib ml1'>{formatNumber(currentConfirmed || 0)}</span>
                 </div>
             </div>
         </div>
     );
 }
 
-function calculatePercentages(data) {
-    // Find max of all total cases for a date and a region
-    let max = 0;
-    data.entries.forEach(entry => {
-        if (entry.aggregate) {
-            return;
-        }
-        const confirmed = entry.stats[0].timeSeries;
-        confirmed.forEach(n => {
-            if (n > max) {
-                max = n;
-            }
-        });
-    });
-    data.entries.forEach(entry => {
-        if (entry.aggregate) {
-            return;
-        }
-        const confirmed = entry.stats[0].timeSeries;
-        const active = entry.stats[2].timeSeries;
-        const recovered = entry.stats[1].timeSeries;
-        const totals = confirmed.map((n, idx) => {
-            return percent(n, max);
-        });
-        const activePerc = active.map((n, idx) => percent(n, confirmed[idx]));
-        const recoveredPerc = recovered.map((n, idx) => percent(n, confirmed[idx]));
-        entry.percentages = {
-            totals,
-            active: activePerc,
-            recovered: recoveredPerc,
-        };
-    });
-}
-
-// Get the maximum confirmed cases value over all entries by day index
-function getMaxConfirmed(data: DashboardData, dayIdx: number) {
-    let max = 0;
-    data.entries.forEach(entry => {
-        if (entry.aggregate) {
-            return;
-        }
-        const confirmed = entry.stats[0].timeSeries;
-        const val = confirmed[dayIdx];
-        if (val > max) {
-            max = val;
-        }
-    });
-    return max;
+// Access an index in a time series with a daysAgo offset, where the current day is the last elem
+function idxDaysAgo(arr: Array<any>, daysAgo: number) {
+    return arr[arr.length - (daysAgo + 1)]
 }
