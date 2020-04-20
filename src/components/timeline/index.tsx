@@ -4,7 +4,7 @@ import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformDataTimeline} from '../../utils/jhu/transform-data-timeline';
 import {sortByDaysAgo} from '../../utils/sort-data';
 import {TimelineData, TimelineRegion} from '../../types/timeline-data';
-import {TimeRangeInput} from './time-range-input';
+import {Inputs} from './inputs';
 import {formatNumber} from '../../utils/formatting';
 import './index.css';
 import * as dataSources from '../../constants/data-sources.json';
@@ -15,6 +15,7 @@ interface State {
     daysAgo: number;
     data?: TimelineData;
     loading: boolean;
+    sortProp: string;
 };
 
 export class Timeline extends Component<Props, State> {
@@ -25,6 +26,7 @@ export class Timeline extends Component<Props, State> {
         this.state = {
             daysAgo: 0,
             loading: true,
+            sortProp: 'confirmed',
         };
     }
 
@@ -40,8 +42,13 @@ export class Timeline extends Component<Props, State> {
     }
 
     handleInputTime(daysAgo: number) {
-        sortByDaysAgo(this.state.data, daysAgo, 'confirmed'); // index 0 is confirmed cases
+        sortByDaysAgo(this.state.data, daysAgo, this.state.sortProp);
         this.setState({daysAgo});
+    }
+
+    handleChangeSort(sortProp: string) {
+        sortByDaysAgo(this.state.data, this.state.daysAgo, sortProp);
+        this.setState({sortProp});
     }
 
     render() {
@@ -66,7 +73,9 @@ export class Timeline extends Component<Props, State> {
                     </p>
                 </div>
                 <div className='bg-near-black pt4'>
-                    <TimeRangeInput onInputDaysAgo={this.handleInputTime.bind(this)} />
+                    <Inputs
+                        onInputDaysAgo={this.handleInputTime.bind(this)}
+                        onChangeSort={this.handleChangeSort.bind(this)} />
                     {renderLegend()}
                     {renderXScale(this)}
                     <div style={{height: rowHeight, position: 'relative'}}>

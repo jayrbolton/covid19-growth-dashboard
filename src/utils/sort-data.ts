@@ -50,6 +50,6 @@ export function genericSort(rows: Array<any>, accessor, dir='desc') {
             return  dir === 'asc' ? 1 : -1;
         } else {
             return 0;
-        }
+    :    }
     });
 }
