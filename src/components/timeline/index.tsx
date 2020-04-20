@@ -6,7 +6,6 @@ import {sortByDaysAgo} from '../../utils/sort-data';
 import {TimelineData, TimelineRegion} from '../../types/timeline-data';
 import {Inputs} from './inputs';
 import {formatNumber} from '../../utils/formatting';
-import './index.css';
 import * as dataSources from '../../constants/data-sources.json';
 import {constants} from './constants';
 
@@ -123,6 +122,7 @@ function renderXScale(timeline: Timeline) {
 }
 
 function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
+    const barHeight = '1.25rem';
     const top = region.order * constants.rowHeight + 'rem';
     const percs = region.percentages;
     const totalWidth = idxDaysAgo(percs.confirmedGlobal, daysAgo);
@@ -146,13 +146,13 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
                     style={{width: totalWidth + '%', transition: 'width 0.25s', overflow: 'visible'}}>
                     <div
                         title={`${formatNumber(currentActive)} active cases`}
-                        className='f6 b w-50 data-bar data-bar-active'
-                        style={{background: constants.activeColor, width: activeWidth + '%'}}>
+                        className='f6 b w-50'
+                        style={{height: barHeight, background: constants.activeColor, width: activeWidth + '%'}}>
                     </div>
                     <div
                         title={`${formatNumber(currentRecovered)} recovered`}
-                        className='f6 b w-50 data-bar data-bar-recovered'
-                        style={{background: constants.recoveredColor, width: recoveredWidth + '%'}}>
+                        className='f6 b w-50'
+                        style={{height: barHeight, background: constants.recoveredColor, width: recoveredWidth + '%'}}>
                     </div>
                 </div>
                 <div
