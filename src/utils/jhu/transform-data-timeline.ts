@@ -1,5 +1,5 @@
 import {TimelineData, TimelineRegion} from '../../types/timeline-data';
-import {parseData} from './transform-data';
+import {parseData, renameCountries} from './transform-data';
 import {percent} from '../math';
 import {sortByDaysAgo} from '../sort-data';
 
@@ -36,6 +36,7 @@ export function transformDataTimeline(sourceData): TimelineData {
         maxConfirmed: 0,
     };
     calculatePercentages(data);
+    renameCountries(data.regions, 'name');
     sortByDaysAgo(data, 0, 'confirmed');
     return data;
 }

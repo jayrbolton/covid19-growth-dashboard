@@ -179,14 +179,14 @@ function insertAggregations(rows) {
 
 // Some of the country names used by JHU are not ideal. This replaces them with clearer names.
 // mutates rows
-function renameCountries(rows) {
+export function renameCountries(rows, prop = 'location') {
     const mapping = {
         'Korea, South': 'South Korea',
         'US': 'USA',
     };
     for (const row of rows) {
-        if (row.location in mapping) {
-            row.location = mapping[row.location];
+        if (row[prop] in mapping) {
+            row[prop] = mapping[row[prop]];
         }
     }
 }
