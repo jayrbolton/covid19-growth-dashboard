@@ -31,15 +31,19 @@ export function transformDataTimeline(sourceData): TimelineData {
         regions.push(region);
         idx += 1;
     }
-    calculatePercentages(regions);
-    const data = {regions};
+    const data: TimelineData = {
+        regions,
+        maxConfirmed: 0,
+    };
+    calculatePercentages(data);
     sortByDaysAgo(data, 0, 'confirmed');
     return data;
 }
 
 // Calculate percent active of total cases, percent recovered, and percent
 // confirmed of max confirmed across all regions/dates
-function calculatePercentages(regions) {
+function calculatePercentages(data) {
+    const regions = data.regions;
     // Find max of all total cases for a date and a region
     let max = 0;
     regions.forEach(region => {
@@ -50,6 +54,7 @@ function calculatePercentages(regions) {
             }
         });
     });
+    data.maxConfirmed = max;
     regions.forEach(region => {
         const {confirmed, active, recovered} = region.totals;
         const confirmedPerc = confirmed.map((n, idx) => {

@@ -1,5 +1,5 @@
 import {h, Component, Fragment} from 'preact';
-import {percent} from '../../utils/math';
+import {percent, graphAxisTicks} from '../../utils/math';
 import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformDataTimeline} from '../../utils/jhu/transform-data-timeline';
 import {sortByDaysAgo} from '../../utils/sort-data';
@@ -77,7 +77,7 @@ export class Timeline extends Component<Props, State> {
                         </a>.
                     </p>
                 </div>
-                <div className='mb3 mw7 ph3' style={{width: BAR_WIDTH + 'rem'}}>
+                <div className='mb3 ph3' style={{width: BAR_WIDTH + 'rem'}}>
                     <label className='db mb2 f4'>Date: {this.state.dateStr}</label>
                     <input
                         className='db w-100'
@@ -92,6 +92,7 @@ export class Timeline extends Component<Props, State> {
                     </div>
                 </div>
                 <div className='mt3 bg-near-black pt3'>
+                    {renderXScale(this)}
                     <div style={{height: rowHeight, position: 'relative'}}>
                         {dataRows}
                     </div>
@@ -109,6 +110,37 @@ function getDates(daysAgo: number) {
         timestamp: Number(date),
         dateStr: date.toLocaleDateString(),
     }
+}
+
+function renderXScale(timeline: Timeline) {
+    const max = timeline.state.data.maxConfirmed;
+    const ticks = graphAxisTicks(max);
+    const tickElems = ticks.map(([tick, perc], idx) => {
+        return (
+            <div
+                className='bl b--white-40 absolute'
+                style={{left: perc + '%', bottom: '0px', height: '1rem', width: '1px'}}>
+            </div>
+        );
+    })
+    const textElems = ticks.map(([tick, perc], idx) => {
+        return (
+            <div
+                className='absolute white-80 f6'
+                style={{left: perc + '%', top: '0px'}}>
+                {formatNumber(tick, true)}
+            </div>
+        );
+    });
+    return (
+        <div className='flex items-center' style={{width: '90%'}}>
+            <div className='mr2' style={{width: LEFT_SPACE + 'rem'}}></div>
+            <div className='bb b--white-40 mb2' style={{flexGrow: 1, position: 'relative', height: '2.25rem'}}>
+                {textElems}
+                {tickElems}
+            </div>
+        </div>
+    );
 }
 
 function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
@@ -129,7 +161,7 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
             <div className='tr mr2 br b--white-20 pr2 truncate f4' style={{width: LEFT_SPACE + 'rem'}}>
                 {region.name}
             </div>
-            <div style={{flexGrow: 1}}>
+            <div style={{flexGrow: 1, position: 'relative'}}>
                 <div
                     className='flex hello'
                     style={{width: totalWidth + '%', transition: 'width 0.25s', overflow: 'visible'}}>
@@ -143,7 +175,11 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
                         className='f6 b w-50 data-bar data-bar-recovered'
                         style={{background: RECOVERED_COLOR, width: recoveredWidth + '%'}}>
                     </div>
-                    <span className='dib ml1'>{formatNumber(currentConfirmed || 0)}</span>
+                </div>
+                <div
+                    className='dib ml1 absolute'
+                    style={{left: totalWidth + '%', top: 0, transition: 'left 0.25s'}}>
+                    {formatNumber(currentConfirmed || 0)}
                 </div>
             </div>
         </div>

@@ -5,6 +5,7 @@
 
 export interface TimelineData {
     regions: Array<TimelineRegion>;
+    maxConfirmed: number;
 }
 
 export interface TimelineRegion {
