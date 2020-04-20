@@ -1,9 +1,12 @@
 
 // Pretty-print a number. eg. 123456 -> 123,456
-export function formatNumber(x): string {
+export function formatNumber(x: number | null, roundThousands: boolean = true): string {
     if (x === null || isNaN(x)) {
         // In our data sources, null values are interpreted as "Unknown"
         return '?';
+    }
+    if (roundThousands && x % 1000 === 0) {
+        return x/1000 + 'k';
     }
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

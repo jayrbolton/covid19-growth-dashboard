@@ -2,6 +2,7 @@
  * Sorting functions
  */
 import {DashboardEntry} from '../types/dashboard';
+import {TimelineData} from '../types/timeline-data';
 
 // Sort by a some EntryStat within a DashboardEntry
 // idxOffset
@@ -14,10 +15,23 @@ export function sortByStat(entries: Array<DashboardEntry>, statIdx: number, grow
         genericSort(entries, entry => {
             const ts = entry.stats[statIdx].timeSeriesWindow.values;
             const val = ts[ts.length - 1];
-            console.log('sorting by', val);
             return val;
         });
     }
+}
+
+// Sort by an entry in the stats for each region offset by a number of days ago
+export function sortByDaysAgo(data: TimelineData, daysAgo: number, prop: string): void {
+    const regions = data.regions;
+    const indexes = regions.map((_, idx) => idx);
+    genericSort(indexes, idx => {
+        const region = regions[idx];
+        const series = region.totals[prop];
+        return series[series.length - (daysAgo + 1)];
+    });
+    indexes.forEach((idx, order) => {
+        regions[idx].order = order;
+    });
 }
 
 export function genericSort(rows: Array<any>, accessor, dir='desc') {

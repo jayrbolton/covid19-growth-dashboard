@@ -2,6 +2,9 @@ html,
 body {
   height: 100%;
 }
+* {
+  font-family: 'Open Sans', Helvetica, Ubuntu, Roboto, sans-serif;
+}
 html, body, .sans-serif {
   font-family: 'Open Sans', Helvetica, Ubuntu, Roboto, sans-serif;
 }

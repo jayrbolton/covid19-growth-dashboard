@@ -47,3 +47,19 @@ export function percent(n, total) {
     return Math.round(n * 100 / total * 10) / 10;
 }
 
+// Return an array of pairs of tick values and scale percentages for a range from 0 to `end`
+export function graphAxisTicks(end: number) {
+    // Nearest power of ten
+    const nearestTen = 10**(Math.round(Math.log10(end)));
+    // Increment ten times
+    const incr = nearestTen / 10;
+    const ret = [];
+    let tick = 0;
+    while (tick < end) {
+        const perc = percent(tick, end);
+        ret.push([tick, perc]);
+        tick += incr;
+    }
+    ret.push([end, 100]);
+    return ret;
+}

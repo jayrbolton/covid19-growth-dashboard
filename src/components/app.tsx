@@ -8,6 +8,7 @@ import {Nav, Page} from './nav';
 import {JHUWorldDashboard} from './jhu-world-dashboard';
 import {USStates} from './us-states';
 import {USCounties} from './us-counties';
+import {Timeline} from './timeline';
 import {AboutPage} from './about-page';
 
 const history = createBrowserHistory();
@@ -74,6 +75,13 @@ export class App extends Component<Props, State> {
         return (<USCounties />);
     }
 
+    timelinePage() {
+        if (this.state.currentPage !== 'timeline') {
+            return '';
+        }
+        return (<Timeline />);
+    }
+
     aboutPage() {
         if (this.state.currentPage !== 'about') {
             return '';
@@ -89,6 +97,7 @@ export class App extends Component<Props, State> {
                 {this.usStatesPage()}
                 {this.usCountiesPage()}
                 {this.aboutPage()}
+                {this.timelinePage()}
             </div>
         );
     }
