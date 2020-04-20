@@ -92,13 +92,6 @@ export class RegionStats extends Component<Props, State> {
 
     render() {
         const entries = this.props.data.entries;
-        if (!entries.length) {
-            return (
-                <p className='pa4'>
-                    No results.
-                </p>
-            );
-        }
         // Let's get imperative. I want this to be really performant.
         let count = 0;
         let idx = 0;
@@ -118,6 +111,13 @@ export class RegionStats extends Component<Props, State> {
             }
             count += 1;
         });
+        if (!rows.length) {
+            return (
+                <p className='pa4'>
+                    No results.
+                </p>
+            );
+        }
         return (
             <Fragment>
                 {rows}
