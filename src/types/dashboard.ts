@@ -19,16 +19,6 @@ export interface DashboardEntry {
     hidden?: boolean;
     location: string;
     stats: Array<EntryStat>;
-    percentages?: {
-        // Percentage of totals of max total across all regions for every date
-        totals: Array<number>;
-        // Percentage of active cases of total cases for this region for every date
-        active: Array<number>;
-        // Percentage of recovered cases of total cases for this region for every date
-        recovered: Array<number>;
-    }
-    // Does this entry aggregate other entries (eg. "Worldwide")
-    aggregate?: boolean;
 }
 
 export interface EntryStat {
