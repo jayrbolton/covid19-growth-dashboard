@@ -4,37 +4,28 @@ import {fetchData} from '../../utils/jhu/fetch-data';
 import {transformDataTimeline} from '../../utils/jhu/transform-data-timeline';
 import {sortByDaysAgo} from '../../utils/sort-data';
 import {TimelineData, TimelineRegion} from '../../types/timeline-data';
+import {TimeRangeInput} from './time-range-input';
 import {formatNumber} from '../../utils/formatting';
 import './index.css';
-import * as colors from '../../constants/graph-colors.json';
 import * as dataSources from '../../constants/data-sources.json';
+import {constants} from './constants';
 
 interface Props {};
 interface State {
-    dateStr: string;
-    timestamp: number;
     daysAgo: number;
     data?: TimelineData;
     loading: boolean;
 };
-
-const RANGE = 100;
-const ACTIVE_COLOR = colors[8];
-const RECOVERED_COLOR = colors[1];
-const ACTIVE_COLOR_LIGHT = 'rgb(220, 150, 150)';
-const RECOVERED_COLOR_LIGHT = 'rgb(99, 203, 116)';
-const BAR_WIDTH = 48; // rem
-const LEFT_SPACE = 15; // rem
-const ROW_HEIGHT = 1.5; // rem
 
 export class Timeline extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
         const date = new Date();
-        this.state = Object.assign(getDates(0), {
+        this.state = {
+            daysAgo: 0,
             loading: true,
-        });
+        };
     }
 
     componentDidMount() {
@@ -48,11 +39,9 @@ export class Timeline extends Component<Props, State> {
             });
     }
 
-    handleInputTime(ev) {
-        const val = ev.currentTarget.value;
-        const daysAgo = RANGE - val;
+    handleInputTime(daysAgo: number) {
         sortByDaysAgo(this.state.data, daysAgo, 'confirmed'); // index 0 is confirmed cases
-        this.setState(getDates(daysAgo));
+        this.setState({daysAgo});
     }
 
     render() {
@@ -64,7 +53,7 @@ export class Timeline extends Component<Props, State> {
         const dataRows = this.state.data.regions.map((region, idx) => {
             return renderDataRow(region, idx, this.state.daysAgo);
         });
-        const rowHeight = this.state.data.regions.length * ROW_HEIGHT + 'rem';
+        const rowHeight = this.state.data.regions.length * constants.rowHeight + 'rem';
         return (
             <div>
                 <div className='ph3 pt3 bb b--white-20 pb3'>
@@ -77,16 +66,7 @@ export class Timeline extends Component<Props, State> {
                     </p>
                 </div>
                 <div className='bg-near-black pt4'>
-                    <div className='mb3 b' style={{width: BAR_WIDTH + 'rem', marginLeft: LEFT_SPACE + 'rem'}}>
-                        <label className='db mb2'>Date: {this.state.dateStr}</label>
-                        <input
-                            className='db w-100'
-                            type='range'
-                            min='0'
-                            max={RANGE}
-                            onInput={ev => this.handleInputTime(ev)}
-                            value={RANGE - this.state.daysAgo} />
-                    </div>
+                    <TimeRangeInput onInputDaysAgo={this.handleInputTime.bind(this)} />
                     {renderLegend()}
                     {renderXScale(this)}
                     <div style={{height: rowHeight, position: 'relative'}}>
@@ -95,16 +75,6 @@ export class Timeline extends Component<Props, State> {
                 </div>
             </div>
         );
-    }
-}
-
-function getDates(daysAgo: number) {
-    const date = new Date();
-    date.setDate(date.getDate() - daysAgo);
-    return {
-        daysAgo,
-        timestamp: Number(date),
-        dateStr: date.toLocaleDateString(),
     }
 }
 
@@ -130,7 +100,7 @@ function renderXScale(timeline: Timeline) {
     });
     return (
         <div className='flex items-center' style={{width: '90%'}}>
-            <div style={{width: LEFT_SPACE + 'rem'}}></div>
+            <div style={{width: constants.leftSpace + 'rem'}}></div>
             <div className='bb b--white-40 mb2' style={{flexGrow: 1, position: 'relative', height: '2.25rem'}}>
                 {textElems}
                 {tickElems}
@@ -140,7 +110,7 @@ function renderXScale(timeline: Timeline) {
 }
 
 function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
-    const top = region.order * ROW_HEIGHT + 'rem';
+    const top = region.order * constants.rowHeight + 'rem';
     const percs = region.percentages;
     const totalWidth = idxDaysAgo(percs.confirmedGlobal, daysAgo);
     const activeWidth = idxDaysAgo(percs.active, daysAgo);
@@ -154,7 +124,7 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
             className='flex mb2 items-center'
             key={region.id}
             style={{position: 'absolute', top, width: '90%', transition: 'top 0.75s'}}>
-            <div className='tr pr2 truncate f4' style={{width: LEFT_SPACE + 'rem'}}>
+            <div className='tr pr2 truncate f4' style={{width: constants.leftSpace + 'rem'}}>
                 {region.name}
             </div>
             <div style={{flexGrow: 1, position: 'relative'}}>
@@ -164,12 +134,12 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
                     <div
                         title={`${formatNumber(currentActive)} active cases`}
                         className='f6 b w-50 data-bar data-bar-active'
-                        style={{background: ACTIVE_COLOR, width: activeWidth + '%'}}>
+                        style={{background: constants.activeColor, width: activeWidth + '%'}}>
                     </div>
                     <div
                         title={`${formatNumber(currentRecovered)} recovered`}
                         className='f6 b w-50 data-bar data-bar-recovered'
-                        style={{background: RECOVERED_COLOR, width: recoveredWidth + '%'}}>
+                        style={{background: constants.recoveredColor, width: recoveredWidth + '%'}}>
                     </div>
                 </div>
                 <div
@@ -190,13 +160,13 @@ function idxDaysAgo(arr: Array<any>, daysAgo: number) {
 // Render the bar graph color legend
 function renderLegend() {
     return (
-        <div className='flex mb2' style={{marginLeft: LEFT_SPACE + 'rem'}}>
-            <span className='b mr3' style={{color: ACTIVE_COLOR}}>
-                {renderSquare(ACTIVE_COLOR)}
+        <div className='flex mb2' style={{marginLeft: constants.leftSpace + 'rem'}}>
+            <span className='b mr3' style={{color: constants.activeColor}}>
+                {renderSquare(constants.activeColor)}
                 Active cases
             </span>
-            <span className='b' style={{color: RECOVERED_COLOR}}>
-                {renderSquare(RECOVERED_COLOR)}
+            <span className='b' style={{color: constants.recoveredColor}}>
+                {renderSquare(constants.recoveredColor)}
                 Recovered
             </span>
         </div>
