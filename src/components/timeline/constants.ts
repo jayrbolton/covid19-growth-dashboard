@@ -9,4 +9,6 @@ export const constants = {
     leftSpace: 15, // rem
     rowHeight: 1.5, // rem
     barWidth: 90, // percent
+    leftArrowKey: 37, // keycode
+    rightArrowKey: 39, // keycode
 };

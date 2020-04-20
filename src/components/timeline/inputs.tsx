@@ -28,6 +28,21 @@ export class Inputs extends Component<Props, State> {
         });
     }
 
+    componentDidMount() {
+        // Bind left and right arrows to move time
+        document.addEventListener('keydown', ev => {
+            if (ev.keyCode !== constants.leftArrowKey && ev.keyCode !== constants.rightArrowKey) {
+                return;
+            }
+            if (ev.keyCode === constants.leftArrowKey) {
+                this.handleJumpBack();
+            }
+            if (ev.keyCode === constants.rightArrowKey) {
+                this.handleJumpForward();
+            }
+        });
+    }
+
     setDaysAgo(daysAgo: number) {
         const update: any = getDates(daysAgo);
         update.atEnd = daysAgo === 0;
@@ -48,6 +63,9 @@ export class Inputs extends Component<Props, State> {
     }
 
     handleJumpBack() {
+        if (this.state.daysAgo === constants.range) {
+            return;
+        }
         const daysAgo = this.state.daysAgo + 1;
         this.setDaysAgo(daysAgo);
     }
@@ -76,6 +94,9 @@ export class Inputs extends Component<Props, State> {
     }
 
     handleJumpForward() {
+        if (this.state.daysAgo === 0) {
+            return;
+        }
         const daysAgo = this.state.daysAgo - 1;
         this.setDaysAgo(daysAgo);
     }
