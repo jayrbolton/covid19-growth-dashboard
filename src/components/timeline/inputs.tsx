@@ -93,7 +93,7 @@ export class Inputs extends Component<Props, State> {
     render() {
         const {atStart, atEnd, paused} = this.state;
         return (
-            <div className='mb2 b' style={{width: constants.barWidth + 'rem', marginLeft: constants.leftSpace + 'rem'}}>
+            <div className='b' style={{width: '48rem', marginLeft: constants.leftSpace + 'rem'}}>
                 <div className='flex items-center justify-between mb2'>
                     <label style={{width: '10rem'}} className='db'>Date: {this.state.dateStr}</label>
                     <div>

@@ -73,10 +73,12 @@ export class Timeline extends Component<Props, State> {
                     </p>
                 </div>
                 <div className='bg-near-black pt4'>
-                    <Inputs
-                        onInputDaysAgo={this.handleInputTime.bind(this)}
-                        onChangeSort={this.handleChangeSort.bind(this)} />
-                    {renderLegend()}
+                    <div className='flex justify-between mb3' style={{width: constants.barWidth + '%'}}>
+                        <Inputs
+                            onInputDaysAgo={this.handleInputTime.bind(this)}
+                            onChangeSort={this.handleChangeSort.bind(this)} />
+                        {renderLegend()}
+                    </div>
                     {renderXScale(this)}
                     <div style={{height: rowHeight, position: 'relative'}}>
                         {dataRows}
@@ -108,8 +110,10 @@ function renderXScale(timeline: Timeline) {
         );
     });
     return (
-        <div className='flex items-center' style={{width: '90%'}}>
-            <div style={{width: constants.leftSpace + 'rem'}}></div>
+        <div className='flex' style={{width: constants.barWidth + '%'}}>
+            <div style={{width: constants.leftSpace + 'rem'}}>
+                <div className='tr f6 pr2 white-80'>Total cases:</div>
+            </div>
             <div className='bb b--white-40 mb2' style={{flexGrow: 1, position: 'relative', height: '2.25rem'}}>
                 {textElems}
                 {tickElems}
@@ -132,7 +136,7 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
         <div
             className='flex mb2 items-center'
             key={region.id}
-            style={{position: 'absolute', top, width: '90%', transition: 'top 0.75s'}}>
+            style={{position: 'absolute', top, width: constants.barWidth + '%', transition: 'top 0.75s'}}>
             <div className='tr pr2 truncate f4' style={{width: constants.leftSpace + 'rem'}}>
                 {region.name}
             </div>
@@ -163,21 +167,21 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
 
 // Access an index in a time series with a daysAgo offset, where the current day is the last elem
 function idxDaysAgo(arr: Array<any>, daysAgo: number) {
-    return arr[arr.length - (daysAgo + 1)]
+    return arr[arr.length - (daysAgo + 1)] || 0;
 }
 
 // Render the bar graph color legend
 function renderLegend() {
     return (
-        <div className='flex mb2' style={{marginLeft: constants.leftSpace + 'rem'}}>
-            <span className='b mr3' style={{color: constants.activeColor}}>
+        <div>
+            <div className='b' style={{color: constants.activeColor}}>
                 {renderSquare(constants.activeColor)}
                 Active cases
-            </span>
-            <span className='b' style={{color: constants.recoveredColor}}>
+            </div>
+            <div className='b' style={{color: constants.recoveredColor}}>
                 {renderSquare(constants.recoveredColor)}
                 Recovered
-            </span>
+            </div>
         </div>
     );
 }

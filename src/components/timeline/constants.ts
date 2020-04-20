@@ -6,7 +6,7 @@ export const constants = {
     recoveredColor: colors[1],
     activeColorLight: 'rgb(220, 150, 150)',
     recoveredColorLight: 'rgb(99, 203, 116)',
-    barWidth: 48, // rem
     leftSpace: 15, // rem
     rowHeight: 1.5, // rem
+    barWidth: 90, // percent
 };
