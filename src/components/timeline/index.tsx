@@ -25,7 +25,6 @@ const ACTIVE_COLOR_LIGHT = 'rgb(220, 150, 150)';
 const RECOVERED_COLOR_LIGHT = 'rgb(99, 203, 116)';
 const BAR_WIDTH = 48; // rem
 const LEFT_SPACE = 15; // rem
-const LEFT_MARGIN = 1; // rem
 const ROW_HEIGHT = 1.5; // rem
 
 export class Timeline extends Component<Props, State> {
@@ -68,7 +67,7 @@ export class Timeline extends Component<Props, State> {
         const rowHeight = this.state.data.regions.length * ROW_HEIGHT + 'rem';
         return (
             <div>
-                <div className='ph3 pt3 bb b--white-20 mb3'>
+                <div className='ph3 pt3 bb b--white-20 pb3'>
                     <h1 className='light-gray f4 f2-m f2-ns'>COVID-19 Animated Timeline by Country</h1>
                     <p>
                         Data is updated daily from the{' '}
@@ -77,21 +76,18 @@ export class Timeline extends Component<Props, State> {
                         </a>.
                     </p>
                 </div>
-                <div className='mb3 ph3' style={{width: BAR_WIDTH + 'rem'}}>
-                    <label className='db mb2 f4'>Date: {this.state.dateStr}</label>
-                    <input
-                        className='db w-100'
-                        type='range'
-                        min='0'
-                        max={RANGE}
-                        onInput={ev => this.handleInputTime(ev)}
-                        value={RANGE - this.state.daysAgo} />
-                    <div className='flex items-end w-100'>
-                        <span className='b' style={{color: ACTIVE_COLOR}}>Active cases</span>
-                        <span className='b' style={{color: RECOVERED_COLOR}}>Recovered</span>
+                <div className='bg-near-black pt4'>
+                    <div className='mb3 b' style={{width: BAR_WIDTH + 'rem', marginLeft: LEFT_SPACE + 'rem'}}>
+                        <label className='db mb2'>Date: {this.state.dateStr}</label>
+                        <input
+                            className='db w-100'
+                            type='range'
+                            min='0'
+                            max={RANGE}
+                            onInput={ev => this.handleInputTime(ev)}
+                            value={RANGE - this.state.daysAgo} />
                     </div>
-                </div>
-                <div className='mt3 bg-near-black pt3'>
+                    {renderLegend()}
                     {renderXScale(this)}
                     <div style={{height: rowHeight, position: 'relative'}}>
                         {dataRows}
@@ -128,13 +124,13 @@ function renderXScale(timeline: Timeline) {
             <div
                 className='absolute white-80 f6'
                 style={{left: perc + '%', top: '0px'}}>
-                {formatNumber(tick, true)}
+                {formatNumber(tick)}
             </div>
         );
     });
     return (
         <div className='flex items-center' style={{width: '90%'}}>
-            <div className='mr2' style={{width: LEFT_SPACE + 'rem'}}></div>
+            <div style={{width: LEFT_SPACE + 'rem'}}></div>
             <div className='bb b--white-40 mb2' style={{flexGrow: 1, position: 'relative', height: '2.25rem'}}>
                 {textElems}
                 {tickElems}
@@ -157,8 +153,8 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
         <div
             className='flex mb2 items-center'
             key={region.id}
-            style={{position: 'absolute', top, width: '90%', left: LEFT_MARGIN, transition: 'top 0.75s'}}>
-            <div className='tr mr2 br b--white-20 pr2 truncate f4' style={{width: LEFT_SPACE + 'rem'}}>
+            style={{position: 'absolute', top, width: '90%', transition: 'top 0.75s'}}>
+            <div className='tr pr2 truncate f4' style={{width: LEFT_SPACE + 'rem'}}>
                 {region.name}
             </div>
             <div style={{flexGrow: 1, position: 'relative'}}>
@@ -189,4 +185,29 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
 // Access an index in a time series with a daysAgo offset, where the current day is the last elem
 function idxDaysAgo(arr: Array<any>, daysAgo: number) {
     return arr[arr.length - (daysAgo + 1)]
+}
+
+// Render the bar graph color legend
+function renderLegend() {
+    return (
+        <div className='flex mb2' style={{marginLeft: LEFT_SPACE + 'rem'}}>
+            <span className='b mr3' style={{color: ACTIVE_COLOR}}>
+                {renderSquare(ACTIVE_COLOR)}
+                Active cases
+            </span>
+            <span className='b' style={{color: RECOVERED_COLOR}}>
+                {renderSquare(RECOVERED_COLOR)}
+                Recovered
+            </span>
+        </div>
+    );
+}
+
+// Render a small colored square (for bar color legend)
+function renderSquare(background: string) {
+    return (
+        <span
+            className='dib mr1'
+            style={{width: '10px', height: '10px', background}}></span>
+    );
 }
