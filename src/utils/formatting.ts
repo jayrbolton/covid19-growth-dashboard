@@ -5,7 +5,7 @@ export function formatNumber(x: number | null, roundThousands: boolean = true): 
         // In our data sources, null values are interpreted as "Unknown"
         return '?';
     }
-    if (roundThousands && x % 1000 === 0) {
+    if (roundThousands && x > 0 && x % 1000 === 0) {
         return x/1000 + 'k';
     }
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
