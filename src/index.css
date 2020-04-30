@@ -1,12 +1,14 @@
-html, 
+html,
 body {
   height: 100%;
 }
 * {
-  font-family: 'Open Sans', Helvetica, Ubuntu, Roboto, sans-serif;
+  font-family: "Open Sans", Helvetica, Ubuntu, Roboto, sans-serif;
 }
-html, body, .sans-serif {
-  font-family: 'Open Sans', Helvetica, Ubuntu, Roboto, sans-serif;
+html,
+body,
+.sans-serif {
+  font-family: "Open Sans", Helvetica, Ubuntu, Roboto, sans-serif;
 }
 body {
   overflow-y: scroll;
@@ -22,6 +24,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }

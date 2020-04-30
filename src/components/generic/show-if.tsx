@@ -1,19 +1,17 @@
-import {h, Component} from 'preact';
+import { h, Component } from "preact";
 
 interface Props {
-    bool: boolean;
+  bool: boolean;
 }
 
-interface State {
-}
+interface State {}
 
 // Really simple way to show and hide child elements based on a boolean expression
 export class ShowIf extends Component<Props, State> {
-
-    render() {
-        if (!this.props.bool) {
-            return '';
-        }
-        return this.props.children;
+  render() {
+    if (!this.props.bool) {
+      return "";
     }
+    return this.props.children;
+  }
 }
