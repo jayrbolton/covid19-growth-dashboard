@@ -1,0 +1,16 @@
+export const VIZ_COLORS = {
+  red1: "#ee6677",
+  green1: "#283",
+  blue1: "#47a",
+  yellow1: "#cb4",
+  blue2: "#6ce",
+  purple1: "#a37",
+  gray1: "#bbb",
+  purple2: "#ce8cf2",
+  red2: "#a65959",
+  green2: "#8ebd6b",
+  yellow2: "#d9cc73",
+  blue3: "#8cd9f2",
+  purple3: "#bf6699",
+  gray2: "#cccccc",
+};

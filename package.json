@@ -1,7 +1,7 @@
 {
   "name": "covid19-growth-dashboard",
   "version": "0.0.1",
-  "description": "Another COVID-19 growth dashboard",
+  "description": "COVID-19 growth dashboard with multiple data sources",
   "main": "index.js",
   "scripts": {
     "test": "tsc --project tsconfig.json --noEmit && prettier --check \"src/**/*\"",
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/jayrbolton/covid19-growth-dashboard#readme",
   "dependencies": {
-    "chart.js": "^2.9.3",
+    "chart.js": "2.9.3",
     "classnames": "2.2.6",
     "csv-parse": "4.8.8",
     "history": "4.10.1",

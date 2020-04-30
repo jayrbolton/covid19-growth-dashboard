@@ -1,4 +1,4 @@
-import { h, Component, Fragment } from "preact";
+import { h, Component } from "preact";
 import { SearchInput } from "../generic/inputs";
 
 interface Props {
@@ -6,6 +6,8 @@ interface Props {
 }
 
 interface State {}
+
+const DEBOUNCE_MS = 200;
 
 export class Filters extends Component<Props, State> {
   // Input debounce timeout
@@ -16,7 +18,7 @@ export class Filters extends Component<Props, State> {
     this.state = {};
   }
 
-  // From an input event, call the callback at most every 200 milliseconds
+  // From an input event, call the callback at most every x milliseconds
   handleFilterLocation(inp: string) {
     const callback = () => {
       if (this.props.onFilterLocation) {
@@ -27,7 +29,7 @@ export class Filters extends Component<Props, State> {
       clearTimeout(this.timeout);
       this.timeout = null;
     }
-    this.timeout = window.setTimeout(callback, 200);
+    this.timeout = window.setTimeout(callback, DEBOUNCE_MS);
   }
 
   render() {

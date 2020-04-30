@@ -1,4 +1,3 @@
-import * as colors from "../../constants/graph-colors.json";
 import { DashboardData } from "../../types/dashboard";
 import { rowToArray } from "../csv-parse";
 import { percent, getPercentGrowth, getGrowthRate } from "../math";
@@ -11,7 +10,7 @@ export function transformData(resp: string): DashboardData {
   const textRows = resp.split("\n");
   const headers = rowToArray(textRows[0]);
   const rows = textRows.slice(1).map(rowToArray);
-  // First we need to aggregate all the rows by location
+  // Aggregate all the rows by location
   const agg = {};
   for (const row of rows) {
     const id = [row[1], row[2], row[3]].join(":");
@@ -20,11 +19,13 @@ export function transformData(resp: string): DashboardData {
     }
     agg[id].push(row);
   }
+  // Initialize our final object (DashboardData)
   const ret = {
     entries: [],
     entryLabels: LABELS,
     timeSeriesOffset: 0,
   };
+  // `fips` is some kind of unique region identifier
   for (const fips in agg) {
     const series = agg[fips];
     const cases = series.map((row) => row[4]);

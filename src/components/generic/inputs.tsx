@@ -1,3 +1,6 @@
+/*
+ * User input related components.
+ */
 import { h, Component, Fragment } from "preact";
 import { ShowIf } from "./show-if";
 
@@ -10,6 +13,7 @@ interface SearchState {
   val: string;
 }
 
+// Text field for searching records
 export class SearchInput extends Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
     super(props);

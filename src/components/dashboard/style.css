@@ -1,6 +1,7 @@
 .region-stats-row:nth-child(even) {
   background: #171717;
 }
+/* Styles for hovering and selecting a metric within a region */
 .region-stats-row-stat {
   transition: transform 0.25s ease-out;
 }
@@ -11,6 +12,8 @@
 .region-stats-row-stat[data-selected="true"] {
   border-color: #ffd700;
 }
+/* Animation for the "Graph & compare" button to draw the user's attention when
+ * a region is selected. */
 @keyframes anim-yellow-fade {
   from {
     background: yellow;

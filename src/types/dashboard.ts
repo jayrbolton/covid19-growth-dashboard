@@ -28,7 +28,7 @@ export interface EntryStat {
   timeSeries: Array<number>;
   // Eg. the last 14 days
   // Both the raw values and percentages for the window
-  timeSeriesWindow: {
+  timeSeriesWindow?: {
     values: Array<number>;
     percentages: Array<number>;
     // Percent growth calculated for the time series window

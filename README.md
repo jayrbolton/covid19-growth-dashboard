@@ -2,9 +2,7 @@
 
 [Visit the website here](https://www.covid19tracking.org).
 
-A dashboard to visualize and examine the activity of COVID-19 around the world.
-
-Credit goes to [The COVID Tracking Project](https://covidtracking.com/) and [Johns Hopkins University](https://coronavirus.jhu.edu/) for the initial dashboard and the source data.
+A dashboard to visualize and examine the activity of COVID-19 around the world with support for multiple data sources.
 
 Thanks to Github for the hosting.
 

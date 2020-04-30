@@ -1,5 +1,7 @@
+/*
+ * Root component for the whole app
+ */
 import { h, Component } from "preact";
-import * as dataSources from "../constants/data-sources.json";
 import { History, createBrowserHistory } from "history";
 import { queryToObj, updateURLQuery } from "../utils/url";
 
@@ -11,8 +13,10 @@ import { USCounties } from "./us-counties";
 import { Timeline } from "./timeline";
 import { AboutPage } from "./about-page";
 
+// History object for managing page navigation via url params
 const history = createBrowserHistory();
 
+// Load the current page from the url params with a default
 let initialPage: Page = "us-states";
 (function getInitialPage() {
   const query = queryToObj();
@@ -24,18 +28,16 @@ let initialPage: Page = "us-states";
 interface Props {}
 
 interface State {
-  rows?: any;
   currentPage: Page;
 }
 
 export class App extends Component<Props, State> {
   constructor(props) {
     super(props);
-    const defaultPage = initialPage;
     this.state = {
-      currentPage: defaultPage,
+      currentPage: initialPage,
     };
-    history.push({ search: "?p=" + defaultPage });
+    history.push({ search: "?p=" + initialPage });
     // Listen for changes to the current location.
     history.listen(() => {
       const queryObj = queryToObj();
@@ -46,40 +48,41 @@ export class App extends Component<Props, State> {
     });
   }
 
+  // Clicking a top-level page nav changes url params and history
   handleClickNavItem(page: Page) {
     const query = updateURLQuery({ p: page });
     history.push({ search: query });
   }
 
-  worldDataPage() {
+  renderWorldData() {
     if (this.state.currentPage !== "world-data") {
       return "";
     }
     return <JHUWorldDashboard />;
   }
 
-  usStatesPage() {
+  renderUSStates() {
     if (this.state.currentPage !== "us-states") {
       return "";
     }
     return <USStates />;
   }
 
-  usCountiesPage() {
+  renderUSCounties() {
     if (this.state.currentPage !== "us-counties") {
       return "";
     }
     return <USCounties />;
   }
 
-  timelinePage() {
+  renderTimeline() {
     if (this.state.currentPage !== "timeline") {
       return "";
     }
     return <Timeline />;
   }
 
-  aboutPage() {
+  renderAbout() {
     if (this.state.currentPage !== "about") {
       return "";
     }
@@ -93,11 +96,11 @@ export class App extends Component<Props, State> {
           onClickNavItem={(pageName) => this.handleClickNavItem(pageName)}
           currentPage={this.state.currentPage}
         />
-        {this.worldDataPage()}
-        {this.usStatesPage()}
-        {this.usCountiesPage()}
-        {this.aboutPage()}
-        {this.timelinePage()}
+        {this.renderWorldData()}
+        {this.renderUSStates()}
+        {this.renderUSCounties()}
+        {this.renderAbout()}
+        {this.renderTimeline()}
       </div>
     );
   }

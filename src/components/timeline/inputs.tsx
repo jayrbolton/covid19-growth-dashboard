@@ -1,4 +1,7 @@
-import { h, Component, Fragment } from "preact";
+/*
+ * Some user controls for the animated timeline, found above the country rows.
+ */
+import { h, Component } from "preact";
 import { constants } from "./constants";
 
 interface Props {
@@ -151,6 +154,7 @@ export class Inputs extends Component<Props, State> {
   }
 }
 
+// Calculate additional state fields from a `daysAgo` value
 function getDates(daysAgo: number) {
   const date = new Date();
   date.setDate(date.getDate() - daysAgo);
@@ -187,6 +191,7 @@ function renderControlBtn(symb: string, disabled: boolean = false, onClick) {
   );
 }
 
+// Dropdown to select what to sort
 function renderSelectSort(cmpnt: Inputs) {
   const optionData = [
     ["Total cases", "confirmed"],

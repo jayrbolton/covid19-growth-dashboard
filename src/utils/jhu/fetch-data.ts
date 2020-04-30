@@ -3,12 +3,12 @@
  * Returns text blobs of the source CSVs.
  */
 
-import * as dataSources from "../../constants/data-sources.json";
+import { JHU_SOURCE } from "../../constants/data-sources";
 
 export async function fetchData() {
   const ret = {};
-  for (const key of dataSources.categoryKeys) {
-    const resp = await fetch(dataSources[key]);
+  for (const key of JHU_SOURCE.categoryKeys) {
+    const resp = await fetch(JHU_SOURCE.sourceUrls[key]);
     const data = await resp.text();
     if (!resp.ok) {
       console.error(

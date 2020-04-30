@@ -15,10 +15,7 @@ import { setTimeSeriesWindow } from "../../utils/transform-data";
 // Types
 import { DashboardData } from "../../types/dashboard";
 // Constants
-import * as uiSettings from "../../constants/ui-settings.json";
-
-// How many days they can time travel backwards
-const MAX_RANGE = 30;
+import { UI_SETTINGS } from "../../constants/ui-settings";
 
 interface Props {
   fetchSourceData: () => Promise<DashboardData>;
@@ -58,6 +55,7 @@ export class Dashboard extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+    // Show a different number of stats/metrics depending on their window width
     const width = window.outerWidth;
     let displayedStats;
     if (width >= 1023) {
@@ -85,7 +83,7 @@ export class Dashboard extends Component<Props, State> {
       showingGraph: false,
       selectedCount: 0,
       resultsCount: 0,
-      displayCount: uiSettings.pageLen,
+      displayCount: UI_SETTINGS.pageLen,
       sortedDaysAgo: 0,
     };
   }
@@ -105,6 +103,8 @@ export class Dashboard extends Component<Props, State> {
     this.setState({ resultsCount });
   }
 
+  // statIdx is the index of the region's stat/metric to sort on (eg. 0 -> Confirmed cases)
+  // byGrowth is a flag of whether to sort by total count or by average daily percent growth
   handleSort(statIdx: number | null, byGrowth: boolean | null) {
     if (statIdx !== null) {
       this.sortingByGrowth = byGrowth;
@@ -120,15 +120,18 @@ export class Dashboard extends Component<Props, State> {
     this.setState({ sortedDaysAgo: this.state.data.timeSeriesOffset });
   }
 
+  // Show more regions for pagination
   handleShowMore() {
     let displayCount = this.state.displayCount;
-    displayCount += uiSettings.pageLen;
+    displayCount += UI_SETTINGS.pageLen;
     if (displayCount > this.state.resultsCount) {
       displayCount = this.state.resultsCount;
     }
     this.setState({ displayCount });
   }
 
+  // Change which stats/metrics are displayed for each region
+  // A map of the metric/stat index to a boolean of whether it is shown
   handleChangeStatsDisplayed(displayedStats: Map<number, boolean>) {
     this.setState({ displayedStats });
   }
@@ -164,6 +167,7 @@ export class Dashboard extends Component<Props, State> {
     this.setState({ showingGraph: false });
   }
 
+  // Change the time period for all metrics
   handleInputTimeRange(daysAgo: number) {
     daysAgo = Number(daysAgo);
     if (this.timeRangeTimeout) {
@@ -175,23 +179,6 @@ export class Dashboard extends Component<Props, State> {
       this.setState({});
     };
     this.timeRangeTimeout = setTimeout(update, 25);
-  }
-
-  showMoreButton() {
-    const diff = this.state.resultsCount - this.state.displayCount;
-    if (diff <= 0) {
-      return "";
-    }
-    return (
-      <p className="ph2 ph2-m ph4-ns pb4">
-        <a
-          onClick={() => this.handleShowMore()}
-          className="pointer link b light-blue dim"
-        >
-          Show more ({diff} remaining)
-        </a>
-      </p>
-    );
   }
 
   render() {
@@ -239,7 +226,7 @@ export class Dashboard extends Component<Props, State> {
             }
             displayedStats={this.state.displayedStats}
           />
-          {this.showMoreButton()}
+          {renderShowMoreButton(this)}
         </div>
         <MetricsComparison
           hidden={!this.state.showingGraph}
@@ -249,6 +236,23 @@ export class Dashboard extends Component<Props, State> {
       </div>
     );
   }
+}
+
+function renderShowMoreButton(dashboard) {
+  const diff = dashboard.state.resultsCount - dashboard.state.displayCount;
+  if (diff <= 0) {
+    return "";
+  }
+  return (
+    <p className="ph2 ph2-m ph4-ns pb4">
+      <a
+        onClick={() => dashboard.handleShowMore()}
+        className="pointer link b light-blue dim"
+      >
+        Show more ({diff} remaining)
+      </a>
+    </p>
+  );
 }
 
 function renderGraphButton(dashboard, selectedCount, onClear) {
@@ -270,7 +274,7 @@ function renderGraphButton(dashboard, selectedCount, onClear) {
         <span>{selectedCount} metrics selected:</span>
         {Button({
           text: "Graph & compare", // `Graph ${selectedCount} selected`,
-          background: "#137752",
+          background: UI_SETTINGS.graphButtonBg,
           className: justSelected ? "yellow-fade" : "",
           disabled: selectedCount === 0,
           onClick: () => dashboard.handleShowGraph(),
@@ -303,7 +307,7 @@ function renderTimeRangeSlider(dashboard) {
         style={{ direction: "rtl" }}
         type="range"
         min={0}
-        max={MAX_RANGE}
+        max={UI_SETTINGS.timeTravelMaxRange}
         step={1}
         onInput={(ev) => dashboard.handleInputTimeRange(ev.currentTarget.value)}
         value={daysAgo}

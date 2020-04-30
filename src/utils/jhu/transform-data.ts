@@ -1,11 +1,7 @@
 /*
  * Take data from the source and convert it into something more usable for our purposes.
  */
-import * as dataSources from "../../constants/data-sources.json";
-import * as states from "../../constants/states.json";
-import * as stateCodes from "../../constants/state-codes.json";
-import * as colors from "../../constants/graph-colors.json";
-
+import { JHU_SOURCE } from "../../constants/data-sources";
 import { rowToArray } from "../csv-parse";
 import { percent } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
@@ -38,8 +34,8 @@ export function parseData(sourceData) {
       if (!row || !row.length) {
         return;
       }
-      const location = row[dataSources.countryIdx];
-      const timeSeries = row.slice(dataSources.seriesIdx);
+      const location = row[JHU_SOURCE.countryIdx];
+      const timeSeries = row.slice(JHU_SOURCE.seriesIdx);
       if (location in agg) {
         if (key in agg[location].cases) {
           const cases = agg[location].cases[key];
@@ -135,9 +131,9 @@ function computeStats(entries) {
 
 // Get the array of dates as [year, month, day] triples
 function parseDatesFromHeaders(headers) {
-  const regex = new RegExp(dataSources.dateRegex);
+  const regex = new RegExp(JHU_SOURCE.dateRegex);
   const ret = [];
-  for (const str of headers.slice(dataSources.seriesIdx)) {
+  for (const str of headers.slice(JHU_SOURCE.seriesIdx)) {
     const matches = str.match(regex);
     // Date keys have the US-based format "month/day/year" such as "1/20/20"
     const month = Number(matches[1]);
@@ -158,11 +154,11 @@ function insertAggregations(rows) {
     cases: {},
   };
   const totalCases = {};
-  for (const key of dataSources.categoryKeys) {
+  for (const key of JHU_SOURCE.categoryKeys) {
     totalCases[key] = [];
   }
   for (const row of rows) {
-    for (const key of dataSources.categoryKeys) {
+    for (const key of JHU_SOURCE.categoryKeys) {
       // 3 iterations
       if (!row.cases[key]) {
         continue;

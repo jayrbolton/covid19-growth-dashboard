@@ -2,8 +2,7 @@ import { h, Component, Fragment } from "preact";
 import { fetchData } from "../../utils/covidtracking/fetch-data";
 import { transformData } from "../../utils/covidtracking/transform-data";
 import { Dashboard } from "../dashboard";
-
-const DATA_SOURCE_URL = "https://covidtracking.com/about-tracker/";
+import { COVIDTRACKING_SOURCE } from "../../constants/data-sources";
 
 interface Props {}
 
@@ -19,7 +18,11 @@ export class USStates extends Component<Props, State> {
           </h1>
           <p>
             Data is updated daily from{" "}
-            <a className="light-blue" href={DATA_SOURCE_URL} target="_blank">
+            <a
+              className="light-blue"
+              href={COVIDTRACKING_SOURCE.homeUrl}
+              target="_blank"
+            >
               The COVID Tracking Project
             </a>
             .

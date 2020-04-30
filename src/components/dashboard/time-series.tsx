@@ -1,7 +1,9 @@
-// Time series bar chart
+/*
+ * Time series bar chart for each metric component (child of region-stats)
+ */
 import { h, Component, Fragment } from "preact";
 import { formatNumber } from "../../utils/formatting";
-import * as colors from "../../constants/graph-colors.json";
+import { VIZ_COLORS } from "../../constants/colors";
 
 interface Props {
   statIdx: number;
@@ -74,11 +76,9 @@ export class TimeSeriesBars extends Component<Props, State> {
   vertBar(val, percentage, idx, len) {
     const border = "2px solid #333";
     const width =
-      percentage === "?" || percentage === null || isNaN(percentage)
-        ? "0%"
-        : percentage + "%";
+      percentage === null || isNaN(percentage) ? "0%" : percentage + "%";
     const height = idx === len - 1 ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
-    const color = colors[this.props.statIdx];
+    const color = Object.values(VIZ_COLORS)[this.props.statIdx];
     return (
       <div
         title={formatNumber(val)}
@@ -118,8 +118,4 @@ export class TimeSeriesBars extends Component<Props, State> {
       </div>
     );
   }
-}
-
-function percent(val, max) {
-  return Math.round(((val * 100) / max) * 10) / 10;
 }

@@ -1,4 +1,8 @@
-import { h, Component, Fragment } from "preact";
+/*
+ * Basic top-level page navigation component
+ * We use url params because url paths will not work on Github Pages
+ */
+import { h, Component } from "preact";
 
 interface Props {
   currentPage: Page;

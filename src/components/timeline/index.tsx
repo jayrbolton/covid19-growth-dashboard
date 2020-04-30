@@ -1,12 +1,12 @@
-import { h, Component, Fragment } from "preact";
-import { percent, graphAxisTicks } from "../../utils/math";
+import { h, Component } from "preact";
+import { graphAxisTicks } from "../../utils/math";
 import { fetchData } from "../../utils/jhu/fetch-data";
 import { transformDataTimeline } from "../../utils/jhu/transform-data-timeline";
 import { sortByDaysAgo } from "../../utils/sort-data";
 import { TimelineData, TimelineRegion } from "../../types/timeline-data";
 import { Inputs } from "./inputs";
 import { formatNumber } from "../../utils/formatting";
-import * as dataSources from "../../constants/data-sources.json";
+import { JHU_SOURCE } from "../../constants/data-sources";
 import { constants } from "./constants";
 
 interface Props {}
@@ -66,11 +66,7 @@ export class Timeline extends Component<Props, State> {
           </h1>
           <p>
             Data is updated daily from the{" "}
-            <a
-              href={dataSources.sourceURL}
-              target="_blank"
-              className="light-blue"
-            >
+            <a href={JHU_SOURCE.homeUrl} target="_blank" className="light-blue">
               Johns Hopkins University CSSE COVID-19 Data Repository
             </a>
             .
@@ -139,6 +135,7 @@ function renderXScale(timeline: Timeline) {
   );
 }
 
+// Each row representing each country in the timeline
 function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
   const barHeight = "1.25rem";
   const top = region.order * constants.rowHeight + "rem";
@@ -206,11 +203,6 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
   );
 }
 
-// Access an index in a time series with a daysAgo offset, where the current day is the last elem
-function idxDaysAgo(arr: Array<any>, daysAgo: number) {
-  return arr[arr.length - (daysAgo + 1)] || 0;
-}
-
 // Render the bar graph color legend
 function renderLegend() {
   return (
@@ -235,4 +227,9 @@ function renderSquare(background: string) {
       style={{ width: "10px", height: "10px", background }}
     ></span>
   );
+}
+
+// Access an index in a time series with a daysAgo offset, where the current day is the last elem
+function idxDaysAgo(arr: Array<any>, daysAgo: number) {
+  return arr[arr.length - (daysAgo + 1)] || 0;
 }

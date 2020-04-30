@@ -1,5 +1,8 @@
-import { h, Component, Fragment } from "preact";
-
+/*
+ * Sorting options for the listing under region-stats.
+ * Sort by either total count or percent growth for each metric.
+ */
+import { h, Component } from "preact";
 import { DashboardEntry } from "../../types/dashboard";
 
 interface Props {

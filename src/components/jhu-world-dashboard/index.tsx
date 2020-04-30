@@ -3,7 +3,7 @@ import { Dashboard } from "../dashboard";
 import { DashboardData } from "../../types/dashboard";
 import { fetchData } from "../../utils/jhu/fetch-data";
 import { transformData } from "../../utils/jhu/transform-data";
-import * as dataSources from "../../constants/data-sources.json";
+import { JHU_SOURCE } from "../../constants/data-sources";
 
 interface Props {}
 interface State {}
@@ -23,11 +23,7 @@ export class JHUWorldDashboard extends Component<Props, State> {
           </h1>
           <p>
             Data is updated daily from the{" "}
-            <a
-              href={dataSources.sourceURL}
-              target="_blank"
-              className="light-blue"
-            >
+            <a href={JHU_SOURCE.homeUrl} target="_blank" className="light-blue">
               Johns Hopkins University CSSE COVID-19 Data Repository
             </a>
             .

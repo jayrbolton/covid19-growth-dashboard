@@ -1,4 +1,5 @@
 // Pretty-print a number. eg. 123456 -> 123,456
+// Also, 120000 -> 120k
 export function formatNumber(
   x: number | null,
   roundThousands: boolean = true

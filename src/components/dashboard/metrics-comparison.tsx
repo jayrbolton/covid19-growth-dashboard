@@ -1,8 +1,12 @@
-import { h, Component, Fragment } from "preact";
+/*
+ * Line graph where multiple metrics from different regions can be plotted
+ * using the same y-axis scale.
+ */
+import { h, Component } from "preact";
 import { DashboardData } from "../../types/dashboard";
 import Chart from "chart.js";
-import * as colors from "../../constants/graph-colors.json";
 import { computeLineChartData } from "../../utils/compute-linechart";
+import { CHART_DEFAULTS } from "../../constants/ui-settings";
 
 interface Props {
   hidden: boolean;
@@ -15,6 +19,12 @@ interface State {}
 export class MetricsComparison extends Component<Props, State> {
   chart: any = null;
 
+  componentDidMount() {
+    Chart.defaults.global.defaultFontColor = "white";
+    Chart.defaults.global.defaultFontSize = 16;
+    this.chart = new Chart("comparison-chart", CHART_DEFAULTS);
+  }
+
   handleClickClose() {
     this.props.onClose();
   }
@@ -24,53 +34,6 @@ export class MetricsComparison extends Component<Props, State> {
       return;
     }
     this.handleClickClose();
-  }
-
-  componentDidMount() {
-    Chart.defaults.global.defaultFontColor = "white";
-    Chart.defaults.global.defaultFontSize = 16;
-    this.chart = new Chart("comparison-chart", {
-      type: "line",
-      data: {
-        datasets: [],
-      },
-      defaults: {
-        global: {
-          defaultFontColor: "white",
-        },
-      },
-      options: {
-        scales: {
-          yAxes: [
-            {
-              gridLines: {
-                color: "rgb(255,255,255,0.3)",
-              },
-            },
-          ],
-          xAxes: [
-            {
-              gridLines: {
-                color: "rgb(255,255,255,0.3)",
-              },
-            },
-          ],
-        },
-        responsive: false,
-        elements: {
-          line: {
-            tension: 0, // disables bezier curves
-          },
-        },
-        animation: {
-          duration: 0, // general animation time
-        },
-        hover: {
-          animationDuration: 0, // duration of animations when hovering an item
-        },
-        responsiveAnimationDuration: 0, // animation duration after a resize
-      },
-    });
   }
 
   render() {

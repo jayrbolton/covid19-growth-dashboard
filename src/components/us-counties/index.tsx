@@ -2,8 +2,7 @@ import { h, Component, Fragment } from "preact";
 import { fetchData } from "../../utils/nyt/fetch-data";
 import { transformData } from "../../utils/nyt/transform-data";
 import { Dashboard } from "../dashboard";
-
-const DATA_SOURCE_URL = "https://github.com/nytimes/covid-19-data";
+import { NYT_SOURCE } from "../../constants/data-sources";
 
 interface Props {}
 
@@ -19,7 +18,7 @@ export class USCounties extends Component<Props, State> {
           </h1>
           <p>
             Data is updated daily from{" "}
-            <a className="light-blue" href={DATA_SOURCE_URL} target="_blank">
+            <a className="light-blue" href={NYT_SOURCE.homeUrl} target="_blank">
               The New York Times COVID-19 data repository
             </a>
             .

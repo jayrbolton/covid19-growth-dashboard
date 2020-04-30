@@ -1,4 +1,7 @@
-import { h, Component } from "preact";
+/*
+ * Generic button component
+ */
+import { h } from "preact";
 
 export function Button({ text, disabled, onClick, background, className }) {
   const cn = ["dib pa2 br2 b f6 ", className || ""].join(" ");

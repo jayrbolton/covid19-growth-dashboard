@@ -1,4 +1,7 @@
-import { h, Component, Fragment } from "preact";
+/*
+ * Sidebar component for selecting which region stats/metrics to display.
+ */
+import { h, Component } from "preact";
 import { hasParentId } from "../../utils/dom";
 
 interface Props {
@@ -8,7 +11,6 @@ interface Props {
 }
 
 interface State {
-  dropdownOpen: boolean;
   displayedStats: Map<number, boolean>;
 }
 
@@ -17,26 +19,10 @@ export class MetricsSelector extends Component<Props, State> {
     super(props);
     this.state = {
       displayedStats: this.props.defaultDisplayedStats,
-      dropdownOpen: false,
     };
   }
 
-  componentDidMount() {
-    document.body.addEventListener("click", ({ target }) => {
-      if (
-        !this.state.dropdownOpen ||
-        hasParentId(target, "metrics-selector-wrapper")
-      ) {
-        return;
-      }
-      this.setState({ dropdownOpen: false });
-    });
-  }
-
-  handleClick() {
-    this.setState({ dropdownOpen: !this.state.dropdownOpen });
-  }
-
+  // User checks or unchecks a metric to show/hide
   handleChange(ev) {
     const idx = Number(ev.currentTarget.getAttribute("data-idx"));
     const checked = ev.currentTarget.checked;
@@ -50,36 +36,36 @@ export class MetricsSelector extends Component<Props, State> {
     this.props.onSelect(selected);
   }
 
-  renderOption(label, idx) {
-    const id = label + "-select-display";
-    const selected = this.state.displayedStats;
-    return (
-      <div className="white-80 mb1 flex items-center">
-        <input
-          className="mr1"
-          type="checkbox"
-          data-idx={idx}
-          id={id}
-          checked={selected.get(idx)}
-          onChange={(ev) => this.handleChange(ev)}
-        />
-        <label htmlFor={id} className="pointer dim">
-          {label}
-        </label>
-      </div>
-    );
-  }
-
   render() {
     return (
-      <div id="metrics-selector-wrapper" class="mb3 pb3 bb b--white-20">
+      <div class="mb3 pb3 bb b--white-20">
         <div class="b white-80 mb2">Displaying metrics:</div>
         <div>
           {this.props.entryLabels.map((label, idx) =>
-            this.renderOption(label, idx)
+            renderOption(this, label, idx)
           )}
         </div>
       </div>
     );
   }
+}
+
+function renderOption(metricsSelector, label, idx) {
+  const id = label + "-select-display";
+  const selected = metricsSelector.state.displayedStats;
+  return (
+    <div className="white-80 mb1 flex items-center">
+      <input
+        className="mr1"
+        type="checkbox"
+        data-idx={idx}
+        id={id}
+        checked={selected.get(idx)}
+        onChange={(ev) => metricsSelector.handleChange(ev)}
+      />
+      <label htmlFor={id} className="pointer dim">
+        {label}
+      </label>
+    </div>
+  );
 }

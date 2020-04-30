@@ -1,5 +1,7 @@
-// Generic data transformation utils
-import * as uiSettings from "../constants/ui-settings.json";
+/*
+ * Generic data transformation utils
+ */
+import { UI_SETTINGS } from "../constants/ui-settings";
 import { percent, getPercentGrowth } from "./math";
 import { DashboardData, DashboardEntry, EntryStat } from "../types/dashboard";
 
@@ -8,8 +10,8 @@ export function setTimeSeriesWindow(
   entries: Array<DashboardEntry>,
   daysAgo: number = 0
 ): void {
-  const sliceStart = -uiSettings.timeSeriesLen - daysAgo - 1;
-  let sliceEnd = sliceStart + uiSettings.timeSeriesLen + 1;
+  const sliceStart = -1 * UI_SETTINGS.timeSeriesLen - daysAgo - 1;
+  let sliceEnd = sliceStart + UI_SETTINGS.timeSeriesLen + 1;
   if (sliceEnd === 0) {
     sliceEnd = undefined;
   }

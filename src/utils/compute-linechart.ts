@@ -1,6 +1,10 @@
-import * as colors from "../constants/graph-colors.json";
+import { VIZ_COLORS } from "../constants/colors";
 import { DashboardData, EntryStat } from "../types/dashboard";
 
+// Access colors by integer index
+const COLORS = Object.values(VIZ_COLORS);
+
+// The region name and specific stat selected to chart
 interface SelectedMetric {
   location: string;
   stat: EntryStat;
@@ -49,8 +53,8 @@ export function computeLineChartData(sourceData: DashboardData, chart) {
     return {
       label: m.location + " - " + m.stat.label,
       data,
-      borderColor: colors[idx],
-      backgroundColor: colors[idx],
+      borderColor: COLORS[idx],
+      backgroundColor: COLORS[idx],
       fill: false,
     };
   });
