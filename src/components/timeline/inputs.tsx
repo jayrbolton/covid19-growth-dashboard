@@ -127,17 +127,17 @@ export class Inputs extends Component<Props, State> {
           <label style={{ width: "10rem" }} className="db">
             Date: {this.state.dateStr}
           </label>
-          <div>
-            {renderControlBtn("⏮", atStart, this.handleJumpStart.bind(this))}
-            {renderControlBtn("⏪︎", atStart, this.handleJumpBack.bind(this))}
+          <div className='flex justify-between'>
+            {renderControlBtn("icon-to-start-alt", atStart, this.handleJumpStart.bind(this))}
+            {renderControlBtn("icon-fast-bw", atStart, this.handleJumpBack.bind(this))}
             {renderControlBtn(
-              "▶️",
+              "icon-play",
               atEnd || !paused,
               this.handlePlay.bind(this)
             )}
-            {renderControlBtn("⏸", paused, this.handlePause.bind(this))}
-            {renderControlBtn("⏩︎", atEnd, this.handleJumpForward.bind(this))}
-            {renderControlBtn("⏭", atEnd, this.handleJumpEnd.bind(this))}
+            {renderControlBtn("icon-pause", paused, this.handlePause.bind(this))}
+            {renderControlBtn("icon-fast-fw", atEnd, this.handleJumpForward.bind(this))}
+            {renderControlBtn("icon-to-end-alt", atEnd, this.handleJumpEnd.bind(this))}
           </div>
           {renderSelectSort(this)}
         </div>
@@ -166,17 +166,18 @@ function getDates(daysAgo: number) {
 }
 
 // Render a play/pause/etc time control button
-function renderControlBtn(symb: string, disabled: boolean = false, onClick) {
+function renderControlBtn(icon: string, disabled: boolean = false, onClick) {
   const style = {
     userSelect: "none",
   };
+  const cls = "bt bb pv2 ph2 flex justify-center"
   if (disabled) {
     return (
       <a
         style={style}
-        className="ba b--white-20 ph2 pt1 pb2 br1 dib bg-near-black dark-gray mh2"
+        className={cls + " b--white-20 bg-near-black dark-gray"}
       >
-        {symb}
+        <i className={icon}></i>
       </a>
     );
   }
@@ -184,9 +185,9 @@ function renderControlBtn(symb: string, disabled: boolean = false, onClick) {
     <a
       style={style}
       onClick={onClick}
-      className="ba b--blue ph2 pt1 pb2 br1 dib bg-dark-gray white mh2 pointer grow dim"
+      className={cls + " b--blue bg-dark-gray white pointer grow dim"}
     >
-      {symb}
+      <i className={icon}></i>
     </a>
   );
 }
