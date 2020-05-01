@@ -127,17 +127,37 @@ export class Inputs extends Component<Props, State> {
           <label style={{ width: "10rem" }} className="db">
             Date: {this.state.dateStr}
           </label>
-          <div className='flex justify-between'>
-            {renderControlBtn("icon-to-start-alt", atStart, this.handleJumpStart.bind(this))}
-            {renderControlBtn("icon-fast-bw", atStart, this.handleJumpBack.bind(this))}
+          <div className="flex justify-between">
+            {renderControlBtn(
+              "icon-to-start-alt",
+              atStart,
+              this.handleJumpStart.bind(this)
+            )}
+            {renderControlBtn(
+              "icon-fast-bw",
+              atStart,
+              this.handleJumpBack.bind(this)
+            )}
             {renderControlBtn(
               "icon-play",
               atEnd || !paused,
               this.handlePlay.bind(this)
             )}
-            {renderControlBtn("icon-pause", paused, this.handlePause.bind(this))}
-            {renderControlBtn("icon-fast-fw", atEnd, this.handleJumpForward.bind(this))}
-            {renderControlBtn("icon-to-end-alt", atEnd, this.handleJumpEnd.bind(this))}
+            {renderControlBtn(
+              "icon-pause",
+              paused,
+              this.handlePause.bind(this)
+            )}
+            {renderControlBtn(
+              "icon-fast-fw",
+              atEnd,
+              this.handleJumpForward.bind(this)
+            )}
+            {renderControlBtn(
+              "icon-to-end-alt",
+              atEnd,
+              this.handleJumpEnd.bind(this)
+            )}
           </div>
           {renderSelectSort(this)}
         </div>
@@ -170,13 +190,10 @@ function renderControlBtn(icon: string, disabled: boolean = false, onClick) {
   const style = {
     userSelect: "none",
   };
-  const cls = "bt bb pv2 ph2 flex justify-center"
+  const cls = "bt bb pv2 ph2 flex justify-center";
   if (disabled) {
     return (
-      <a
-        style={style}
-        className={cls + " b--white-20 bg-near-black dark-gray"}
-      >
+      <a style={style} className={cls + " b--white-20 bg-near-black dark-gray"}>
         <i className={icon}></i>
       </a>
     );
