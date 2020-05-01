@@ -100,7 +100,7 @@ export class TimeSeriesBars extends Component<Props, State> {
         <div className="flex justify-between">
           <div
             className="flex flex-column-reverse justify-between f6 pr2"
-            style={{ width: "60%" }}
+            style={{ width: "63%" }}
           >
             {values.map((val, idx) =>
               this.barText(val, idx, this.props.isPercentage, values.length)
@@ -108,7 +108,7 @@ export class TimeSeriesBars extends Component<Props, State> {
           </div>
           <div
             className="flex flex-column-reverse justify-between"
-            style={{ width: "40%" }}
+            style={{ width: "37%" }}
           >
             {values.map((val, idx) =>
               this.vertBar(val, percentages[idx], idx, values.length)

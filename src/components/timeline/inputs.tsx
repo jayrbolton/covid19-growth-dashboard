@@ -129,14 +129,14 @@ export class Inputs extends Component<Props, State> {
           </label>
           <div>
             {renderControlBtn("⏮", atStart, this.handleJumpStart.bind(this))}
-            {renderControlBtn("⏪", atStart, this.handleJumpBack.bind(this))}
+            {renderControlBtn("⏪︎", atStart, this.handleJumpBack.bind(this))}
             {renderControlBtn(
               "▶️",
               atEnd || !paused,
               this.handlePlay.bind(this)
             )}
-            {renderControlBtn("⏸️", paused, this.handlePause.bind(this))}
-            {renderControlBtn("⏩", atEnd, this.handleJumpForward.bind(this))}
+            {renderControlBtn("⏸", paused, this.handlePause.bind(this))}
+            {renderControlBtn("⏩︎", atEnd, this.handleJumpForward.bind(this))}
             {renderControlBtn("⏭", atEnd, this.handleJumpEnd.bind(this))}
           </div>
           {renderSelectSort(this)}
