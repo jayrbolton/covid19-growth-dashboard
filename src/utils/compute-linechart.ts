@@ -1,8 +1,9 @@
 import { VIZ_COLORS } from "../constants/colors";
 import { DashboardData, EntryStat } from "../types/dashboard";
+import { vals } from '../utils/obj';
 
 // Access colors by integer index
-const COLORS = Object.values(VIZ_COLORS);
+const COLORS = vals(VIZ_COLORS);
 
 // The region name and specific stat selected to chart
 interface SelectedMetric {

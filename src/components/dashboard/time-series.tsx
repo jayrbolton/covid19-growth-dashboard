@@ -4,6 +4,7 @@
 import { h, Component, Fragment } from "preact";
 import { formatNumber } from "../../utils/formatting";
 import { VIZ_COLORS } from "../../constants/colors";
+import { vals } from '../../utils/obj';
 
 interface Props {
   statIdx: number;
@@ -78,7 +79,7 @@ export class TimeSeriesBars extends Component<Props, State> {
     const width =
       percentage === null || isNaN(percentage) ? "0%" : percentage + "%";
     const height = idx === len - 1 ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
-    const color = Object.values(VIZ_COLORS)[this.props.statIdx];
+    const color = vals(VIZ_COLORS)[this.props.statIdx];
     return (
       <div
         title={formatNumber(val)}
