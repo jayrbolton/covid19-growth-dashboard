@@ -1,6 +1,7 @@
 import "tachyons/css/tachyons.css";
 import "./index.css";
 import "./icons.css";
+import "./styles/input-range.css";
 import { h, render } from "preact";
 import { App } from "./components/app";
 
