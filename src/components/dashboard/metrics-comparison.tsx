@@ -58,7 +58,7 @@ export class MetricsComparison extends Component<Props, State> {
             className="f4 b pointer dim white"
             onClick={() => this.handleClickClose()}
           >
-            🠘 Close and return
+            Close and return
           </a>
         </div>
         <div className="flex justify-center items-center bg-near-black pa2 ba b--white-40">
