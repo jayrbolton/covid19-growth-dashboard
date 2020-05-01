@@ -4,7 +4,7 @@
 import { h, Component, Fragment } from "preact";
 import { formatNumber } from "../../utils/formatting";
 import { VIZ_COLORS } from "../../constants/colors";
-import { vals } from '../../utils/obj';
+import { vals } from "../../utils/obj";
 
 interface Props {
   statIdx: number;

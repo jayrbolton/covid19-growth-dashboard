@@ -1,6 +1,6 @@
 import { VIZ_COLORS } from "../constants/colors";
 import { DashboardData, EntryStat } from "../types/dashboard";
-import { vals } from '../utils/obj';
+import { vals } from "../utils/obj";
 
 // Access colors by integer index
 const COLORS = vals(VIZ_COLORS);
