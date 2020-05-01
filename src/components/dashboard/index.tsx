@@ -303,7 +303,7 @@ function renderTimeRangeSlider(dashboard) {
         </ShowIf>
       </div>
       <input
-        className="dib w-100 outline-0 pv1 mt2"
+        className="db w-100"
         style={{ direction: "rtl" }}
         type="range"
         min={0}
