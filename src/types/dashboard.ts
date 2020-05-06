@@ -18,6 +18,7 @@ export interface DashboardEntry {
   // Has this entry been filtered out by a search?
   hidden?: boolean;
   location: string;
+  id: string;
   stats: Array<EntryStat>;
 }
 

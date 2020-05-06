@@ -3,6 +3,7 @@ import { rowToArray } from "../csv-parse";
 import { percent, getPercentGrowth, getGrowthRate } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
 import { sortByStat } from "../sort-data";
+import { slugify } from "../slugify";
 
 const LABELS = ["Confirmed cases, cumulative", "Deaths", "Mortality rate"];
 
@@ -51,6 +52,7 @@ export function transformData(resp: string): DashboardData {
     ];
     const entry = {
       location,
+      id: slugify(location),
       stats,
     };
     ret.entries.push(entry);

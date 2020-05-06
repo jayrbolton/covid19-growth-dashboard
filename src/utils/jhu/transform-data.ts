@@ -7,6 +7,7 @@ import { percent } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
 import { sortByStat } from "../sort-data";
 import { DashboardData } from "../../types/dashboard";
+import { slugify } from '../slugify';
 
 const LABELS = [
   "Confirmed cases, cumulative",
@@ -48,6 +49,7 @@ export function parseData(sourceData) {
       } else {
         agg[location] = {
           location,
+          id: slugify(location),
           cases: {
             [key]: timeSeries,
           },
@@ -151,6 +153,7 @@ function insertAggregations(rows) {
   const worldwide = {
     aggregate: true,
     location: "Worldwide",
+    id: 'worldwide',
     cases: {},
   };
   const totalCases = {};

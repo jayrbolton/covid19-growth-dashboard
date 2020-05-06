@@ -27,6 +27,7 @@ export function queryToObj(query: string | null = null): any {
 
 // Convert a flat object of keyvals into a url query string
 export function objToQuery(obj: object): string {
-  const keyvals = Object.keys(obj).map((key) => [key, obj[key]]);
+  const keyvals = Object.keys(obj).map((key) => [key, obj[key]])
+    .filter(([key, val]) => val !== null && val !== undefined);
   return "?" + keyvals.map(([key, val]) => key + "=" + val).join("&");
 }

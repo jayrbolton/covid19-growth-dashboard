@@ -7,6 +7,7 @@ import { DashboardData, EntryStat } from "../../types/dashboard";
 import { genericSort, sortByStat } from "../sort-data";
 import { percent } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
+import { slugify } from '../slugify';
 
 export function transformData(resp: string): DashboardData {
   const data = JSON.parse(resp)
@@ -25,8 +26,10 @@ export function transformData(resp: string): DashboardData {
   for (const state in data) {
     const stateName = STATE_CODES[state];
     const series = data[state].series;
+    const location = getLocation(data[state]);
     const entry = {
-      location: getLocation(data[state]),
+      location,
+      id: slugify(location),
       stats: ENTRY_STATS.map((each) => each.createStat(series)),
     };
     entries.push(entry);
@@ -34,6 +37,7 @@ export function transformData(resp: string): DashboardData {
   const entryLabels = ENTRY_STATS.map(({ label }) => label);
   setTimeSeriesWindow(entries, 0);
   sortByStat(entries, 0);
+  console.log(entries);
   return { entries, entryLabels, timeSeriesOffset: 0 };
 }
 

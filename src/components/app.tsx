@@ -2,7 +2,6 @@
  * Root component for the whole app
  */
 import { h, Component } from "preact";
-import { History, createBrowserHistory } from "history";
 import { queryToObj, updateURLQuery } from "../utils/url";
 
 // Components
@@ -12,9 +11,6 @@ import { USStates } from "./us-states";
 import { USCounties } from "./us-counties";
 import { Timeline } from "./timeline";
 import { AboutPage } from "./about-page";
-
-// History object for managing page navigation via url params
-const history = createBrowserHistory();
 
 // Load the current page from the url params with a default
 let initialPage: Page = "us-states";
@@ -37,9 +33,8 @@ export class App extends Component<Props, State> {
     this.state = {
       currentPage: initialPage,
     };
-    history.push({ search: "?p=" + initialPage });
     // Listen for changes to the current location.
-    history.listen(() => {
+    window._history.listen(() => {
       const queryObj = queryToObj();
       const page = queryObj.p;
       if (page) {
@@ -51,7 +46,7 @@ export class App extends Component<Props, State> {
   // Clicking a top-level page nav changes url params and history
   handleClickNavItem(page: Page) {
     const query = updateURLQuery({ p: page });
-    history.push({ search: query });
+    window._history.push({ search: query });
   }
 
   renderWorldData() {

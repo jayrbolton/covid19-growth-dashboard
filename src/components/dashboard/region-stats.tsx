@@ -6,6 +6,7 @@ import { h, Component, Fragment } from "preact";
 import { formatNumber } from "../../utils/formatting";
 import { TimeSeriesBars } from "./time-series";
 import { DashboardData, DashboardEntry } from "../../types/dashboard";
+import { queryToObj, updateURLQuery } from "../../utils/url";
 import "./style.css";
 
 // Number of days of stats to show
@@ -29,6 +30,12 @@ export class RegionStats extends Component<Props, State> {
 
   handleClickStat(entry, statIdx) {
     this.props.onSelectStat(entry, statIdx);
+  }
+
+  handleClickRegion(region) {
+    console.log('region', region.id);
+    const query = updateURLQuery({ r: region.id });
+    window._history.push({ search: query });
   }
 
   render() {
@@ -74,7 +81,9 @@ function renderEntry(regionStats, entry) {
       key={entry.location}
       className="ph3 pv2 pb1 region-stats-row bb b--white-20 bg-near-black"
     >
-      <h2 className="f4 mv2 b">{entry.location}</h2>
+      <h2 className="f4 b ma0 mv2">
+        <a onClick={() => regionStats.handleClickRegion(entry)} className="light-blue pointer dim">{entry.location}</a>
+      </h2>
       <div
         className="w-100"
         style={{
