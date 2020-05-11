@@ -24,8 +24,8 @@ export interface DashboardEntry {
 
 export interface EntryStat {
   label: string;
+  id: string;
   isPercentage: boolean;
-  // Full history from the data source
   timeSeries: Array<number>;
   // Eg. the last 14 days
   // Both the raw values and percentages for the window
@@ -35,6 +35,12 @@ export interface EntryStat {
     // Percent growth calculated for the time series window
     percentGrowth: number;
   };
+  // A longer time series window for the region details pages
+  longWindow?: {
+    values: Array<number>;
+    percentages: Array<number>;
+    percentGrowth: number;
+  }
   // Is this stat marked for comparison/graphing
   isComparing?: boolean;
 }

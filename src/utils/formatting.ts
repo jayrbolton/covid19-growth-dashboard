@@ -2,7 +2,8 @@
 // Also, 120000 -> 120k
 export function formatNumber(
   x: number | null,
-  roundThousands: boolean = true
+  roundThousands: boolean = true,
+  percentage: boolean = false,
 ): string {
   if (x === null || isNaN(x)) {
     // In our data sources, null values are interpreted as "Unknown"
@@ -11,7 +12,11 @@ export function formatNumber(
   if (roundThousands && x > 0 && x % 1000 === 0) {
     return x / 1000 + "k";
   }
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  let ret = x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  if (percentage) {
+    ret = ret + '%';
+  }
+  return ret;
 }
 
 export function formatUTCDateStr(date: string) {

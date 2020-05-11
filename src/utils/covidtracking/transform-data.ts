@@ -37,7 +37,6 @@ export function transformData(resp: string): DashboardData {
   const entryLabels = ENTRY_STATS.map(({ label }) => label);
   setTimeSeriesWindow(entries, 0);
   sortByStat(entries, 0);
-  console.log(entries);
   return { entries, entryLabels, timeSeriesOffset: 0 };
 }
 
@@ -100,7 +99,7 @@ const ENTRY_STATS = [
     },
   },
   {
-    label: "Percent positive",
+    label: "Percent of tests positive",
     createStat(series) {
       const nonulls = series.filter((each) => {
         return each.positive !== null && each.totalTestResults !== null;

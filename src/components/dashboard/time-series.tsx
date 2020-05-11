@@ -13,8 +13,6 @@ interface Props {
     percentages: Array<number>;
   };
   isPercentage: boolean;
-  // How many days to show
-  timeRange: number;
   // How many days ago for the end date
   daysAgo: number;
 }
@@ -53,7 +51,7 @@ export class TimeSeriesBars extends Component<Props, State> {
     this.state = {};
   }
 
-  barText(val, idx, isPercentage, len) {
+  renderBarText(val, idx, isPercentage, len) {
     const isLast = idx === len - 1;
     const height = isLast ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
     const fontSize = isLast ? "1rem" : "inherit";
@@ -74,7 +72,7 @@ export class TimeSeriesBars extends Component<Props, State> {
     );
   }
 
-  vertBar(val, percentage, idx, len) {
+  renderBar(val, percentage, idx, len) {
     const border = "2px solid #333";
     const width =
       percentage === null || isNaN(percentage) ? "0%" : percentage + "%";
@@ -101,18 +99,18 @@ export class TimeSeriesBars extends Component<Props, State> {
         <div className="flex justify-between">
           <div
             className="flex flex-column-reverse justify-between f6 pr2"
-            style={{ width: "63%" }}
+            style={{ minWidth: '9.25rem' }}
           >
             {values.map((val, idx) =>
-              this.barText(val, idx, this.props.isPercentage, values.length)
+              this.renderBarText(val, idx, this.props.isPercentage, values.length)
             )}
           </div>
           <div
             className="flex flex-column-reverse justify-between"
-            style={{ width: "37%" }}
+            style={{ width: "100%" }}
           >
             {values.map((val, idx) =>
-              this.vertBar(val, percentages[idx], idx, values.length)
+              this.renderBar(val, percentages[idx], idx, values.length)
             )}
           </div>
         </div>

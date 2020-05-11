@@ -33,9 +33,9 @@ export class RegionStats extends Component<Props, State> {
   }
 
   handleClickRegion(region) {
-    console.log('region', region.id);
     const query = updateURLQuery({ r: region.id });
     window._history.push({ search: query });
+    window.scrollTo(0, 0);
   }
 
   render() {
@@ -88,7 +88,7 @@ function renderEntry(regionStats, entry) {
         className="w-100"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, 15.25rem)",
+          gridTemplateColumns: "repeat(auto-fill, 16rem)",
           gridColumnGap: "0.65rem",
         }}
       >
@@ -124,7 +124,6 @@ function renderStat(regionStats, stat, entry, idx) {
       </div>
       <TimeSeriesBars
         daysAgo={daysAgo}
-        timeRange={TIME_RANGE}
         statIdx={idx}
         series={stat.timeSeriesWindow}
         isPercentage={stat.isPercentage}
