@@ -29,7 +29,7 @@ export class RegionDetails extends Component<Props, State> {
         <h2 style={{fontSize: '2rem'}} className='mb3'>{this.props.entry.location}</h2>
         <QuickView entry={this.props.entry} />
         <div>
-          {this.props.entry.stats.map(stat => (<RegionStat stat={stat} />))}
+          {this.props.entry.stats.map((stat, idx) => (<RegionStat stat={stat} statIdx={idx} />))}
         </div>
       </div>
     );

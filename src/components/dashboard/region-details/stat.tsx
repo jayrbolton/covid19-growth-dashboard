@@ -8,6 +8,7 @@ import { formatNumber } from "../../../utils/formatting";
 
 interface Props {
   stat: EntryStat;
+  statIdx: number;
 }
 
 interface State {}
@@ -27,7 +28,7 @@ export class RegionStat extends Component<Props, State> {
         </div>
         <div className='flex justify-between' style={{alignContent: 'stretch'}}>
           <div className='mw6' style={{minWidth: '32rem'}}>
-            <TimeSeriesBars series={series} statIdx={4} isPercentage={isPercentage} daysAgo={0} />
+            <TimeSeriesBars series={series} statIdx={this.props.statIdx} isPercentage={isPercentage} daysAgo={0} />
           </div>
           <div style={{flexGrow: 1}}>
             {renderGrowthStats(this.props.stat)}
