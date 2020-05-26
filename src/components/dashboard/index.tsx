@@ -7,13 +7,15 @@ import { Filters } from "./filters";
 import { Sorts } from "./sorts";
 import { Button } from "../generic/button";
 import { ShowIf } from "../generic/show-if";
+import { RegionDetails } from "./region-details";
 // Utils
 import { filterLocation } from "../../utils/filter-data";
 import { sortByStat } from "../../utils/sort-data";
 import { pluralize } from "../../utils/formatting";
 import { setTimeSeriesWindow } from "../../utils/transform-data";
+import { queryToObj, updateURLQuery } from "../../utils/url";
 // Types
-import { DashboardData } from "../../types/dashboard";
+import { DashboardData, DashboardEntry } from "../../types/dashboard";
 // Constants
 import { UI_SETTINGS } from "../../constants/ui-settings";
 
@@ -25,6 +27,8 @@ interface State {
   data?: DashboardData;
   loading: boolean;
   displayedStats: Map<number, boolean>;
+  // ID of a selected region to show full-page details for
+  selectedRegion: null | DashboardEntry;
   // Stats selected for graphing and comparing
   showingGraph: boolean;
   selectedCount: number;
@@ -79,6 +83,7 @@ export class Dashboard extends Component<Props, State> {
     }
     this.state = {
       loading: true,
+      selectedRegion: null,
       displayedStats,
       showingGraph: false,
       selectedCount: 0,
@@ -86,14 +91,36 @@ export class Dashboard extends Component<Props, State> {
       displayCount: UI_SETTINGS.pageLen,
       sortedDaysAgo: 0,
     };
+    // Listen for changes to the current location
+    // Handle region selection updates.
+    window._history.listen(() => {
+      const queryObj = queryToObj();
+      const regionID = queryObj.r;
+      if (regionID && this.state.data) {
+        this.setState({
+          selectedRegion: this.state.data.entries.find(
+            (e) => e.id === regionID
+          ),
+        });
+      } else {
+        this.setState({ selectedRegion: null });
+      }
+    });
   }
 
   componentDidMount() {
     this.props.fetchSourceData().then((data) => {
+      // Get the URL query parameter for the selected region, if present
+      const query = queryToObj();
+      let selectedRegion = null;
+      if (query.r) {
+        selectedRegion = data.entries.find((e) => e.id === query.r);
+      }
       this.setState({
         data,
         loading: false,
         resultsCount: data.entries.length,
+        selectedRegion,
       });
     });
   }
@@ -184,6 +211,9 @@ export class Dashboard extends Component<Props, State> {
   render() {
     if (this.state.loading || !this.state.data) {
       return <p className="white sans-serif ph3 pv4">Loading data...</p>;
+    }
+    if (this.state.selectedRegion) {
+      return <RegionDetails entry={this.state.selectedRegion} />;
     }
     const selectedCount = this.state.selectedCount;
     let selectedText = "Select some metrics to graph and compare";

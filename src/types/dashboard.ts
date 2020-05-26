@@ -18,13 +18,14 @@ export interface DashboardEntry {
   // Has this entry been filtered out by a search?
   hidden?: boolean;
   location: string;
+  id: string;
   stats: Array<EntryStat>;
 }
 
 export interface EntryStat {
   label: string;
+  id: string;
   isPercentage: boolean;
-  // Full history from the data source
   timeSeries: Array<number>;
   // Eg. the last 14 days
   // Both the raw values and percentages for the window
@@ -33,6 +34,15 @@ export interface EntryStat {
     percentages: Array<number>;
     // Percent growth calculated for the time series window
     percentGrowth: number;
+  };
+  // A longer time series window for the region details pages
+  longWindow?: {
+    values: Array<number>;
+    percentages: Array<number>;
+    // Average percent change over several time periods
+    percentGrowths: Array<number>;
+    // Average increase or decrease over several time periods
+    change: Array<number>;
   };
   // Is this stat marked for comparison/graphing
   isComparing?: boolean;

@@ -161,16 +161,16 @@ export class Inputs extends Component<Props, State> {
           </div>
           {renderSelectSort(this)}
         </div>
-        <div className='mt2 flex'>
-        <input
-          className="db w-100"
-          type="range"
-          min="0"
-          max={constants.range}
-          onInput={(ev) => this.handleInputTime(ev)}
-          value={constants.range - this.state.daysAgo}
-        />
-      </div>
+        <div className="mt2 flex">
+          <input
+            className="db w-100"
+            type="range"
+            min="0"
+            max={constants.range}
+            onInput={(ev) => this.handleInputTime(ev)}
+            value={constants.range - this.state.daysAgo}
+          />
+        </div>
       </div>
     );
   }

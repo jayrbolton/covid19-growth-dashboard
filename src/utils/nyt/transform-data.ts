@@ -3,8 +3,10 @@ import { rowToArray } from "../csv-parse";
 import { percent, getPercentGrowth, getGrowthRate } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
 import { sortByStat } from "../sort-data";
+import { slugify } from "../slugify";
 
 const LABELS = ["Confirmed cases, cumulative", "Deaths", "Mortality rate"];
+const LIMIT = 64;
 
 export function transformData(resp: string): DashboardData {
   const textRows = resp.split("\n");
@@ -16,6 +18,9 @@ export function transformData(resp: string): DashboardData {
     const id = [row[1], row[2], row[3]].join(":");
     if (!(id in agg)) {
       agg[id] = [];
+    }
+    if (agg[id].length === LIMIT) {
+      continue;
     }
     agg[id].push(row);
   }
@@ -51,6 +56,7 @@ export function transformData(resp: string): DashboardData {
     ];
     const entry = {
       location,
+      id: slugify(location),
       stats,
     };
     ret.entries.push(entry);

@@ -115,7 +115,7 @@ function renderXScale(timeline: Timeline) {
         className="absolute white-80 f6"
         style={{ left: perc + "%", top: "0px" }}
       >
-        {formatNumber(tick)}
+        {formatNumber({ num: tick })}
       </div>
     );
   });
@@ -174,7 +174,7 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
           }}
         >
           <div
-            title={`${formatNumber(currentActive)} active cases`}
+            title={`${formatNumber({ num: currentActive })} active cases`}
             className="f6 b w-50"
             style={{
               height: barHeight,
@@ -183,7 +183,7 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
             }}
           ></div>
           <div
-            title={`${formatNumber(currentRecovered)} recovered`}
+            title={`${formatNumber({ num: currentRecovered })} recovered`}
             className="f6 b w-50"
             style={{
               height: barHeight,
@@ -196,7 +196,7 @@ function renderDataRow(region: TimelineRegion, idx: number, daysAgo: number) {
           className="dib ml1 absolute"
           style={{ left: totalWidth + "%", top: 0, transition: "left 0.25s" }}
         >
-          {formatNumber(currentConfirmed || 0)}
+          {formatNumber({ num: currentConfirmed || 0 })}
         </div>
       </div>
     </div>

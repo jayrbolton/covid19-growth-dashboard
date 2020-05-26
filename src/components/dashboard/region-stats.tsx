@@ -6,6 +6,7 @@ import { h, Component, Fragment } from "preact";
 import { formatNumber } from "../../utils/formatting";
 import { TimeSeriesBars } from "./time-series";
 import { DashboardData, DashboardEntry } from "../../types/dashboard";
+import { queryToObj, updateURLQuery } from "../../utils/url";
 import "./style.css";
 
 // Number of days of stats to show
@@ -29,6 +30,12 @@ export class RegionStats extends Component<Props, State> {
 
   handleClickStat(entry, statIdx) {
     this.props.onSelectStat(entry, statIdx);
+  }
+
+  handleClickRegion(region) {
+    const query = updateURLQuery({ r: region.id });
+    window._history.push({ search: query });
+    window.scrollTo(0, 0);
   }
 
   render() {
@@ -74,12 +81,19 @@ function renderEntry(regionStats, entry) {
       key={entry.location}
       className="ph3 pv2 pb1 region-stats-row bb b--white-20 bg-near-black"
     >
-      <h2 className="f4 mv2 b">{entry.location}</h2>
+      <h2 className="f4 b ma0 mv2">
+        <a
+          onClick={() => regionStats.handleClickRegion(entry)}
+          className="light-blue pointer dim"
+        >
+          {entry.location}
+        </a>
+      </h2>
       <div
         className="w-100"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, 15.25rem)",
+          gridTemplateColumns: "repeat(auto-fill, 16rem)",
           gridColumnGap: "0.65rem",
         }}
       >
@@ -115,7 +129,6 @@ function renderStat(regionStats, stat, entry, idx) {
       </div>
       <TimeSeriesBars
         daysAgo={daysAgo}
-        timeRange={TIME_RANGE}
         statIdx={idx}
         series={stat.timeSeriesWindow}
         isPercentage={stat.isPercentage}
@@ -127,8 +140,11 @@ function renderStat(regionStats, stat, entry, idx) {
         <div className="dib white-80 f6">Average daily growth:</div>
         <div>
           <div className="dib b white-90 relative">
-            {stat.timeSeriesWindow.percentGrowth > 0 ? "+" : ""}
-            {formatNumber(stat.timeSeriesWindow.percentGrowth)}%
+            {formatNumber({
+              num: stat.timeSeriesWindow.percentGrowth,
+              showSign: true,
+            })}
+            %
           </div>
         </div>
       </div>
