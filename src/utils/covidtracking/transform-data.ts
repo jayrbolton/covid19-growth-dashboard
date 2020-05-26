@@ -7,7 +7,7 @@ import { DashboardData, EntryStat } from "../../types/dashboard";
 import { genericSort, sortByStat } from "../sort-data";
 import { percent } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
-import { slugify } from '../slugify';
+import { slugify } from "../slugify";
 
 export function transformData(resp: string): DashboardData {
   const data = JSON.parse(resp)
@@ -78,7 +78,7 @@ function computeUSTotals(data) {
 }
 
 // Generic function to create an EntryStat object for some series
-function stat(label, series, isPercentage = false): EntryStat {
+function stat(label, series, isPercentage = false) {
   const stat = {
     label,
     isPercentage,

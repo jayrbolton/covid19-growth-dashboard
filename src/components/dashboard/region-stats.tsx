@@ -82,7 +82,12 @@ function renderEntry(regionStats, entry) {
       className="ph3 pv2 pb1 region-stats-row bb b--white-20 bg-near-black"
     >
       <h2 className="f4 b ma0 mv2">
-        <a onClick={() => regionStats.handleClickRegion(entry)} className="light-blue pointer dim">{entry.location}</a>
+        <a
+          onClick={() => regionStats.handleClickRegion(entry)}
+          className="light-blue pointer dim"
+        >
+          {entry.location}
+        </a>
       </h2>
       <div
         className="w-100"
@@ -135,8 +140,11 @@ function renderStat(regionStats, stat, entry, idx) {
         <div className="dib white-80 f6">Average daily growth:</div>
         <div>
           <div className="dib b white-90 relative">
-            {stat.timeSeriesWindow.percentGrowth > 0 ? "+" : ""}
-            {formatNumber(stat.timeSeriesWindow.percentGrowth)}%
+            {formatNumber({
+              num: stat.timeSeriesWindow.percentGrowth,
+              showSign: true,
+            })}
+            %
           </div>
         </div>
       </div>

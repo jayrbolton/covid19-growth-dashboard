@@ -39,8 +39,11 @@ export interface EntryStat {
   longWindow?: {
     values: Array<number>;
     percentages: Array<number>;
-    percentGrowth: number;
-  }
+    // Average percent change over several time periods
+    percentGrowths: Array<number>;
+    // Average increase or decrease over several time periods
+    change: Array<number>;
+  };
   // Is this stat marked for comparison/graphing
   isComparing?: boolean;
 }

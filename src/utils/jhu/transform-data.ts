@@ -7,7 +7,7 @@ import { percent } from "../math";
 import { setTimeSeriesWindow } from "../transform-data";
 import { sortByStat } from "../sort-data";
 import { DashboardData } from "../../types/dashboard";
-import { slugify } from '../slugify';
+import { slugify } from "../slugify";
 
 const LABELS = [
   "Confirmed cases, cumulative",
@@ -17,6 +17,7 @@ const LABELS = [
   "Mortality rate",
   "Percent recovered",
 ];
+const LIMIT = 64;
 
 // Parse the CSV headers and rows into a mapping of location to arrays of metrics
 export function parseData(sourceData) {
@@ -36,7 +37,8 @@ export function parseData(sourceData) {
         return;
       }
       const location = row[JHU_SOURCE.countryIdx];
-      const timeSeries = row.slice(JHU_SOURCE.seriesIdx);
+      let timeSeries = row.slice(JHU_SOURCE.seriesIdx);
+      timeSeries = timeSeries.slice(timeSeries.length - LIMIT);
       if (location in agg) {
         if (key in agg[location].cases) {
           const cases = agg[location].cases[key];
@@ -153,7 +155,7 @@ function insertAggregations(rows) {
   const worldwide = {
     aggregate: true,
     location: "Worldwide",
-    id: 'worldwide',
+    id: "worldwide",
     cases: {},
   };
   const totalCases = {};

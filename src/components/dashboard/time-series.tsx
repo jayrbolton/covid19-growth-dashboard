@@ -65,7 +65,7 @@ export class TimeSeriesBars extends Component<Props, State> {
       >
         <div>{date}</div>
         <div>
-          {formatNumber(val)}
+          {formatNumber({ num: val })}
           <span className="white-80">{isPercentage ? "%" : ""}</span>
         </div>
       </div>
@@ -80,7 +80,7 @@ export class TimeSeriesBars extends Component<Props, State> {
     const color = vals(VIZ_COLORS)[this.props.statIdx];
     return (
       <div
-        title={formatNumber(val)}
+        title={formatNumber({ num: val })}
         style={{
           width,
           background: color,
@@ -99,10 +99,15 @@ export class TimeSeriesBars extends Component<Props, State> {
         <div className="flex justify-between">
           <div
             className="flex flex-column-reverse justify-between f6 pr2"
-            style={{ minWidth: '9.25rem' }}
+            style={{ minWidth: "9.25rem" }}
           >
             {values.map((val, idx) =>
-              this.renderBarText(val, idx, this.props.isPercentage, values.length)
+              this.renderBarText(
+                val,
+                idx,
+                this.props.isPercentage,
+                values.length
+              )
             )}
           </div>
           <div

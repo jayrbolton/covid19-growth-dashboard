@@ -8,6 +8,8 @@ export const UI_SETTINGS = {
   timeTravelMaxRange: 50,
   // Background color for button to open graph
   graphButtonBg: "#137752",
+  // Different time periods in days for average percent growth and total change
+  detailsAverages: [3, 7, 14, 21, 49],
 };
 
 // Chart.js metrics comparison chart defaults

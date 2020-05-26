@@ -30,6 +30,23 @@ export function getPercentGrowth(series: Array<number>): number {
   return Math.round(ret * 100) / 100;
 }
 
+export function getAvgChange(series: Array<number>): number {
+  const nonulls = series.filter((val) => val !== null && !isNaN(val));
+  if (!nonulls.length) {
+    return 0;
+  }
+  // Differences between today and yesterday
+  const diffs = nonulls.map((val, idx) => {
+    if (idx === 0) {
+      return 0;
+    }
+    return val - nonulls[idx - 1];
+  });
+  // Return average of diffs
+  const ret = diffs.reduce((sum, n) => sum + n, 0) / diffs.length;
+  return Math.round(ret * 100) / 100;
+}
+
 // Get the exponential growth rate of a time series
 export function getGrowthRate(series) {
   const first = series.find((n) => n > 0);
@@ -55,7 +72,7 @@ export function graphAxisTicks(end: number) {
   const incr = nearestTen / 10;
   const ret = [];
   let tick = 0;
-  while (tick < end) {
+  while (tick < end - incr) {
     const perc = percent(tick, end);
     ret.push([tick, perc]);
     tick += incr;

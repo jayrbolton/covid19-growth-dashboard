@@ -45,7 +45,7 @@ export class App extends Component<Props, State> {
 
   // Clicking a top-level page nav changes url params and history
   handleClickNavItem(page: Page) {
-    const query = updateURLQuery({ p: page });
+    const query = updateURLQuery({ p: page, r: null });
     window._history.push({ search: query });
   }
 

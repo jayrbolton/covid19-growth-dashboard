@@ -7,9 +7,9 @@ import { App } from "./components/app";
 import { History, createBrowserHistory } from "history";
 
 declare global {
-    interface Window {
-      _history: History;
-    }
+  interface Window {
+    _history: History;
+  }
 }
 
 // History object for managing page navigation via url params

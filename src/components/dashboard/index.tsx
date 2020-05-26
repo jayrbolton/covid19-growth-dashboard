@@ -7,7 +7,7 @@ import { Filters } from "./filters";
 import { Sorts } from "./sorts";
 import { Button } from "../generic/button";
 import { ShowIf } from "../generic/show-if";
-import { RegionDetails } from './region-details';
+import { RegionDetails } from "./region-details";
 // Utils
 import { filterLocation } from "../../utils/filter-data";
 import { sortByStat } from "../../utils/sort-data";
@@ -98,7 +98,9 @@ export class Dashboard extends Component<Props, State> {
       const regionID = queryObj.r;
       if (regionID && this.state.data) {
         this.setState({
-          selectedRegion: this.state.data.entries.find(e => e.id === regionID)
+          selectedRegion: this.state.data.entries.find(
+            (e) => e.id === regionID
+          ),
         });
       } else {
         this.setState({ selectedRegion: null });
@@ -112,7 +114,7 @@ export class Dashboard extends Component<Props, State> {
       const query = queryToObj();
       let selectedRegion = null;
       if (query.r) {
-        selectedRegion = data.entries.find(e => e.id === query.r);
+        selectedRegion = data.entries.find((e) => e.id === query.r);
       }
       this.setState({
         data,
@@ -211,7 +213,7 @@ export class Dashboard extends Component<Props, State> {
       return <p className="white sans-serif ph3 pv4">Loading data...</p>;
     }
     if (this.state.selectedRegion) {
-      return <RegionDetails entry={this.state.selectedRegion} />
+      return <RegionDetails entry={this.state.selectedRegion} />;
     }
     const selectedCount = this.state.selectedCount;
     let selectedText = "Select some metrics to graph and compare";
