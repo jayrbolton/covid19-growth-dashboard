@@ -65,7 +65,11 @@ export function percent(n, total) {
 
 // Return an array of pairs of tick values and scale percentages for a range from 0 to `end`
 // Used in the metric comparison line chart in the Dashboard component (using Chart.js)
-export function graphAxisTicks(end: number, round: number = 100000, ticks: number = 10) {
+export function graphAxisTicks(
+  end: number,
+  round: number = 100000,
+  ticks: number = 10
+) {
   const incr = Math.round(end / ticks / round) * round;
   const ret = [];
   let tick = 0;
