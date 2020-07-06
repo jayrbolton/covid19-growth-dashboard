@@ -95,7 +95,7 @@ export class Timeline extends Component<Props, State> {
 
 function renderXScale(timeline: Timeline) {
   const max = timeline.state.data.maxConfirmed;
-  const ticks = graphAxisTicks(max);
+  const ticks = graphAxisTicks(max, 100000, 15);
   const tickElems = ticks.map(([tick, perc], idx) => {
     return (
       <div
@@ -115,7 +115,7 @@ function renderXScale(timeline: Timeline) {
         className="absolute white-80 f6"
         style={{ left: perc + "%", top: "0px" }}
       >
-        {formatNumber({ num: tick })}
+        {formatNumber({ num: tick, roundThousands: true, roundMillions: true })}
       </div>
     );
   });

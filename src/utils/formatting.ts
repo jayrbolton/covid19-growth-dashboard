@@ -2,6 +2,8 @@ interface FormatNumberParams {
   num?: number | null;
   // Whether to truncate even thousands and append "k"
   roundThousands?: boolean;
+  // Whether to truncate millions and append "m"
+  roundMillions?: boolean;
   // Whether to show percentage symbol
   percentage?: boolean;
   // Whether to show positive sign (negative is always shown)
@@ -13,6 +15,7 @@ interface FormatNumberParams {
 export function formatNumber({
   num = null,
   roundThousands = false,
+  roundMillions = false,
   percentage = false,
   showSign = false,
 }: FormatNumberParams): string {
@@ -22,8 +25,16 @@ export function formatNumber({
     // In our data sources, null values are interpreted as "Unknown"
     return "?";
   }
-  if (roundThousands && num > 0 && num % 1000 === 0) {
-    return num / 1000 + "k";
+  if (roundMillions && num >= 1000000) {
+    const modm = num % 1000000;
+    const modmodm = modm % 100000;
+    if (modm === 0 || modmodm === 0) {
+      return num / 1000000 + "m";
+    }
+  } else if (roundThousands && num > 0) {
+    if (num % 1000 === 0) {
+      return num / 1000 + "k";
+    }
   }
   let ret = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   if (percentage) {
