@@ -27,7 +27,7 @@ export const JHU_SOURCE = {
 
 // Covidtracking.com US states source
 export const COVIDTRACKING_SOURCE = {
-  sourceUrl: "https://covidtracking.com/api/v1/states/daily.json",
+  sourceUrl: "https://api.covidtracking.com/v1/states/daily.json",
   homeUrl: "https://covidtracking.com/about-tracker/",
 };
 
