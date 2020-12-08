@@ -63,11 +63,9 @@ export class TimeSeriesBars extends Component<Props, State> {
     // Data
     const date = DATES[DATES.length - len - this.props.daysAgo + idx];
     return (
-      <div
-        className="flex justify-between items-center"
-      >
-        <div style={{width: "4.7rem"}}>{date}</div>
-        <div style={{flexGrow: '1'}}>
+      <div className="flex justify-between items-center">
+        <div style={{ width: "4.7rem" }}>{date}</div>
+        <div style={{ flexGrow: "1" }}>
           <div
             title={formatNumber({ num: val })}
             style={{
@@ -78,12 +76,13 @@ export class TimeSeriesBars extends Component<Props, State> {
             }}
           >
             <span
-              className='dib'
+              className="dib"
               style={{
-                fontSize, fontWeight,
+                fontSize,
+                fontWeight,
                 color: textColor,
-                textShadow: 'black 0px 0px 3px',
-                lineHeight: '1rem',
+                textShadow: "black 0px 0px 3px",
+                lineHeight: "1rem",
                 margin,
               }}
             >
@@ -105,7 +104,13 @@ export class TimeSeriesBars extends Component<Props, State> {
           style={{ minWidth: "4.7rem" }}
         >
           {values.map((val, idx) =>
-            this.renderBar(val, percentages[idx], this.props.isPercentage, idx, values.length)
+            this.renderBar(
+              val,
+              percentages[idx],
+              this.props.isPercentage,
+              idx,
+              values.length
+            )
           )}
         </div>
       </div>
