@@ -1,6 +1,6 @@
 export const UI_SETTINGS = {
   // How many days to show in the time series for each metric
-  timeSeriesLen: 14,
+  timeSeriesLen: 12,
   longSeriesLen: 50,
   // How many regions to show on each page
   pageLen: 10,
