@@ -19,8 +19,6 @@ interface Props {
 
 interface State {}
 
-const ROW_HEIGHT = "1rem";
-const ROW_HEIGHT_FIRST = "1.25rem";
 const MONTHS = [
   "Jan",
   "Feb",
@@ -51,44 +49,49 @@ export class TimeSeriesBars extends Component<Props, State> {
     this.state = {};
   }
 
-  renderBarText(val, idx, isPercentage, len) {
-    const isLast = idx === len - 1;
-    const height = isLast ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
-    const fontSize = isLast ? "1rem" : "inherit";
-    const fontWeight = isLast ? "bold" : "normal";
-    const color = isLast ? "white" : "#d8d8d8";
-    const date = DATES[DATES.length - len - this.props.daysAgo + idx];
-    return (
-      <div
-        className="flex justify-between"
-        style={{ height, fontSize, fontWeight, color }}
-      >
-        <div>{date}</div>
-        <div>
-          {formatNumber({ num: val })}
-          <span className="white-80">{isPercentage ? "%" : ""}</span>
-        </div>
-      </div>
-    );
-  }
-
-  renderBar(val, percentage, idx, len) {
+  renderBar(val, percentage, isPercentage, idx, len) {
     const border = "2px solid #333";
     const width =
       percentage === null || isNaN(percentage) ? "0%" : percentage + "%";
-    const height = idx === len - 1 ? ROW_HEIGHT_FIRST : ROW_HEIGHT;
     const color = vals(VIZ_COLORS)[this.props.statIdx];
+    // Text styling
+    const isLast = idx === len - 1;
+    const fontSize = "0.85rem";
+    const fontWeight = "bold";
+    const textColor = "white";
+    const margin = "0.075rem 0.35rem 0.125rem 0.35rem";
+    // Data
+    const date = DATES[DATES.length - len - this.props.daysAgo + idx];
     return (
-      <div
-        title={formatNumber({ num: val })}
-        style={{
-          width,
-          background: color,
-          height,
-          borderTop: border,
-          borderBottom: border,
-        }}
-      ></div>
+      <div className="flex justify-between items-center">
+        <div style={{ width: "4.7rem" }}>{date}</div>
+        <div style={{ flexGrow: "1" }}>
+          <div
+            title={formatNumber({ num: val })}
+            style={{
+              width,
+              background: color,
+              borderTop: border,
+              borderBottom: border,
+            }}
+          >
+            <span
+              className="dib"
+              style={{
+                fontSize,
+                fontWeight,
+                color: textColor,
+                textShadow: "black 0px 0px 3px",
+                lineHeight: "1rem",
+                margin,
+              }}
+            >
+              {formatNumber({ num: val })}
+              <span className="white-80">{isPercentage ? "%" : ""}</span>
+            </span>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -96,28 +99,19 @@ export class TimeSeriesBars extends Component<Props, State> {
     const { values, percentages } = this.props.series;
     return (
       <div className="pa2" style={{ background: "rgb(40, 40, 40)" }}>
-        <div className="flex justify-between">
-          <div
-            className="flex flex-column-reverse justify-between f6 pr2"
-            style={{ minWidth: "9.25rem" }}
-          >
-            {values.map((val, idx) =>
-              this.renderBarText(
-                val,
-                idx,
-                this.props.isPercentage,
-                values.length
-              )
-            )}
-          </div>
-          <div
-            className="flex flex-column-reverse justify-between"
-            style={{ width: "100%" }}
-          >
-            {values.map((val, idx) =>
-              this.renderBar(val, percentages[idx], idx, values.length)
-            )}
-          </div>
+        <div
+          className="flex flex-column-reverse justify-between f6 pr2"
+          style={{ minWidth: "4.7rem" }}
+        >
+          {values.map((val, idx) =>
+            this.renderBar(
+              val,
+              percentages[idx],
+              this.props.isPercentage,
+              idx,
+              values.length
+            )
+          )}
         </div>
       </div>
     );
