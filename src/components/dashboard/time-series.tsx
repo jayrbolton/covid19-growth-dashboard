@@ -56,10 +56,10 @@ export class TimeSeriesBars extends Component<Props, State> {
     const color = vals(VIZ_COLORS)[this.props.statIdx];
     // Text styling
     const isLast = idx === len - 1;
-    const fontSize = "0.85rem";
+    const fontSize = "1rem";
     const fontWeight = "bold";
     const textColor = "white";
-    const margin = "0.075rem 0.35rem 0.125rem 0.35rem";
+    const margin = "0.1rem 0.35rem 0.2rem 0.35rem";
     // Data
     const date = DATES[DATES.length - len - this.props.daysAgo + idx];
     return (
@@ -81,7 +81,7 @@ export class TimeSeriesBars extends Component<Props, State> {
                 fontSize,
                 fontWeight,
                 color: textColor,
-                textShadow: "black 0px 0px 3px",
+                textShadow: "black 0px 0px 2px",
                 lineHeight: "1rem",
                 margin,
               }}
