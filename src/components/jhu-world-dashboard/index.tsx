@@ -28,6 +28,9 @@ export class JHUWorldDashboard extends Component<Props, State> {
             </a>
             .
           </p>
+          <p className='b'>
+            Note that JHU is no longer tracking recovery metrics for the US.
+          </p>
         </div>
         <Dashboard fetchSourceData={fetchSourceData} />
       </Fragment>

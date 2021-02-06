@@ -81,7 +81,7 @@ export class TimeSeriesBars extends Component<Props, State> {
                 fontSize,
                 fontWeight,
                 color: textColor,
-                textShadow: "black 0px 0px 2px",
+                textShadow: "black 0px 0px 1px",
                 lineHeight: "1rem",
                 margin,
               }}
