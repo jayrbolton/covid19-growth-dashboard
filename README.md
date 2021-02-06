@@ -1,5 +1,7 @@
 # COVID-19 Growth Dashboard
 
+> Note: The COVID Tracking Project will no longer be collecting data starting March, 2021. Coinciding with this, I will bring the site down at the same time while keeping the code archived and available.
+
 [Visit the website here](https://www.covid19tracking.org).
 
 A dashboard to visualize and examine the activity of COVID-19 around the world with support for multiple data sources.
